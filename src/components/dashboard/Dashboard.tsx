@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import StatsCard from './StatsCard';
+import AnalyticsCharts from './AnalyticsCharts';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 import { 
   ClipboardCheck, 
@@ -11,7 +12,8 @@ import {
   XCircle, 
   CheckCircle,
   Search,
-  FlaskConical
+  FlaskConical,
+  BarChart3
 } from 'lucide-react';
 import { UserRole, ValidationFilters as Filters, Validation, EquipmentType } from '@/types/validation';
 import { getValidationStatus, formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
@@ -27,7 +29,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
   const [filters, setFilters] = useState<Filters>({});
   const [validations, setValidations] = useState<Validation[]>([]);
 
-  // Mock data - replace with actual API calls
+  // Mock data with new statuses
   const mockValidations: Validation[] = [
     {
       id: '1',
@@ -59,7 +61,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       validation_type: 'procesos',
       issue_date: '2024-06-15',
       expiry_date: '2025-02-15',
-      status: 'proximo_vencer',
+      status: 'en_validacion',
       created_by: 'user1',
       updated_by: 'user1',
       created_at: '2024-06-15T00:00:00Z',
@@ -81,7 +83,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       validation_type: 'limpieza',
       issue_date: '2023-01-10',
       expiry_date: '2024-12-10',
-      status: 'vencido',
+      status: 'por_revalidar',
       created_by: 'user1',
       updated_by: 'user1',
       created_at: '2023-01-10T00:00:00Z',
@@ -95,16 +97,37 @@ const Dashboard = ({ userRole }: DashboardProps) => {
         updated_at: '2023-01-10T00:00:00Z',
       }
     },
+    {
+      id: '4',
+      product_id: '4',
+      validation_code: 'VAL-004-2024',
+      equipment_type: 'NIR',
+      validation_type: 'metodos_analiticos',
+      issue_date: '2024-03-01',
+      expiry_date: '2025-03-01',
+      status: 'primera_revision',
+      created_by: 'user1',
+      updated_by: 'user1',
+      created_at: '2024-03-01T00:00:00Z',
+      updated_at: '2024-03-01T00:00:00Z',
+      product: {
+        id: '4',
+        code: 'PT-003',
+        name: 'Aspirina 100mg',
+        type: 'producto_terminado',
+        created_at: '2024-03-01T00:00:00Z',
+        updated_at: '2024-03-01T00:00:00Z',
+      }
+    },
   ];
 
   useEffect(() => {
-    // Mock data load - replace with actual API call
     setValidations(mockValidations);
   }, []);
 
   const stats = {
     total: validations.length,
-    validated: validations.filter(v => v.status === 'validado').length,
+    validated: validations.filter(v => v.status === 'validado' || v.status === 'primera_revision' || v.status === 'segunda_revision').length,
     expiring: validations.filter(v => v.status === 'proximo_vencer').length,
     expired: validations.filter(v => v.status === 'vencido').length,
   };
@@ -121,6 +144,14 @@ const Dashboard = ({ userRole }: DashboardProps) => {
         return <Badge className="bg-red-100 text-red-800">{t('status.vencido')}</Badge>;
       case 'en_revalidacion':
         return <Badge className="bg-blue-100 text-blue-800">{t('status.revalidacion')}</Badge>;
+      case 'en_validacion':
+        return <Badge className="bg-purple-100 text-purple-800">{t('status.en_validacion')}</Badge>;
+      case 'por_revalidar':
+        return <Badge className="bg-orange-100 text-orange-800">{t('status.por_revalidar')}</Badge>;
+      case 'primera_revision':
+        return <Badge className="bg-cyan-100 text-cyan-800">{t('status.primera_revision')}</Badge>;
+      case 'segunda_revision':
+        return <Badge className="bg-indigo-100 text-indigo-800">{t('status.segunda_revision')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -172,6 +203,19 @@ const Dashboard = ({ userRole }: DashboardProps) => {
           variant="danger"
         />
       </div>
+
+      {/* Analytics Charts */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <BarChart3 className="mr-2 h-5 w-5" />
+            {t('dashboard.analytics')}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <AnalyticsCharts validations={validations} />
+        </CardContent>
+      </Card>
 
       {/* Quick Search */}
       <Card>

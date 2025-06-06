@@ -10,6 +10,7 @@ import {
   FlaskConical
 } from 'lucide-react';
 import { UserRole } from '@/types/validation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface SidebarProps {
   activeTab: string;
@@ -22,40 +23,42 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps) => {
+  const { t } = useLanguage();
+
   const menuItems = [
     {
       id: 'dashboard',
-      label: 'Dashboard',
+      label: t('menu.dashboard'),
       icon: LayoutDashboard,
       roles: ['administrador', 'analista', 'visualizador'],
     },
     {
       id: 'products',
-      label: 'Productos',
+      label: t('menu.products'),
       icon: Package,
       roles: ['administrador', 'analista', 'visualizador'],
     },
     {
       id: 'validations',
-      label: 'Validaciones',
+      label: t('menu.validations'),
       icon: ClipboardCheck,
       roles: ['administrador', 'analista', 'visualizador'],
     },
     {
       id: 'equipments',
-      label: 'Equipos Analíticos',
+      label: t('menu.equipments'),
       icon: FlaskConical,
       roles: ['administrador', 'analista', 'visualizador'],
     },
     {
       id: 'users',
-      label: 'Usuarios',
+      label: t('menu.users'),
       icon: Users,
       roles: ['administrador'],
     },
     {
       id: 'settings',
-      label: 'Configuración',
+      label: t('menu.settings'),
       icon: Settings,
       roles: ['administrador'],
     },

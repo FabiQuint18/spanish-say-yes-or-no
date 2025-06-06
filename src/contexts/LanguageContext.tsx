@@ -24,6 +24,14 @@ const translations = {
     'login.button': 'Iniciar sesión',
     'login.loading': 'Iniciando sesión...',
     
+    // Sidebar Menu
+    'menu.dashboard': 'Dashboard',
+    'menu.products': 'Productos',
+    'menu.validations': 'Validaciones',
+    'menu.equipments': 'Equipos Analíticos',
+    'menu.users': 'Usuarios',
+    'menu.settings': 'Configuración',
+    
     // Stats
     'stats.total': 'Total Validaciones',
     'stats.validated': 'Validadas',
@@ -57,6 +65,10 @@ const translations = {
     'status.proximo': 'Próximo a Vencer',
     'status.vencido': 'Vencido',
     'status.revalidacion': 'En Revalidación',
+    'status.en_validacion': 'En Validación',
+    'status.por_revalidar': 'Por Revalidar',
+    'status.primera_revision': 'Primera Revisión',
+    'status.segunda_revision': 'Segunda Revisión',
     
     // Dashboard
     'dashboard.quickSearch': 'Búsqueda Rápida',
@@ -65,6 +77,10 @@ const translations = {
     'dashboard.equipment': 'Equipo',
     'dashboard.expires': 'Vence',
     'dashboard.days': 'días',
+    'dashboard.analytics': 'Análisis de Validaciones',
+    'dashboard.byType': 'Por Tipo de Validación',
+    'dashboard.byStatus': 'Por Estado',
+    'dashboard.byEquipment': 'Por Equipo',
     
     // Common
     'select.placeholder': 'Seleccionar',
@@ -82,6 +98,14 @@ const translations = {
     'login.password': 'Password',
     'login.button': 'Sign In',
     'login.loading': 'Signing in...',
+    
+    // Sidebar Menu
+    'menu.dashboard': 'Dashboard',
+    'menu.products': 'Products',
+    'menu.validations': 'Validations',
+    'menu.equipments': 'Analytical Equipment',
+    'menu.users': 'Users',
+    'menu.settings': 'Settings',
     
     // Stats
     'stats.total': 'Total Validations',
@@ -116,6 +140,10 @@ const translations = {
     'status.proximo': 'Expiring Soon',
     'status.vencido': 'Expired',
     'status.revalidacion': 'Under Revalidation',
+    'status.en_validacion': 'Under Validation',
+    'status.por_revalidar': 'Pending Revalidation',
+    'status.primera_revision': 'First Review',
+    'status.segunda_revision': 'Second Review',
     
     // Dashboard
     'dashboard.quickSearch': 'Quick Search',
@@ -124,6 +152,10 @@ const translations = {
     'dashboard.equipment': 'Equipment',
     'dashboard.expires': 'Expires',
     'dashboard.days': 'days',
+    'dashboard.analytics': 'Validation Analytics',
+    'dashboard.byType': 'By Validation Type',
+    'dashboard.byStatus': 'By Status',
+    'dashboard.byEquipment': 'By Equipment',
     
     // Common
     'select.placeholder': 'Select',
@@ -141,6 +173,14 @@ const translations = {
     'login.password': 'Senha',
     'login.button': 'Entrar',
     'login.loading': 'Entrando...',
+    
+    // Sidebar Menu
+    'menu.dashboard': 'Dashboard',
+    'menu.products': 'Produtos',
+    'menu.validations': 'Validações',
+    'menu.equipments': 'Equipamentos Analíticos',
+    'menu.users': 'Usuários',
+    'menu.settings': 'Configurações',
     
     // Stats
     'stats.total': 'Total de Validações',
@@ -175,6 +215,10 @@ const translations = {
     'status.proximo': 'Próximo ao Vencimento',
     'status.vencido': 'Vencido',
     'status.revalidacion': 'Em Revalidação',
+    'status.en_validacion': 'Em Validação',
+    'status.por_revalidar': 'Pendente de Revalidação',
+    'status.primera_revision': 'Primeira Revisão',
+    'status.segunda_revision': 'Segunda Revisão',
     
     // Dashboard
     'dashboard.quickSearch': 'Busca Rápida',
@@ -183,6 +227,10 @@ const translations = {
     'dashboard.equipment': 'Equipamento',
     'dashboard.expires': 'Vence',
     'dashboard.days': 'dias',
+    'dashboard.analytics': 'Análise de Validações',
+    'dashboard.byType': 'Por Tipo de Validação',
+    'dashboard.byStatus': 'Por Status',
+    'dashboard.byEquipment': 'Por Equipamento',
     
     // Common
     'select.placeholder': 'Selecionar',

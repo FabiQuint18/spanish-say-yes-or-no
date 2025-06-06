@@ -1,9 +1,8 @@
-
 export type ProductType = 'producto_terminado' | 'materia_prima' | 'material_envase';
 
 export type EquipmentType = 'HPLC' | 'GC' | 'UV-VIS' | 'NIR' | 'RAMAN' | 'IR' | 'AA' | 'Karl Fischer';
 
-export type ValidationStatus = 'validado' | 'proximo_vencer' | 'vencido' | 'en_revalidacion';
+export type ValidationStatus = 'validado' | 'proximo_vencer' | 'vencido' | 'en_revalidacion' | 'en_validacion' | 'por_revalidar' | 'primera_revision' | 'segunda_revision';
 
 export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos';
 
