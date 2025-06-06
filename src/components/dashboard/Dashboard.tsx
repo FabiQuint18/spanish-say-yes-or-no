@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import StatsCard from './StatsCard';
 import AnalyticsCharts from './AnalyticsCharts';
+import ExportOptions from './ExportOptions';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 import { 
   ClipboardCheck, 
@@ -203,6 +204,9 @@ const Dashboard = ({ userRole }: DashboardProps) => {
           variant="danger"
         />
       </div>
+
+      {/* Export Options */}
+      <ExportOptions validations={validations} />
 
       {/* Analytics Charts */}
       <Card>
