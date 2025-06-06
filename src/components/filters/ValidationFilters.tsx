@@ -1,11 +1,13 @@
 
+import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, X } from 'lucide-react';
-import { ValidationFilters as Filters, ProductType, EquipmentType, ValidationStatus } from '@/types/validation';
+import { ValidationFilters as Filters, ProductType, EquipmentType, ValidationStatus, ValidationType } from '@/types/validation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ValidationFiltersProps {
   filters: Filters;
@@ -14,10 +16,18 @@ interface ValidationFiltersProps {
 }
 
 const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: ValidationFiltersProps) => {
+  const { t } = useLanguage();
+
   const productTypes: { value: ProductType; label: string }[] = [
-    { value: 'producto_terminado', label: 'Producto Terminado' },
-    { value: 'materia_prima', label: 'Materia Prima' },
-    { value: 'material_envase', label: 'Material de Envase' },
+    { value: 'producto_terminado', label: t('product.terminado') },
+    { value: 'materia_prima', label: t('product.materia') },
+    { value: 'material_envase', label: t('product.envase') },
+  ];
+
+  const validationTypes: { value: ValidationType; label: string }[] = [
+    { value: 'procesos', label: t('validation.procesos') },
+    { value: 'limpieza', label: t('validation.limpieza') },
+    { value: 'metodos_analiticos', label: t('validation.metodos') },
   ];
 
   const equipmentTypes: { value: EquipmentType; label: string }[] = [
@@ -32,10 +42,10 @@ const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: Validat
   ];
 
   const statusOptions: { value: ValidationStatus; label: string }[] = [
-    { value: 'validado', label: 'Validado' },
-    { value: 'proximo_vencer', label: 'Próximo a Vencer' },
-    { value: 'vencido', label: 'Vencido' },
-    { value: 'en_revalidacion', label: 'En Revalidación' },
+    { value: 'validado', label: t('status.validado') },
+    { value: 'proximo_vencer', label: t('status.proximo') },
+    { value: 'vencido', label: t('status.vencido') },
+    { value: 'en_revalidacion', label: t('status.revalidacion') },
   ];
 
   const updateFilter = (key: keyof Filters, value: string) => {
@@ -53,12 +63,12 @@ const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: Validat
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center">
             <Search className="mr-2 h-5 w-5" />
-            Filtros de Búsqueda
+            {t('filters.title')}
           </div>
           {hasActiveFilters && (
             <Button variant="outline" size="sm" onClick={onClearFilters}>
               <X className="mr-2 h-4 w-4" />
-              Limpiar Filtros
+              {t('filters.clear')}
             </Button>
           )}
         </CardTitle>
@@ -66,10 +76,10 @@ const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: Validat
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <Label htmlFor="productType">Tipo de Producto</Label>
+            <Label htmlFor="productType">{t('filters.productType')}</Label>
             <Select value={filters.productType || ''} onValueChange={(value) => updateFilter('productType', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar tipo" />
+                <SelectValue placeholder={t('select.placeholder')} />
               </SelectTrigger>
               <SelectContent>
                 {productTypes.map((type) => (
@@ -82,10 +92,26 @@ const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: Validat
           </div>
 
           <div>
-            <Label htmlFor="equipmentType">Equipo Analítico</Label>
+            <Label htmlFor="validationType">{t('filters.validationType')}</Label>
+            <Select value={filters.validationType || ''} onValueChange={(value) => updateFilter('validationType', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder={t('select.placeholder')} />
+              </SelectTrigger>
+              <SelectContent>
+                {validationTypes.map((type) => (
+                  <SelectItem key={type.value} value={type.value}>
+                    {type.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="equipmentType">{t('filters.equipmentType')}</Label>
             <Select value={filters.equipmentType || ''} onValueChange={(value) => updateFilter('equipmentType', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar equipo" />
+                <SelectValue placeholder={t('select.placeholder')} />
               </SelectTrigger>
               <SelectContent>
                 {equipmentTypes.map((equipment) => (
@@ -98,10 +124,10 @@ const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: Validat
           </div>
 
           <div>
-            <Label htmlFor="status">Estado</Label>
+            <Label htmlFor="status">{t('filters.status')}</Label>
             <Select value={filters.status || ''} onValueChange={(value) => updateFilter('status', value)}>
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar estado" />
+                <SelectValue placeholder={t('select.placeholder')} />
               </SelectTrigger>
               <SelectContent>
                 {statusOptions.map((status) => (
@@ -114,27 +140,27 @@ const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: Validat
           </div>
 
           <div>
-            <Label htmlFor="productCode">Código de Producto</Label>
+            <Label htmlFor="productCode">{t('filters.productCode')}</Label>
             <Input
               id="productCode"
-              placeholder="Buscar por código"
+              placeholder={t('search.placeholder')}
               value={filters.productCode || ''}
               onChange={(e) => updateFilter('productCode', e.target.value)}
             />
           </div>
 
           <div>
-            <Label htmlFor="validationCode">Código de Validación</Label>
+            <Label htmlFor="validationCode">{t('filters.validationCode')}</Label>
             <Input
               id="validationCode"
-              placeholder="Buscar por código"
+              placeholder={t('search.placeholder')}
               value={filters.validationCode || ''}
               onChange={(e) => updateFilter('validationCode', e.target.value)}
             />
           </div>
 
           <div>
-            <Label htmlFor="expiryDateFrom">Vencimiento Desde</Label>
+            <Label htmlFor="expiryDateFrom">{t('filters.expiryFrom')}</Label>
             <Input
               id="expiryDateFrom"
               type="date"
@@ -144,7 +170,7 @@ const ValidationFilters = ({ filters, onFiltersChange, onClearFilters }: Validat
           </div>
 
           <div>
-            <Label htmlFor="expiryDateTo">Vencimiento Hasta</Label>
+            <Label htmlFor="expiryDateTo">{t('filters.expiryTo')}</Label>
             <Input
               id="expiryDateTo"
               type="date"

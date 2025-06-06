@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -15,12 +15,14 @@ import {
 } from 'lucide-react';
 import { UserRole, ValidationFilters as Filters, Validation, EquipmentType } from '@/types/validation';
 import { getValidationStatus, formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DashboardProps {
   userRole: UserRole;
 }
 
 const Dashboard = ({ userRole }: DashboardProps) => {
+  const { t } = useLanguage();
   const [quickSearch, setQuickSearch] = useState('');
   const [filters, setFilters] = useState<Filters>({});
   const [validations, setValidations] = useState<Validation[]>([]);
@@ -32,6 +34,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       product_id: '1',
       validation_code: 'VAL-001-2024',
       equipment_type: 'HPLC',
+      validation_type: 'metodos_analiticos',
       issue_date: '2024-01-15',
       expiry_date: '2029-01-15',
       status: 'validado',
@@ -53,6 +56,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       product_id: '2',
       validation_code: 'VAL-002-2024',
       equipment_type: 'GC',
+      validation_type: 'procesos',
       issue_date: '2024-06-15',
       expiry_date: '2025-02-15',
       status: 'proximo_vencer',
@@ -74,6 +78,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       product_id: '3',
       validation_code: 'VAL-003-2023',
       equipment_type: 'UV-VIS',
+      validation_type: 'limpieza',
       issue_date: '2023-01-10',
       expiry_date: '2024-12-10',
       status: 'vencido',
@@ -109,15 +114,28 @@ const Dashboard = ({ userRole }: DashboardProps) => {
     
     switch (status) {
       case 'validado':
-        return <Badge className="bg-green-100 text-green-800">Validado</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('status.validado')}</Badge>;
       case 'proximo_vencer':
-        return <Badge className="bg-yellow-100 text-yellow-800">Próximo a Vencer ({daysUntilExpiry} días)</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.proximo')} ({daysUntilExpiry} {t('dashboard.days')})</Badge>;
       case 'vencido':
-        return <Badge className="bg-red-100 text-red-800">Vencido</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{t('status.vencido')}</Badge>;
       case 'en_revalidacion':
-        return <Badge className="bg-blue-100 text-blue-800">En Revalidación</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">{t('status.revalidacion')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
+    }
+  };
+
+  const getValidationTypeLabel = (type: string) => {
+    switch (type) {
+      case 'procesos':
+        return t('validation.procesos');
+      case 'limpieza':
+        return t('validation.limpieza');
+      case 'metodos_analiticos':
+        return t('validation.metodos');
+      default:
+        return type;
     }
   };
 
@@ -130,25 +148,25 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
-          title="Total Validaciones"
+          title={t('stats.total')}
           value={stats.total}
           icon={ClipboardCheck}
           variant="default"
         />
         <StatsCard
-          title="Validadas"
+          title={t('stats.validated')}
           value={stats.validated}
           icon={CheckCircle}
           variant="success"
         />
         <StatsCard
-          title="Próximas a Vencer"
+          title={t('stats.expiring')}
           value={stats.expiring}
           icon={AlertTriangle}
           variant="warning"
         />
         <StatsCard
-          title="Vencidas"
+          title={t('stats.expired')}
           value={stats.expired}
           icon={XCircle}
           variant="danger"
@@ -160,12 +178,12 @@ const Dashboard = ({ userRole }: DashboardProps) => {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Search className="mr-2 h-5 w-5" />
-            Búsqueda Rápida
+            {t('dashboard.quickSearch')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Input
-            placeholder="Buscar por código de producto o validación..."
+            placeholder={t('dashboard.searchPlaceholder')}
             value={quickSearch}
             onChange={(e) => setQuickSearch(e.target.value)}
             className="max-w-md"
@@ -183,7 +201,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       {/* Recent Validations */}
       <Card>
         <CardHeader>
-          <CardTitle>Validaciones Recientes</CardTitle>
+          <CardTitle>{t('dashboard.recent')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -193,11 +211,13 @@ const Dashboard = ({ userRole }: DashboardProps) => {
                   {getEquipmentIcon(validation.equipment_type)}
                   <div>
                     <h4 className="font-semibold">{validation.product?.name}</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {validation.product?.code} | {validation.validation_code}
                     </p>
-                    <p className="text-xs text-gray-500">
-                      Equipo: {validation.equipment_type} | Vence: {formatDate(validation.expiry_date)}
+                    <p className="text-xs text-muted-foreground">
+                      {t('dashboard.equipment')}: {validation.equipment_type} | 
+                      {getValidationTypeLabel(validation.validation_type)} | 
+                      {t('dashboard.expires')}: {formatDate(validation.expiry_date)}
                     </p>
                   </div>
                 </div>

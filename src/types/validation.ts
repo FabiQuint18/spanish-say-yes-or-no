@@ -5,7 +5,11 @@ export type EquipmentType = 'HPLC' | 'GC' | 'UV-VIS' | 'NIR' | 'RAMAN' | 'IR' | 
 
 export type ValidationStatus = 'validado' | 'proximo_vencer' | 'vencido' | 'en_revalidacion';
 
+export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos';
+
 export type UserRole = 'administrador' | 'analista' | 'visualizador';
+
+export type Language = 'es' | 'en' | 'pt';
 
 export interface Product {
   id: string;
@@ -22,6 +26,7 @@ export interface Validation {
   product_id: string;
   validation_code: string;
   equipment_type: EquipmentType;
+  validation_type: ValidationType;
   issue_date: string;
   expiry_date: string;
   status: ValidationStatus;
@@ -47,6 +52,7 @@ export interface ValidationFilters {
   productCode?: string;
   validationCode?: string;
   equipmentType?: EquipmentType;
+  validationType?: ValidationType;
   status?: ValidationStatus;
   expiryDateFrom?: string;
   expiryDateTo?: string;

@@ -7,8 +7,10 @@ import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import Dashboard from '@/components/dashboard/Dashboard';
 import { UserRole } from '@/types/validation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const Index = () => {
+  const { t } = useLanguage();
   const [user, setUser] = useState<User | null>(null);
   const [userRole, setUserRole] = useState<UserRole>('visualizador');
   const [loading, setLoading] = useState(true);
@@ -82,8 +84,8 @@ const Index = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Cargando...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Cargando...</p>
         </div>
       </div>
     );
@@ -113,7 +115,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Header user={user} onLogout={handleLogout} />
       <div className="flex h-[calc(100vh-80px)]">
         <Sidebar 
@@ -132,6 +134,7 @@ const Index = () => {
 
 // Login Form Component
 const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => void }) => {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -144,40 +147,45 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="max-w-md w-full space-y-8 p-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Sistema de Gestión de Validaciones
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-2xl">V</span>
+            </div>
+          </div>
+          <h2 className="text-3xl font-bold text-foreground">
+            {t('login.title')}
           </h2>
-          <p className="mt-2 text-gray-600">Laboratorio Farmacéutico</p>
+          <p className="mt-2 text-muted-foreground">{t('system.subtitle')}</p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              Correo electrónico
+            <label htmlFor="email" className="block text-sm font-medium text-foreground">
+              {t('login.email')}
             </label>
             <input
               id="email"
               name="email"
               type="email"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="demo@example.com"
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-              Contraseña
+            <label htmlFor="password" className="block text-sm font-medium text-foreground">
+              {t('login.password')}
             </label>
             <input
               id="password"
               name="password"
               type="password"
               required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="mt-1 block w-full px-3 py-2 border border-input rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary bg-background text-foreground"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
@@ -186,9 +194,9 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
           >
-            {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+            {loading ? t('login.loading') : t('login.button')}
           </button>
         </form>
       </div>

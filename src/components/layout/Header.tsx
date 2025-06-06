@@ -1,7 +1,10 @@
 
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import { LogOut, User } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import LanguageSelector from '@/components/ui/language-selector';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HeaderProps {
   user: any;
@@ -9,17 +12,29 @@ interface HeaderProps {
 }
 
 const Header = ({ user, onLogout }: HeaderProps) => {
+  const { t } = useLanguage();
+
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+    <header className="bg-white shadow-sm border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Sistema de Gestión de Validaciones
-          </h1>
-          <p className="text-sm text-gray-600">Laboratorio Farmacéutico</p>
+        <div className="flex items-center space-x-4">
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-lg">V</span>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">
+                {t('system.title')}
+              </h1>
+              <p className="text-sm text-muted-foreground">{t('system.subtitle')}</p>
+            </div>
+          </div>
         </div>
         
         <div className="flex items-center space-x-4">
+          <LanguageSelector />
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center space-x-2">
@@ -30,7 +45,7 @@ const Header = ({ user, onLogout }: HeaderProps) => {
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuItem onClick={onLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                Cerrar sesión
+                {t('logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
