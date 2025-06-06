@@ -6,6 +6,11 @@ import { toast } from '@/hooks/use-toast';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import Dashboard from '@/components/dashboard/Dashboard';
+import ProductsModule from '@/components/modules/ProductsModule';
+import ValidationsModule from '@/components/modules/ValidationsModule';
+import EquipmentsModule from '@/components/modules/EquipmentsModule';
+import UsersModule from '@/components/modules/UsersModule';
+import SettingsModule from '@/components/modules/SettingsModule';
 import { UserRole } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -88,6 +93,11 @@ const Index = () => {
     }
   };
 
+  const handleTabChange = (tab: string) => {
+    console.log('Tab changed to:', tab);
+    setActiveTab(tab);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -108,15 +118,15 @@ const Index = () => {
       case 'dashboard':
         return <Dashboard userRole={userRole} />;
       case 'products':
-        return <div className="p-6">Módulo de Productos (por implementar)</div>;
+        return <ProductsModule />;
       case 'validations':
-        return <div className="p-6">Módulo de Validaciones (por implementar)</div>;
+        return <ValidationsModule />;
       case 'equipments':
-        return <div className="p-6">Módulo de Equipos Analíticos (por implementar)</div>;
+        return <EquipmentsModule />;
       case 'users':
-        return <div className="p-6">Módulo de Usuarios (por implementar)</div>;
+        return <UsersModule />;
       case 'settings':
-        return <div className="p-6">Configuración (por implementar)</div>;
+        return <SettingsModule />;
       default:
         return <Dashboard userRole={userRole} />;
     }
@@ -128,7 +138,7 @@ const Index = () => {
       <div className="flex h-[calc(100vh-80px)]">
         <Sidebar 
           activeTab={activeTab} 
-          onTabChange={setActiveTab} 
+          onTabChange={handleTabChange} 
           userRole={userRole}
           alertCounts={{ expiring: 5, expired: 2 }}
         />

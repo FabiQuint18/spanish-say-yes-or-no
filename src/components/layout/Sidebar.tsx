@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { UserRole } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { cn } from '@/lib/utils';
 
 interface SidebarProps {
   activeTab: string;
@@ -68,8 +69,13 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
     item.roles.includes(userRole)
   );
 
+  const handleTabClick = (tabId: string) => {
+    console.log('Switching to tab:', tabId);
+    onTabChange(tabId);
+  };
+
   return (
-    <aside className="w-64 bg-gray-50 border-r border-gray-200 h-full">
+    <aside className="w-64 bg-sidebar border-r border-border h-full">
       <nav className="p-4 space-y-2">
         {filteredItems.map((item) => {
           const Icon = item.icon;
@@ -80,8 +86,13 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
             <Button
               key={item.id}
               variant={isActive ? 'default' : 'ghost'}
-              className={`w-full justify-start ${isActive ? 'bg-blue-600 text-white' : 'text-gray-700 hover:bg-gray-100'}`}
-              onClick={() => onTabChange(item.id)}
+              className={cn(
+                'w-full justify-start transition-colors',
+                isActive 
+                  ? 'bg-primary text-primary-foreground shadow-sm' 
+                  : 'text-foreground hover:bg-accent hover:text-accent-foreground'
+              )}
+              onClick={() => handleTabClick(item.id)}
             >
               <Icon className="mr-3 h-4 w-4" />
               {item.label}
