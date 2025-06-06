@@ -1,7 +1,6 @@
-
 import { useState, useEffect } from 'react';
-// import { supabase } from '@/integrations/supabase/client';
-// import { User } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
+import { User } from '@supabase/supabase-js';
 import { toast } from '@/hooks/use-toast';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
@@ -9,27 +8,73 @@ import Dashboard from '@/components/dashboard/Dashboard';
 import { UserRole } from '@/types/validation';
 
 const Index = () => {
-  // Mock user for demo purposes
-  const [user, setUser] = useState<any>({ email: 'demo@example.com', user_metadata: { full_name: 'Usuario Demo' } });
-  const [userRole, setUserRole] = useState<UserRole>('administrador');
-  const [loading, setLoading] = useState(false); // Set to false to skip loading
+  const [user, setUser] = useState<User | null>(null);
+  const [userRole, setUserRole] = useState<UserRole>('visualizador');
+  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  const handleLogout = async () => {
-    setUser(null);
-    toast({
-      title: "Sesión cerrada",
-      description: "Has cerrado sesión exitosamente",
+  useEffect(() => {
+    // Get initial user
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUser(user);
+      if (user) {
+        // Here you would fetch the user role from your database
+        // For now, we'll set a default role
+        setUserRole('administrador'); // This should come from your users table
+      }
+      setLoading(false);
     });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setUser(session?.user ?? null);
+        if (session?.user) {
+          setUserRole('administrador'); // Fetch actual role from database
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await supabase.auth.signOut();
+      toast({
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión exitosamente",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "No se pudo cerrar la sesión",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleLogin = async (email: string, password: string) => {
-    // Mock login for demo
-    setUser({ email, user_metadata: { full_name: 'Usuario Demo' } });
-    toast({
-      title: "Inicio de sesión exitoso",
-      description: "Bienvenido al sistema",
-    });
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Inicio de sesión exitoso",
+        description: "Bienvenido al sistema",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error de autenticación",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   if (loading) {
@@ -105,9 +150,6 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
             Sistema de Gestión de Validaciones
           </h2>
           <p className="mt-2 text-gray-600">Laboratorio Farmacéutico</p>
-          <p className="mt-4 text-sm text-blue-600">
-            Versión demo - Ingresa cualquier email y contraseña
-          </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
