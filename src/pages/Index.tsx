@@ -18,15 +18,23 @@ const Index = () => {
 
   useEffect(() => {
     // Get initial user
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
-      if (user) {
-        // Here you would fetch the user role from your database
-        // For now, we'll set a default role
-        setUserRole('administrador'); // This should come from your users table
+    const getUser = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
+        if (user) {
+          // Here you would fetch the user role from your database
+          // For now, we'll set a default role
+          setUserRole('administrador'); // This should come from your users table
+        }
+      } catch (error) {
+        console.error('Error getting user:', error);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
-    });
+    };
+
+    getUser();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
