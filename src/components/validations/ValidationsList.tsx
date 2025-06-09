@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -211,7 +210,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
         </CardHeader>
         <CardContent>
           {/* Quick Type Filters */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-6">
             <Button
               variant={filterType === 'all' ? 'default' : 'outline'}
               onClick={() => setFilterType('all')}
@@ -238,77 +237,117 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
             </Button>
           </div>
 
-          {/* PDF Generation Buttons by Type and Subcategory */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {/* Procesos */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">PDF Procesos</h4>
-              <div className="flex flex-col gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePrintByType('procesos', 'fabricacion')}
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  PDF Fabricación
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePrintByType('procesos', 'envasado')}
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  PDF Envasado
-                </Button>
-              </div>
-            </div>
+          {/* Improved PDF Generation Section */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center text-lg">
+                <Printer className="mr-2 h-5 w-5" />
+                Generar Reportes PDF por Tipo de Validación
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Validaciones de Procesos */}
+                <div className="space-y-4">
+                  <div className="border-l-4 border-blue-500 pl-4">
+                    <h3 className="font-semibold text-blue-700 mb-3">Validaciones de Procesos</h3>
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('procesos', 'fabricacion')}
+                        className="w-full justify-start hover:bg-blue-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Fabricación
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('procesos', 'envasado')}
+                        className="w-full justify-start hover:bg-blue-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Envasado
+                      </Button>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Métodos Analíticos */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">PDF Métodos Analíticos</h4>
-              <div className="flex flex-col gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePrintByType('metodos_analiticos', 'valoracion')}
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  PDF Valoración
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePrintByType('metodos_analiticos', 'disolucion')}
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  PDF Disolución
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePrintByType('metodos_analiticos', 'impurezas')}
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  PDF Impurezas
-                </Button>
-              </div>
-            </div>
+                {/* Validaciones de Métodos Analíticos */}
+                <div className="space-y-4">
+                  <div className="border-l-4 border-green-500 pl-4">
+                    <h3 className="font-semibold text-green-700 mb-3">Métodos Analíticos</h3>
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('metodos_analiticos', 'valoracion')}
+                        className="w-full justify-start hover:bg-green-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Valoración
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('metodos_analiticos', 'disolucion')}
+                        className="w-full justify-start hover:bg-green-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Disolución
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('metodos_analiticos', 'impurezas')}
+                        className="w-full justify-start hover:bg-green-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Impurezas
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('metodos_analiticos', 'uniformidad_unidades_dosificacion')}
+                        className="w-full justify-start hover:bg-green-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Uniformidad UD
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('metodos_analiticos', 'identificacion')}
+                        className="w-full justify-start hover:bg-green-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Identificación
+                      </Button>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Limpieza */}
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">PDF Limpieza</h4>
-              <div className="flex flex-col gap-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePrintByType('limpieza', 'no_aplica')}
-                >
-                  <Printer className="mr-2 h-4 w-4" />
-                  PDF Limpieza (NA)
-                </Button>
+                {/* Validaciones de Limpieza */}
+                <div className="space-y-4">
+                  <div className="border-l-4 border-purple-500 pl-4">
+                    <h3 className="font-semibold text-purple-700 mb-3">Validaciones de Limpieza</h3>
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePrintByType('limpieza', 'no_aplica')}
+                        className="w-full justify-start hover:bg-purple-50"
+                      >
+                        <Printer className="mr-2 h-4 w-4" />
+                        PDF Limpieza (NA)
+                      </Button>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
 
           <Table>
             <TableHeader>
