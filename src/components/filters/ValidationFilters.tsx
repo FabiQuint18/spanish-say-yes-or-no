@@ -18,7 +18,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
   const updateFilter = (key: keyof ValidationFilters, value: string) => {
     onFiltersChange({
       ...filters,
-      [key]: value || undefined,
+      [key]: value === 'all' ? undefined : value || undefined,
     });
   };
 
@@ -65,12 +65,12 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
           <div>
             <Label htmlFor="validation-type">Tipo de Validación</Label>
             <Select
-              value={filters.validationType || ''}
+              value={filters.validationType || 'all'}
               onValueChange={(value) => {
                 updateFilter('validationType', value);
                 // Clear subcategory when validation type changes
                 if (value !== filters.validationType) {
-                  updateFilter('subcategory', '');
+                  updateFilter('subcategory', 'all');
                 }
               }}
             >
@@ -78,7 +78,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
                 <SelectValue placeholder="Seleccionar tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="procesos">Procesos</SelectItem>
                 <SelectItem value="limpieza">Limpieza</SelectItem>
                 <SelectItem value="metodos_analiticos">Métodos Analíticos</SelectItem>
@@ -89,7 +89,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
           <div>
             <Label htmlFor="subcategory">Subcategoría</Label>
             <Select
-              value={filters.subcategory || ''}
+              value={filters.subcategory || 'all'}
               onValueChange={(value) => updateFilter('subcategory', value)}
               disabled={!filters.validationType}
             >
@@ -97,7 +97,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
                 <SelectValue placeholder="Seleccionar subcategoría" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
                 {getSubcategoryOptions(filters.validationType).map((option) => (
                   <SelectItem key={option.value} value={option.value}>
                     {option.label}
@@ -130,14 +130,14 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
           <div>
             <Label htmlFor="equipment-type">Tipo de Equipo</Label>
             <Select
-              value={filters.equipmentType || ''}
+              value={filters.equipmentType || 'all'}
               onValueChange={(value) => updateFilter('equipmentType', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar equipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="HPLC">HPLC</SelectItem>
                 <SelectItem value="GC">GC</SelectItem>
                 <SelectItem value="UV-VIS">UV-VIS</SelectItem>
@@ -153,14 +153,14 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
           <div>
             <Label htmlFor="status">Estado</Label>
             <Select
-              value={filters.status || ''}
+              value={filters.status || 'all'}
               onValueChange={(value) => updateFilter('status', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar estado" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="validado">Validado</SelectItem>
                 <SelectItem value="en_validacion">En Validación</SelectItem>
                 <SelectItem value="por_revalidar">Por Revalidar</SelectItem>
