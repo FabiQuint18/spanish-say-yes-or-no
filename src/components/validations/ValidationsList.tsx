@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Plus, Upload, Trash2, Edit, Printer, Download, FileText, Filter } from 'lucide-react';
 import { Validation, ValidationType, ValidationFilters } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,6 +31,8 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
   const [selectedValidation, setSelectedValidation] = useState<Validation | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<ValidationFilters>({});
+  const [reportType, setReportType] = useState<string>('all');
+  const [reportSubcategory, setReportSubcategory] = useState<string>('all');
 
   const applyFilters = (validationsList: Validation[]): Validation[] => {
     return validationsList.filter(validation => {
@@ -114,6 +118,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
       'impurezas': 'Impurezas',
       'uniformidad_unidades_dosificacion': 'Uniformidad UD',
       'identificacion': 'Identificación',
+      'trazas': 'Trazas',
       // Limpieza
       'no_aplica': 'NA',
     };
@@ -121,33 +126,66 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     return labels[subcategory] || subcategory;
   };
 
-  const handlePrintByType = (type: ValidationType, subcategory?: string) => {
-    let typeValidations = validations.filter(v => v.validation_type === type);
+  const handleGenerateReport = () => {
+    let filteredForReport = validations;
     
-    if (subcategory) {
-      typeValidations = typeValidations.filter(v => v.subcategory === subcategory);
+    if (reportType !== 'all') {
+      filteredForReport = filteredForReport.filter(v => v.validation_type === reportType);
+      
+      if (reportSubcategory !== 'all') {
+        filteredForReport = filteredForReport.filter(v => v.subcategory === reportSubcategory);
+      }
     }
     
-    if (typeValidations.length === 0) {
+    if (filteredForReport.length === 0) {
       toast({
         title: "Sin datos",
-        description: `No hay validaciones de tipo ${type}${subcategory ? ` - ${getSubcategoryLabel(type, subcategory)}` : ''} para imprimir`,
+        description: "No hay validaciones que coincidan con los filtros seleccionados",
         variant: "destructive",
       });
       return;
     }
 
+    const reportTitle = reportType === 'all' 
+      ? 'Todas las validaciones' 
+      : `${reportType}${reportSubcategory !== 'all' ? ` - ${getSubcategoryLabel(reportType as ValidationType, reportSubcategory)}` : ''}`;
+
     toast({
       title: "Generando PDF",
-      description: `Preparando reporte de ${type}${subcategory ? ` - ${getSubcategoryLabel(type, subcategory)}` : ''}`,
+      description: `Preparando reporte: ${reportTitle}`,
     });
     
     setTimeout(() => {
       toast({
         title: "PDF generado",
-        description: `Reporte de ${type}${subcategory ? ` - ${getSubcategoryLabel(type, subcategory)}` : ''} listo para descarga`,
+        description: `Reporte de ${reportTitle} listo para descarga`,
       });
     }, 2000);
+  };
+
+  const getSubcategoryOptions = (validationType: string) => {
+    switch (validationType) {
+      case 'procesos':
+        return [
+          { value: 'fabricacion', label: 'Fabricación' },
+          { value: 'envasado', label: 'Envasado' },
+        ];
+      case 'metodos_analiticos':
+        return [
+          { value: 'valoracion', label: 'Valoración' },
+          { value: 'disolucion', label: 'Disolución' },
+          { value: 'impurezas', label: 'Impurezas' },
+          { value: 'uniformidad_unidades_dosificacion', label: 'Uniformidad UD' },
+          { value: 'identificacion', label: 'Identificación' },
+          { value: 'trazas', label: 'Trazas' },
+        ];
+      case 'limpieza':
+        return [
+          { value: 'no_aplica', label: 'NA' },
+        ];
+      default:
+        return [];
+    }
   };
 
   const handleDelete = (validation: Validation) => {
@@ -216,6 +254,17 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
           </div>
         </CardHeader>
         <CardContent>
+          {/* Advanced Filters */}
+          {showFilters && (
+            <div className="mb-6">
+              <ValidationFiltersComponent
+                filters={filters}
+                onFiltersChange={setFilters}
+                onClearFilters={clearFilters}
+              />
+            </div>
+          )}
+
           {/* Quick Type Filters */}
           <div className="flex gap-2 mb-6">
             <Button
@@ -248,113 +297,66 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
             </Button>
           </div>
 
-          {/* Improved PDF Generation Section */}
+          {/* Report Generation Section */}
           <Card className="mb-6">
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
                 <Printer className="mr-2 h-5 w-5" />
-                Generar Reportes PDF por Tipo de Validación
+                Generar Reporte PDF
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Validaciones de Procesos */}
-                <div className="space-y-4">
-                  <div className="border-l-4 border-blue-500 pl-4">
-                    <h3 className="font-semibold text-blue-700 mb-3">Validaciones de Procesos</h3>
-                    <div className="space-y-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('procesos', 'fabricacion')}
-                        className="w-full justify-start hover:bg-blue-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Fabricación
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('procesos', 'envasado')}
-                        className="w-full justify-start hover:bg-blue-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Envasado
-                      </Button>
-                    </div>
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Tipo de Validación</label>
+                  <Select 
+                    value={reportType} 
+                    onValueChange={(value) => {
+                      setReportType(value);
+                      setReportSubcategory('all');
+                    }}
+                  >
+                    <SelectTrigger className="bg-background border-border">
+                      <SelectValue placeholder="Seleccionar tipo" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border">
+                      <SelectItem value="all">Todas las validaciones</SelectItem>
+                      <SelectItem value="procesos">Procesos</SelectItem>
+                      <SelectItem value="metodos_analiticos">Métodos Analíticos</SelectItem>
+                      <SelectItem value="limpieza">Limpieza</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Validaciones de Métodos Analíticos */}
-                <div className="space-y-4">
-                  <div className="border-l-4 border-green-500 pl-4">
-                    <h3 className="font-semibold text-green-700 mb-3">Métodos Analíticos</h3>
-                    <div className="space-y-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('metodos_analiticos', 'valoracion')}
-                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Valoración
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('metodos_analiticos', 'disolucion')}
-                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Disolución
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('metodos_analiticos', 'impurezas')}
-                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Impurezas
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('metodos_analiticos', 'uniformidad_unidades_dosificacion')}
-                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Uniformidad UD
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('metodos_analiticos', 'identificacion')}
-                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Identificación
-                      </Button>
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Subcategoría</label>
+                  <Select 
+                    value={reportSubcategory} 
+                    onValueChange={setReportSubcategory}
+                    disabled={reportType === 'all'}
+                  >
+                    <SelectTrigger className="bg-background border-border">
+                      <SelectValue placeholder="Seleccionar subcategoría" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover border border-border">
+                      <SelectItem value="all">Todas las subcategorías</SelectItem>
+                      {getSubcategoryOptions(reportType).map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
 
-                {/* Validaciones de Limpieza */}
-                <div className="space-y-4">
-                  <div className="border-l-4 border-purple-500 pl-4">
-                    <h3 className="font-semibold text-purple-700 mb-3">Validaciones de Limpieza</h3>
-                    <div className="space-y-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePrintByType('limpieza', 'no_aplica')}
-                        className="w-full justify-start hover:bg-purple-50 bg-background border-border hover:text-foreground"
-                      >
-                        <Printer className="mr-2 h-4 w-4" />
-                        PDF Limpieza (NA)
-                      </Button>
-                    </div>
-                  </div>
+                <div>
+                  <Button 
+                    onClick={handleGenerateReport}
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    <Printer className="mr-2 h-4 w-4" />
+                    Generar PDF
+                  </Button>
                 </div>
               </div>
             </CardContent>
@@ -479,15 +481,6 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
           )}
         </CardContent>
       </Card>
-
-      {/* Advanced Filters */}
-      {showFilters && (
-        <ValidationFiltersComponent
-          filters={filters}
-          onFiltersChange={setFilters}
-          onClearFilters={clearFilters}
-        />
-      )}
     </div>
   );
 };

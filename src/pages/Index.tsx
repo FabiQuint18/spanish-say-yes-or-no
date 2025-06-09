@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -11,6 +10,7 @@ import ValidationsModule from '@/components/modules/ValidationsModule';
 import EquipmentsModule from '@/components/modules/EquipmentsModule';
 import UsersModule from '@/components/modules/UsersModule';
 import SettingsModule from '@/components/modules/SettingsModule';
+import LanguageSelector from '@/components/ui/language-selector';
 import { UserRole } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
 
