@@ -16,10 +16,17 @@ interface ValidationFiltersProps {
 
 const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }: ValidationFiltersProps) => {
   const updateFilter = (key: keyof ValidationFilters, value: string) => {
-    onFiltersChange({
+    const newFilters = {
       ...filters,
-      [key]: value === 'all' ? undefined : value || undefined,
-    });
+      [key]: value === 'all' || value === '' ? undefined : value,
+    };
+
+    // Clear subcategory when validation type changes
+    if (key === 'validationType' && value !== filters.validationType) {
+      newFilters.subcategory = undefined;
+    }
+
+    onFiltersChange(newFilters);
   };
 
   const getSubcategoryOptions = (validationType?: ValidationType) => {
@@ -34,12 +41,13 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
           { value: 'valoracion', label: 'Valoración' },
           { value: 'disolucion', label: 'Disolución' },
           { value: 'impurezas', label: 'Impurezas' },
-          { value: 'uniformidad_unidades_dosificacion', label: 'Uniformidad de Unidades de Dosificación' },
+          { value: 'uniformidad_unidades_dosificacion', label: 'Uniformidad De Unidades De Dosificación' },
           { value: 'identificacion', label: 'Identificación' },
+          { value: 'trazas', label: 'Trazas' },
         ];
       case 'limpieza':
         return [
-          { value: 'no_aplica', label: 'No Aplica (NA)' },
+          { value: 'no_aplica', label: 'NA' },
         ];
       default:
         return [];
@@ -52,7 +60,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center">
             <Filter className="mr-2 h-5 w-5" />
-            Filtros de Búsqueda
+            Filtros De Búsqueda
           </CardTitle>
           <Button variant="outline" size="sm" onClick={onClearFilters}>
             <X className="mr-2 h-4 w-4" />
@@ -63,19 +71,13 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <Label htmlFor="validation-type">Tipo de Validación</Label>
+            <Label htmlFor="validation-type">Tipo De Validación</Label>
             <Select
               value={filters.validationType || 'all'}
-              onValueChange={(value) => {
-                updateFilter('validationType', value);
-                // Clear subcategory when validation type changes
-                if (value !== filters.validationType) {
-                  updateFilter('subcategory', 'all');
-                }
-              }}
+              onValueChange={(value) => updateFilter('validationType', value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar tipo" />
+                <SelectValue placeholder="Seleccionar Tipo" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
@@ -94,7 +96,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
               disabled={!filters.validationType}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar subcategoría" />
+                <SelectValue placeholder="Seleccionar Subcategoría" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas</SelectItem>
@@ -108,33 +110,33 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
           </div>
 
           <div>
-            <Label htmlFor="validation-code">Código de Validación</Label>
+            <Label htmlFor="validation-code">Código De Validación</Label>
             <Input
               id="validation-code"
-              placeholder="Buscar por código"
+              placeholder="Buscar Por Código"
               value={filters.validationCode || ''}
               onChange={(e) => updateFilter('validationCode', e.target.value)}
             />
           </div>
 
           <div>
-            <Label htmlFor="product-code">Código de Producto</Label>
+            <Label htmlFor="product-code">Código De Producto</Label>
             <Input
               id="product-code"
-              placeholder="Buscar por producto"
+              placeholder="Buscar Por Producto"
               value={filters.productCode || ''}
               onChange={(e) => updateFilter('productCode', e.target.value)}
             />
           </div>
 
           <div>
-            <Label htmlFor="equipment-type">Tipo de Equipo</Label>
+            <Label htmlFor="equipment-type">Tipo De Equipo</Label>
             <Select
               value={filters.equipmentType || 'all'}
               onValueChange={(value) => updateFilter('equipmentType', value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar equipo" />
+                <SelectValue placeholder="Seleccionar Equipo" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
@@ -157,7 +159,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
               onValueChange={(value) => updateFilter('status', value)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Seleccionar estado" />
+                <SelectValue placeholder="Seleccionar Estado" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todos</SelectItem>
@@ -165,7 +167,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
                 <SelectItem value="en_validacion">En Validación</SelectItem>
                 <SelectItem value="por_revalidar">Por Revalidar</SelectItem>
                 <SelectItem value="vencido">Vencido</SelectItem>
-                <SelectItem value="proximo_vencer">Próximo a Vencer</SelectItem>
+                <SelectItem value="proximo_vencer">Próximo A Vencer</SelectItem>
               </SelectContent>
             </Select>
           </div>

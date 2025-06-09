@@ -1,12 +1,22 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users, Plus, UserCheck } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 
 const UsersModule = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+
+  const handleAddUser = () => {
+    toast({
+      title: "Nuevo Usuario",
+      description: "Abriendo formulario para agregar nuevo usuario",
+    });
+    // Aquí se abriría el formulario de nuevo usuario
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -14,10 +24,10 @@ const UsersModule = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">{t('menu.users')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestiona los usuarios del sistema
+            Gestiona Los Usuarios Del Sistema
           </p>
         </div>
-        <Button>
+        <Button onClick={handleAddUser}>
           <Plus className="mr-2 h-4 w-4" />
           Agregar Usuario
         </Button>
@@ -34,7 +44,7 @@ const UsersModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">3</div>
             <p className="text-xs text-muted-foreground">
-              Usuarios activos
+              Usuarios Activos
             </p>
           </CardContent>
         </Card>
@@ -49,7 +59,7 @@ const UsersModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">8</div>
             <p className="text-xs text-muted-foreground">
-              Usuarios activos
+              Usuarios Activos
             </p>
           </CardContent>
         </Card>
@@ -64,7 +74,7 @@ const UsersModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">12</div>
             <p className="text-xs text-muted-foreground">
-              Usuarios activos
+              Usuarios Activos
             </p>
           </CardContent>
         </Card>
@@ -72,14 +82,14 @@ const UsersModule = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Gestión de Usuarios</CardTitle>
+          <CardTitle>Gestión De Usuarios</CardTitle>
           <CardDescription>
-            Lista de usuarios registrados en el sistema
+            Lista De Usuarios Registrados En El Sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            Módulo de usuarios en desarrollo...
+            Módulo De Usuarios En Desarrollo...
           </div>
         </CardContent>
       </Card>

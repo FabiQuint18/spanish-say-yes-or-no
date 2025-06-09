@@ -98,7 +98,7 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
               {item.label}
               {showAlert && (
                 <Badge variant="destructive" className="ml-auto text-xs px-1.5 py-0.5">
-                  !
+                  {alertCounts.expiring + alertCounts.expired}
                 </Badge>
               )}
             </Button>

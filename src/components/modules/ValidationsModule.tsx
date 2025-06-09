@@ -5,12 +5,14 @@ import { ClipboardCheck, Plus, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Validation } from '@/types/validation';
 import ValidationsList from '@/components/validations/ValidationsList';
+import ValidationForm from '@/components/validations/ValidationForm';
 import { useToast } from '@/hooks/use-toast';
 
 const ValidationsModule = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [validations, setValidations] = useState<Validation[]>([]);
+  const [showForm, setShowForm] = useState(false);
 
   // Mock data con subcategorías y archivos
   const mockValidations: Validation[] = [
@@ -177,10 +179,9 @@ const ValidationsModule = () => {
 
   const handleEdit = (validation: Validation) => {
     toast({
-      title: "Editar validación",
+      title: "Editar Validación",
       description: `Editando validación ${validation.validation_code}`,
     });
-    // Aquí iría la lógica de edición
   };
 
   const handleDelete = (id: string) => {
@@ -188,15 +189,39 @@ const ValidationsModule = () => {
   };
 
   const handleAdd = () => {
-    toast({
-      title: "Nueva validación",
-      description: "Abriendo formulario para nueva validación",
-    });
-    // Aquí iría la lógica para agregar nueva validación
+    setShowForm(true);
+  };
+
+  const handleFormSubmit = (formData: any) => {
+    const newValidation: Validation = {
+      id: Date.now().toString(),
+      product_id: Date.now().toString(),
+      validation_code: formData.validation_code,
+      equipment_type: formData.equipment_type,
+      validation_type: formData.validation_type,
+      subcategory: formData.subcategory,
+      issue_date: formData.issue_date,
+      expiry_date: formData.expiry_date,
+      status: 'en_validacion',
+      created_by: 'current_user',
+      updated_by: 'current_user',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      product: {
+        id: Date.now().toString(),
+        code: formData.product_code,
+        name: formData.product_name,
+        type: 'producto_terminado',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      files: []
+    };
+
+    setValidations(prev => [newValidation, ...prev]);
   };
 
   const handleFileUpload = (validationId: string, file: File) => {
-    // Simular carga de archivo
     const mockFile = {
       id: `file-${Date.now()}`,
       validation_id: validationId,
@@ -239,7 +264,7 @@ const ValidationsModule = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">{t('menu.validations')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestiona las validaciones del sistema
+            Gestiona Las Validaciones Del Sistema
           </p>
         </div>
         <Button onClick={handleAdd}>
@@ -260,7 +285,7 @@ const ValidationsModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats.validated}</div>
             <p className="text-xs text-muted-foreground">
-              Validaciones completadas
+              Validaciones Completadas
             </p>
           </CardContent>
         </Card>
@@ -268,14 +293,14 @@ const ValidationsModule = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Próximas a Vencer
+              Próximas A Vencer
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.expiring}</div>
             <p className="text-xs text-muted-foreground">
-              En los próximos 30 días
+              En Los Próximos 30 Días
             </p>
           </CardContent>
         </Card>
@@ -290,7 +315,7 @@ const ValidationsModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats.expired}</div>
             <p className="text-xs text-muted-foreground">
-              Requieren atención inmediata
+              Requieren Atención Inmediata
             </p>
           </CardContent>
         </Card>
@@ -305,7 +330,7 @@ const ValidationsModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stats.inValidation}</div>
             <p className="text-xs text-muted-foreground">
-              En proceso
+              En Proceso
             </p>
           </CardContent>
         </Card>
@@ -319,6 +344,13 @@ const ValidationsModule = () => {
         onAdd={handleAdd}
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
+      />
+
+      {/* Validation Form Modal */}
+      <ValidationForm
+        isOpen={showForm}
+        onClose={() => setShowForm(false)}
+        onSubmit={handleFormSubmit}
       />
     </div>
   );

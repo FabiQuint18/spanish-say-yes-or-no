@@ -1,12 +1,22 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FlaskConical, Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 
 const EquipmentsModule = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+
+  const handleAddEquipment = () => {
+    toast({
+      title: "Nuevo Equipo",
+      description: "Abriendo formulario para agregar nuevo equipo",
+    });
+    // Aquí se abriría el formulario de nuevo equipo
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -14,10 +24,10 @@ const EquipmentsModule = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">{t('menu.equipments')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestiona los equipos analíticos
+            Gestiona Los Equipos Analíticos
           </p>
         </div>
-        <Button>
+        <Button onClick={handleAddEquipment}>
           <Plus className="mr-2 h-4 w-4" />
           Agregar Equipo
         </Button>
@@ -34,7 +44,7 @@ const EquipmentsModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">4</div>
             <p className="text-xs text-muted-foreground">
-              Equipos registrados
+              Equipos Registrados
             </p>
           </CardContent>
         </Card>
@@ -49,7 +59,7 @@ const EquipmentsModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">2</div>
             <p className="text-xs text-muted-foreground">
-              Equipos registrados
+              Equipos Registrados
             </p>
           </CardContent>
         </Card>
@@ -64,7 +74,7 @@ const EquipmentsModule = () => {
           <CardContent>
             <div className="text-2xl font-bold">6</div>
             <p className="text-xs text-muted-foreground">
-              Equipos registrados
+              Equipos Registrados
             </p>
           </CardContent>
         </Card>
@@ -74,12 +84,12 @@ const EquipmentsModule = () => {
         <CardHeader>
           <CardTitle>Equipos Analíticos</CardTitle>
           <CardDescription>
-            Lista de equipos registrados en el sistema
+            Lista De Equipos Registrados En El Sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            Módulo de equipos en desarrollo...
+            Módulo De Equipos En Desarrollo...
           </div>
         </CardContent>
       </Card>
