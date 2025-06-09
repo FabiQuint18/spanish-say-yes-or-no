@@ -16,14 +16,18 @@ const LanguageSelector = () => {
 
   return (
     <div className="flex items-center space-x-2">
-      <Languages className="h-4 w-4" />
+      <Languages className="h-4 w-4 text-foreground" />
       <Select value={language} onValueChange={(value: Language) => setLanguage(value)}>
-        <SelectTrigger className="w-32">
+        <SelectTrigger className="w-32 bg-background border-border hover:bg-accent hover:text-accent-foreground">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent>
+        <SelectContent className="bg-popover border border-border">
           {languages.map((lang) => (
-            <SelectItem key={lang.value} value={lang.value}>
+            <SelectItem 
+              key={lang.value} 
+              value={lang.value}
+              className="hover:bg-accent hover:text-accent-foreground cursor-pointer"
+            >
               <span className="flex items-center space-x-2">
                 <span>{lang.flag}</span>
                 <span>{lang.label}</span>

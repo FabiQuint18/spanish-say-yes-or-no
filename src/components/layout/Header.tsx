@@ -15,7 +15,7 @@ const Header = ({ user, onLogout }: HeaderProps) => {
   const { t } = useLanguage();
 
   return (
-    <header className="bg-white shadow-sm border-b border-border px-6 py-4">
+    <header className="bg-background shadow-sm border-b border-border px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           {/* Logo */}
@@ -37,13 +37,13 @@ const Header = ({ user, onLogout }: HeaderProps) => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-2">
+              <Button variant="ghost" className="flex items-center space-x-2 hover:bg-accent hover:text-accent-foreground">
                 <User className="h-4 w-4" />
                 <span>{user?.user_metadata?.full_name || user?.email}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem onClick={onLogout}>
+            <DropdownMenuContent align="end" className="w-56 bg-popover border border-border">
+              <DropdownMenuItem onClick={onLogout} className="hover:bg-accent hover:text-accent-foreground cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('logout')}
               </DropdownMenuItem>

@@ -137,7 +137,6 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
       return;
     }
 
-    // Simular impresión por tipo y subcategoría
     toast({
       title: "Generando PDF",
       description: `Preparando reporte de ${type}${subcategory ? ` - ${getSubcategoryLabel(type, subcategory)}` : ''}`,
@@ -162,6 +161,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
   const clearFilters = () => {
     setFilters({});
     setFilterType('all');
+    setShowFilters(false);
   };
 
   return (
@@ -174,22 +174,29 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
               <Button 
                 variant="outline" 
                 onClick={() => setShowFilters(!showFilters)}
+                className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
               >
                 <Filter className="mr-2 h-4 w-4" />
                 Filtros Avanzados
               </Button>
-              <Button onClick={onAdd}>
+              <Button 
+                onClick={onAdd}
+                className="bg-primary hover:bg-primary/90 text-primary-foreground"
+              >
                 <Plus className="mr-2 h-4 w-4" />
                 Nueva Validación
               </Button>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline">
+                  <Button 
+                    variant="outline"
+                    className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
+                  >
                     <Upload className="mr-2 h-4 w-4" />
                     Cargar Archivo
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="bg-popover border border-border">
                   <DialogHeader>
                     <DialogTitle>Cargar Validaciones</DialogTitle>
                   </DialogHeader>
@@ -200,7 +207,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                     <input
                       type="file"
                       accept=".xlsx,.xls,.csv"
-                      className="w-full p-2 border rounded"
+                      className="w-full p-2 border border-border rounded bg-background text-foreground"
                     />
                   </div>
                 </DialogContent>
@@ -214,24 +221,28 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
             <Button
               variant={filterType === 'all' ? 'default' : 'outline'}
               onClick={() => setFilterType('all')}
+              className={filterType === 'all' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
             >
               Todas ({validations.length})
             </Button>
             <Button
               variant={filterType === 'procesos' ? 'default' : 'outline'}
               onClick={() => setFilterType('procesos')}
+              className={filterType === 'procesos' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
             >
               Procesos ({validations.filter(v => v.validation_type === 'procesos').length})
             </Button>
             <Button
               variant={filterType === 'limpieza' ? 'default' : 'outline'}
               onClick={() => setFilterType('limpieza')}
+              className={filterType === 'limpieza' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
             >
               Limpieza ({validations.filter(v => v.validation_type === 'limpieza').length})
             </Button>
             <Button
               variant={filterType === 'metodos_analiticos' ? 'default' : 'outline'}
               onClick={() => setFilterType('metodos_analiticos')}
+              className={filterType === 'metodos_analiticos' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
             >
               Métodos Analíticos ({validations.filter(v => v.validation_type === 'metodos_analiticos').length})
             </Button>
@@ -256,7 +267,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('procesos', 'fabricacion')}
-                        className="w-full justify-start hover:bg-blue-50"
+                        className="w-full justify-start hover:bg-blue-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Fabricación
@@ -265,7 +276,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('procesos', 'envasado')}
-                        className="w-full justify-start hover:bg-blue-50"
+                        className="w-full justify-start hover:bg-blue-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Envasado
@@ -283,7 +294,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('metodos_analiticos', 'valoracion')}
-                        className="w-full justify-start hover:bg-green-50"
+                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Valoración
@@ -292,7 +303,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('metodos_analiticos', 'disolucion')}
-                        className="w-full justify-start hover:bg-green-50"
+                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Disolución
@@ -301,7 +312,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('metodos_analiticos', 'impurezas')}
-                        className="w-full justify-start hover:bg-green-50"
+                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Impurezas
@@ -310,7 +321,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('metodos_analiticos', 'uniformidad_unidades_dosificacion')}
-                        className="w-full justify-start hover:bg-green-50"
+                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Uniformidad UD
@@ -319,7 +330,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('metodos_analiticos', 'identificacion')}
-                        className="w-full justify-start hover:bg-green-50"
+                        className="w-full justify-start hover:bg-green-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Identificación
@@ -337,7 +348,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => handlePrintByType('limpieza', 'no_aplica')}
-                        className="w-full justify-start hover:bg-purple-50"
+                        className="w-full justify-start hover:bg-purple-50 bg-background border-border hover:text-foreground"
                       >
                         <Printer className="mr-2 h-4 w-4" />
                         PDF Limpieza (NA)
@@ -382,12 +393,16 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                   <TableCell>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" size="sm">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
+                        >
                           <FileText className="h-4 w-4" />
                           {validation.files?.length || 0}
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="max-w-4xl">
+                      <DialogContent className="max-w-4xl bg-popover border border-border">
                         <DialogHeader>
                           <DialogTitle>
                             Archivos - {validation.validation_code}
@@ -408,17 +423,22 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         variant="outline"
                         size="sm"
                         onClick={() => onEdit(validation)}
+                        className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
                       >
                         <Edit className="h-4 w-4" />
                       </Button>
                       
                       <AlertDialog>
                         <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            className="bg-background hover:bg-destructive/10 hover:text-destructive border-border"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </AlertDialogTrigger>
-                        <AlertDialogContent>
+                        <AlertDialogContent className="bg-popover border border-border">
                           <AlertDialogHeader>
                             <AlertDialogTitle>¿Estás seguro de eliminar este registro?</AlertDialogTitle>
                             <AlertDialogDescription>
@@ -426,10 +446,12 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
-                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                            <AlertDialogCancel className="bg-background hover:bg-accent hover:text-accent-foreground border-border">
+                              Cancelar
+                            </AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => handleDelete(validation)}
-                              className="bg-red-600 hover:bg-red-700"
+                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                             >
                               Eliminar
                             </AlertDialogAction>
@@ -446,7 +468,11 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
           {filteredValidations.length === 0 && (
             <div className="text-center py-8">
               <p className="text-muted-foreground">No se encontraron validaciones con los filtros aplicados</p>
-              <Button variant="outline" onClick={clearFilters} className="mt-2">
+              <Button 
+                variant="outline" 
+                onClick={clearFilters} 
+                className="mt-2 bg-background hover:bg-accent hover:text-accent-foreground border-border"
+              >
                 Limpiar filtros
               </Button>
             </div>

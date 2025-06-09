@@ -178,6 +178,12 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
           </h2>
           <p className="mt-2 text-muted-foreground">{t('system.subtitle')}</p>
         </div>
+
+        {/* Language Selector */}
+        <div className="flex justify-center">
+          <LanguageSelector />
+        </div>
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-foreground">
@@ -212,7 +218,7 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
           <button
             type="submit"
             disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50"
+            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
           >
             {loading ? t('login.loading') : t('login.button')}
           </button>
