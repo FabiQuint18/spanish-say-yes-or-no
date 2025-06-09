@@ -6,27 +6,76 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Upload, Trash2, Edit, Printer, Download } from 'lucide-react';
-import { Validation, ValidationType } from '@/types/validation';
+import { Plus, Upload, Trash2, Edit, Printer, Download, FileText, Filter } from 'lucide-react';
+import { Validation, ValidationType, ValidationFilters } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
+import ValidationFiles from './ValidationFiles';
+import ValidationFiltersComponent from '@/components/filters/ValidationFilters';
 
 interface ValidationsListProps {
   validations: Validation[];
   onEdit: (validation: Validation) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
+  onFileUpload: (validationId: string, file: File) => void;
+  onFileDelete: (fileId: string) => void;
 }
 
-const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsListProps) => {
+const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, onFileDelete }: ValidationsListProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [filterType, setFilterType] = useState<ValidationType | 'all'>('all');
+  const [selectedValidation, setSelectedValidation] = useState<Validation | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<ValidationFilters>({});
 
-  const filteredValidations = filterType === 'all' 
-    ? validations 
-    : validations.filter(v => v.validation_type === filterType);
+  const applyFilters = (validationsList: Validation[]): Validation[] => {
+    return validationsList.filter(validation => {
+      // Apply type filter
+      if (filterType !== 'all' && validation.validation_type !== filterType) {
+        return false;
+      }
+
+      // Apply advanced filters
+      if (filters.validationType && validation.validation_type !== filters.validationType) {
+        return false;
+      }
+
+      if (filters.subcategory && validation.subcategory !== filters.subcategory) {
+        return false;
+      }
+
+      if (filters.validationCode && !validation.validation_code.toLowerCase().includes(filters.validationCode.toLowerCase())) {
+        return false;
+      }
+
+      if (filters.productCode && !validation.product?.code.toLowerCase().includes(filters.productCode.toLowerCase())) {
+        return false;
+      }
+
+      if (filters.equipmentType && validation.equipment_type !== filters.equipmentType) {
+        return false;
+      }
+
+      if (filters.status && validation.status !== filters.status) {
+        return false;
+      }
+
+      if (filters.expiryDateFrom && validation.expiry_date < filters.expiryDateFrom) {
+        return false;
+      }
+
+      if (filters.expiryDateTo && validation.expiry_date > filters.expiryDateTo) {
+        return false;
+      }
+
+      return true;
+    });
+  };
+
+  const filteredValidations = applyFilters(validations);
 
   const getStatusBadge = (status: string, expiryDate: string) => {
     const daysUntilExpiry = getDaysUntilExpiry(expiryDate);
@@ -53,29 +102,52 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsLi
     }
   };
 
-  const handlePrintByType = (type: ValidationType) => {
-    const typeValidations = validations.filter(v => v.validation_type === type);
+  const getSubcategoryLabel = (type: ValidationType, subcategory?: string) => {
+    if (!subcategory) return '-';
+
+    const labels: Record<string, string> = {
+      // Procesos
+      'fabricacion': 'Fabricación',
+      'envasado': 'Envasado',
+      // Métodos Analíticos
+      'valoracion': 'Valoración',
+      'disolucion': 'Disolución',
+      'impurezas': 'Impurezas',
+      'uniformidad_unidades_dosificacion': 'Uniformidad UD',
+      'identificacion': 'Identificación',
+      // Limpieza
+      'no_aplica': 'NA',
+    };
+
+    return labels[subcategory] || subcategory;
+  };
+
+  const handlePrintByType = (type: ValidationType, subcategory?: string) => {
+    let typeValidations = validations.filter(v => v.validation_type === type);
+    
+    if (subcategory) {
+      typeValidations = typeValidations.filter(v => v.subcategory === subcategory);
+    }
     
     if (typeValidations.length === 0) {
       toast({
         title: "Sin datos",
-        description: `No hay validaciones de tipo ${type} para imprimir`,
+        description: `No hay validaciones de tipo ${type}${subcategory ? ` - ${getSubcategoryLabel(type, subcategory)}` : ''} para imprimir`,
         variant: "destructive",
       });
       return;
     }
 
-    // Simular impresión por tipo
+    // Simular impresión por tipo y subcategoría
     toast({
       title: "Generando PDF",
-      description: `Preparando reporte de validaciones de ${type}`,
+      description: `Preparando reporte de ${type}${subcategory ? ` - ${getSubcategoryLabel(type, subcategory)}` : ''}`,
     });
     
-    // Aquí iría la lógica real de generación de PDF
     setTimeout(() => {
       toast({
         title: "PDF generado",
-        description: `Reporte de ${type} listo para descarga`,
+        description: `Reporte de ${type}${subcategory ? ` - ${getSubcategoryLabel(type, subcategory)}` : ''} listo para descarga`,
       });
     }, 2000);
   };
@@ -88,6 +160,11 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsLi
     });
   };
 
+  const clearFilters = () => {
+    setFilters({});
+    setFilterType('all');
+  };
+
   return (
     <div className="space-y-6">
       <Card>
@@ -95,6 +172,13 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsLi
           <div className="flex items-center justify-between">
             <CardTitle>Lista de Validaciones</CardTitle>
             <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                <Filter className="mr-2 h-4 w-4" />
+                Filtros Avanzados
+              </Button>
               <Button onClick={onAdd}>
                 <Plus className="mr-2 h-4 w-4" />
                 Nueva Validación
@@ -126,55 +210,104 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsLi
           </div>
         </CardHeader>
         <CardContent>
+          {/* Quick Type Filters */}
           <div className="flex gap-2 mb-4">
             <Button
               variant={filterType === 'all' ? 'default' : 'outline'}
               onClick={() => setFilterType('all')}
             >
-              Todas
+              Todas ({validations.length})
             </Button>
             <Button
               variant={filterType === 'procesos' ? 'default' : 'outline'}
               onClick={() => setFilterType('procesos')}
             >
-              Procesos
+              Procesos ({validations.filter(v => v.validation_type === 'procesos').length})
             </Button>
             <Button
               variant={filterType === 'limpieza' ? 'default' : 'outline'}
               onClick={() => setFilterType('limpieza')}
             >
-              Limpieza
+              Limpieza ({validations.filter(v => v.validation_type === 'limpieza').length})
             </Button>
             <Button
               variant={filterType === 'metodos_analiticos' ? 'default' : 'outline'}
               onClick={() => setFilterType('metodos_analiticos')}
             >
-              Métodos Analíticos
+              Métodos Analíticos ({validations.filter(v => v.validation_type === 'metodos_analiticos').length})
             </Button>
           </div>
 
-          <div className="flex gap-2 mb-4">
-            <Button
-              variant="outline"
-              onClick={() => handlePrintByType('procesos')}
-            >
-              <Printer className="mr-2 h-4 w-4" />
-              PDF Procesos
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handlePrintByType('limpieza')}
-            >
-              <Printer className="mr-2 h-4 w-4" />
-              PDF Limpieza
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => handlePrintByType('metodos_analiticos')}
-            >
-              <Printer className="mr-2 h-4 w-4" />
-              PDF Métodos
-            </Button>
+          {/* PDF Generation Buttons by Type and Subcategory */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* Procesos */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">PDF Procesos</h4>
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrintByType('procesos', 'fabricacion')}
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  PDF Fabricación
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrintByType('procesos', 'envasado')}
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  PDF Envasado
+                </Button>
+              </div>
+            </div>
+
+            {/* Métodos Analíticos */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">PDF Métodos Analíticos</h4>
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrintByType('metodos_analiticos', 'valoracion')}
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  PDF Valoración
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrintByType('metodos_analiticos', 'disolucion')}
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  PDF Disolución
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrintByType('metodos_analiticos', 'impurezas')}
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  PDF Impurezas
+                </Button>
+              </div>
+            </div>
+
+            {/* Limpieza */}
+            <div className="space-y-2">
+              <h4 className="font-medium text-sm">PDF Limpieza</h4>
+              <div className="flex flex-col gap-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handlePrintByType('limpieza', 'no_aplica')}
+                >
+                  <Printer className="mr-2 h-4 w-4" />
+                  PDF Limpieza (NA)
+                </Button>
+              </div>
+            </div>
           </div>
 
           <Table>
@@ -183,9 +316,11 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsLi
                 <TableHead>Código</TableHead>
                 <TableHead>Producto</TableHead>
                 <TableHead>Tipo</TableHead>
+                <TableHead>Subcategoría</TableHead>
                 <TableHead>Equipo</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Vencimiento</TableHead>
+                <TableHead>Archivos</TableHead>
                 <TableHead>Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -197,11 +332,37 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsLi
                   </TableCell>
                   <TableCell>{validation.product?.name}</TableCell>
                   <TableCell>{validation.validation_type}</TableCell>
+                  <TableCell>
+                    {getSubcategoryLabel(validation.validation_type, validation.subcategory)}
+                  </TableCell>
                   <TableCell>{validation.equipment_type}</TableCell>
                   <TableCell>
                     {getStatusBadge(validation.status, validation.expiry_date)}
                   </TableCell>
                   <TableCell>{formatDate(validation.expiry_date)}</TableCell>
+                  <TableCell>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm">
+                          <FileText className="h-4 w-4" />
+                          {validation.files?.length || 0}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                          <DialogTitle>
+                            Archivos - {validation.validation_code}
+                          </DialogTitle>
+                        </DialogHeader>
+                        <ValidationFiles
+                          validationId={validation.id}
+                          files={validation.files || []}
+                          onFileUpload={onFileUpload}
+                          onFileDelete={onFileDelete}
+                        />
+                      </DialogContent>
+                    </Dialog>
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-2">
                       <Button
@@ -242,8 +403,26 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd }: ValidationsLi
               ))}
             </TableBody>
           </Table>
+
+          {filteredValidations.length === 0 && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No se encontraron validaciones con los filtros aplicados</p>
+              <Button variant="outline" onClick={clearFilters} className="mt-2">
+                Limpiar filtros
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Advanced Filters */}
+      {showFilters && (
+        <ValidationFiltersComponent
+          filters={filters}
+          onFiltersChange={setFilters}
+          onClearFilters={clearFilters}
+        />
+      )}
     </div>
   );
 };

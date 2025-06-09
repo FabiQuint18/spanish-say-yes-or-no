@@ -12,7 +12,7 @@ const ValidationsModule = () => {
   const { toast } = useToast();
   const [validations, setValidations] = useState<Validation[]>([]);
 
-  // Mock data - mismo que en Dashboard
+  // Mock data con subcategorías y archivos
   const mockValidations: Validation[] = [
     {
       id: '1',
@@ -20,6 +20,7 @@ const ValidationsModule = () => {
       validation_code: 'VAL-001-2024',
       equipment_type: 'HPLC',
       validation_type: 'metodos_analiticos',
+      subcategory: 'valoracion',
       issue_date: '2024-01-15',
       expiry_date: '2029-01-15',
       status: 'validado',
@@ -34,7 +35,19 @@ const ValidationsModule = () => {
         type: 'producto_terminado',
         created_at: '2024-01-15T00:00:00Z',
         updated_at: '2024-01-15T00:00:00Z',
-      }
+      },
+      files: [
+        {
+          id: 'file-1',
+          validation_id: '1',
+          file_name: 'Validacion_Paracetamol_500mg_Valoracion.pdf',
+          file_url: '/mock-files/validacion-paracetamol.pdf',
+          file_size: 2048576,
+          file_type: 'application/pdf',
+          uploaded_at: '2024-01-15T10:30:00Z',
+          uploaded_by: 'user1',
+        }
+      ]
     },
     {
       id: '2',
@@ -42,6 +55,7 @@ const ValidationsModule = () => {
       validation_code: 'VAL-002-2024',
       equipment_type: 'GC',
       validation_type: 'procesos',
+      subcategory: 'fabricacion',
       issue_date: '2024-06-15',
       expiry_date: '2025-02-15',
       status: 'en_validacion',
@@ -56,7 +70,8 @@ const ValidationsModule = () => {
         type: 'materia_prima',
         created_at: '2024-06-15T00:00:00Z',
         updated_at: '2024-06-15T00:00:00Z',
-      }
+      },
+      files: []
     },
     {
       id: '3',
@@ -64,6 +79,7 @@ const ValidationsModule = () => {
       validation_code: 'VAL-003-2023',
       equipment_type: 'UV-VIS',
       validation_type: 'limpieza',
+      subcategory: 'no_aplica',
       issue_date: '2023-01-10',
       expiry_date: '2024-12-10',
       status: 'por_revalidar',
@@ -78,7 +94,8 @@ const ValidationsModule = () => {
         type: 'producto_terminado',
         created_at: '2023-01-10T00:00:00Z',
         updated_at: '2023-01-10T00:00:00Z',
-      }
+      },
+      files: []
     },
     {
       id: '4',
@@ -86,6 +103,7 @@ const ValidationsModule = () => {
       validation_code: 'VAL-004-2024',
       equipment_type: 'NIR',
       validation_type: 'metodos_analiticos',
+      subcategory: 'disolucion',
       issue_date: '2024-03-01',
       expiry_date: '2025-03-01',
       status: 'primera_revision',
@@ -100,7 +118,56 @@ const ValidationsModule = () => {
         type: 'producto_terminado',
         created_at: '2024-03-01T00:00:00Z',
         updated_at: '2024-03-01T00:00:00Z',
-      }
+      },
+      files: []
+    },
+    {
+      id: '5',
+      product_id: '1',
+      validation_code: 'VAL-005-2024',
+      equipment_type: 'HPLC',
+      validation_type: 'metodos_analiticos',
+      subcategory: 'impurezas',
+      issue_date: '2024-02-15',
+      expiry_date: '2029-02-15',
+      status: 'validado',
+      created_by: 'user1',
+      updated_by: 'user1',
+      created_at: '2024-02-15T00:00:00Z',
+      updated_at: '2024-02-15T00:00:00Z',
+      product: {
+        id: '1',
+        code: 'PT-001',
+        name: 'Paracetamol 500mg',
+        type: 'producto_terminado',
+        created_at: '2024-01-15T00:00:00Z',
+        updated_at: '2024-01-15T00:00:00Z',
+      },
+      files: []
+    },
+    {
+      id: '6',
+      product_id: '2',
+      validation_code: 'VAL-006-2024',
+      equipment_type: 'GC',
+      validation_type: 'procesos',
+      subcategory: 'envasado',
+      issue_date: '2024-07-01',
+      expiry_date: '2025-07-01',
+      status: 'en_validacion',
+      created_by: 'user1',
+      updated_by: 'user1',
+      created_at: '2024-07-01T00:00:00Z',
+      updated_at: '2024-07-01T00:00:00Z',
+      product: {
+        id: '2',
+        code: 'MP-001',
+        name: 'Principio Activo A',
+        type: 'materia_prima',
+        created_at: '2024-06-15T00:00:00Z',
+        updated_at: '2024-06-15T00:00:00Z',
+      },
+      files: []
     },
   ];
 
@@ -126,6 +193,37 @@ const ValidationsModule = () => {
       description: "Abriendo formulario para nueva validación",
     });
     // Aquí iría la lógica para agregar nueva validación
+  };
+
+  const handleFileUpload = (validationId: string, file: File) => {
+    // Simular carga de archivo
+    const mockFile = {
+      id: `file-${Date.now()}`,
+      validation_id: validationId,
+      file_name: file.name,
+      file_url: URL.createObjectURL(file),
+      file_size: file.size,
+      file_type: file.type,
+      uploaded_at: new Date().toISOString(),
+      uploaded_by: 'current_user',
+    };
+
+    setValidations(prev => 
+      prev.map(v => 
+        v.id === validationId 
+          ? { ...v, files: [...(v.files || []), mockFile] }
+          : v
+      )
+    );
+  };
+
+  const handleFileDelete = (fileId: string) => {
+    setValidations(prev => 
+      prev.map(v => ({
+        ...v,
+        files: v.files?.filter(f => f.id !== fileId) || []
+      }))
+    );
   };
 
   const stats = {
@@ -219,6 +317,8 @@ const ValidationsModule = () => {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onAdd={handleAdd}
+        onFileUpload={handleFileUpload}
+        onFileDelete={handleFileDelete}
       />
     </div>
   );

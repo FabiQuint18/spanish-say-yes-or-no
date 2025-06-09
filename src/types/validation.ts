@@ -1,3 +1,4 @@
+
 export type ProductType = 'producto_terminado' | 'materia_prima' | 'material_envase';
 
 export type EquipmentType = 'HPLC' | 'GC' | 'UV-VIS' | 'NIR' | 'RAMAN' | 'IR' | 'AA' | 'Karl Fischer';
@@ -6,9 +7,25 @@ export type ValidationStatus = 'validado' | 'proximo_vencer' | 'vencido' | 'en_r
 
 export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos';
 
+// Nuevas subcategorías específicas
+export type ProcessSubcategory = 'fabricacion' | 'envasado';
+export type AnalyticalSubcategory = 'valoracion' | 'disolucion' | 'impurezas' | 'uniformidad_unidades_dosificacion' | 'identificacion';
+export type CleaningSubcategory = 'no_aplica';
+
 export type UserRole = 'administrador' | 'analista' | 'visualizador';
 
 export type Language = 'es' | 'en' | 'pt';
+
+export interface ValidationFile {
+  id: string;
+  validation_id: string;
+  file_name: string;
+  file_url: string;
+  file_size: number;
+  file_type: string;
+  uploaded_at: string;
+  uploaded_by: string;
+}
 
 export interface Product {
   id: string;
@@ -26,6 +43,7 @@ export interface Validation {
   validation_code: string;
   equipment_type: EquipmentType;
   validation_type: ValidationType;
+  subcategory?: ProcessSubcategory | AnalyticalSubcategory | CleaningSubcategory;
   issue_date: string;
   expiry_date: string;
   status: ValidationStatus;
@@ -35,6 +53,7 @@ export interface Validation {
   created_at: string;
   updated_at: string;
   product?: Product;
+  files?: ValidationFile[];
 }
 
 export interface User {
@@ -52,6 +71,7 @@ export interface ValidationFilters {
   validationCode?: string;
   equipmentType?: EquipmentType;
   validationType?: ValidationType;
+  subcategory?: ProcessSubcategory | AnalyticalSubcategory | CleaningSubcategory;
   status?: ValidationStatus;
   expiryDateFrom?: string;
   expiryDateTo?: string;
