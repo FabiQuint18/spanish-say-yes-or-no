@@ -207,7 +207,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle>Lista de Validaciones</CardTitle>
+            <CardTitle className="text-center flex-1">Lista de Validaciones</CardTitle>
             <div className="flex gap-2">
               <Button 
                 variant="outline" 
@@ -236,10 +236,10 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                 </DialogTrigger>
                 <DialogContent className="bg-popover border border-border">
                   <DialogHeader>
-                    <DialogTitle>Cargar Validaciones</DialogTitle>
+                    <DialogTitle className="text-center">Cargar Validaciones</DialogTitle>
                   </DialogHeader>
                   <div className="py-4">
-                    <p className="text-sm text-muted-foreground mb-4">
+                    <p className="text-sm text-muted-foreground mb-4 text-center">
                       Selecciona un archivo Excel o CSV para cargar validaciones masivamente
                     </p>
                     <input
@@ -266,7 +266,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
           )}
 
           {/* Quick Type Filters */}
-          <div className="flex gap-2 mb-6">
+          <div className="flex gap-2 mb-6 justify-center flex-wrap">
             <Button
               variant={filterType === 'all' ? 'default' : 'outline'}
               onClick={() => setFilterType('all')}
@@ -300,7 +300,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
           {/* Report Generation Section */}
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle className="flex items-center text-lg">
+              <CardTitle className="flex items-center justify-center text-lg">
                 <Printer className="mr-2 h-5 w-5" />
                 Generar Reporte de Validaciones
               </CardTitle>
@@ -308,7 +308,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Tipo de Validación</label>
+                  <label className="block text-sm font-medium mb-2 text-center">Tipo de Validación</label>
                   <Select 
                     value={reportType} 
                     onValueChange={(value) => {
@@ -329,7 +329,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Subcategoría</label>
+                  <label className="block text-sm font-medium mb-2 text-center">Subcategoría</label>
                   <Select 
                     value={reportSubcategory} 
                     onValueChange={setReportSubcategory}
@@ -365,38 +365,38 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código del Documento</TableHead>
-                <TableHead>Código de Producto o Materia Prima</TableHead>
-                <TableHead>Producto</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Subcategoría</TableHead>
-                <TableHead>Equipo</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Vencimiento</TableHead>
-                <TableHead>Archivos</TableHead>
-                <TableHead>Acciones</TableHead>
+                <TableHead className="text-center">Código del Documento</TableHead>
+                <TableHead className="text-center">Código de Producto o Materia Prima</TableHead>
+                <TableHead className="text-center">Producto</TableHead>
+                <TableHead className="text-center">Tipo</TableHead>
+                <TableHead className="text-center">Subcategoría</TableHead>
+                <TableHead className="text-center">Equipo</TableHead>
+                <TableHead className="text-center">Estado</TableHead>
+                <TableHead className="text-center">Vencimiento</TableHead>
+                <TableHead className="text-center">Archivos</TableHead>
+                <TableHead className="text-center">Acciones</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredValidations.map((validation) => (
                 <TableRow key={validation.id}>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-center">
                     {validation.validation_code}
                   </TableCell>
-                  <TableCell className="font-medium">
+                  <TableCell className="font-medium text-center">
                     {validation.product?.code || '-'}
                   </TableCell>
-                  <TableCell>{validation.product?.name}</TableCell>
-                  <TableCell>{validation.validation_type}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">{validation.product?.name}</TableCell>
+                  <TableCell className="text-center">{validation.validation_type}</TableCell>
+                  <TableCell className="text-center">
                     {getSubcategoryLabel(validation.validation_type, validation.subcategory)}
                   </TableCell>
-                  <TableCell>{validation.equipment_type}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">{validation.equipment_type}</TableCell>
+                  <TableCell className="text-center">
                     {getStatusBadge(validation.status, validation.expiry_date)}
                   </TableCell>
-                  <TableCell>{formatDate(validation.expiry_date)}</TableCell>
-                  <TableCell>
+                  <TableCell className="text-center">{formatDate(validation.expiry_date)}</TableCell>
+                  <TableCell className="text-center">
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button 
@@ -410,7 +410,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                       </DialogTrigger>
                       <DialogContent className="max-w-4xl bg-popover border border-border">
                         <DialogHeader>
-                          <DialogTitle>
+                          <DialogTitle className="text-center">
                             Archivos - {validation.validation_code}
                           </DialogTitle>
                         </DialogHeader>
@@ -423,8 +423,8 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                       </DialogContent>
                     </Dialog>
                   </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
+                  <TableCell className="text-center">
+                    <div className="flex gap-2 justify-center">
                       <Button
                         variant="outline"
                         size="sm"
@@ -446,12 +446,12 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-popover border border-border">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>¿Estás Seguro de Eliminar Este Registro?</AlertDialogTitle>
-                            <AlertDialogDescription>
+                            <AlertDialogTitle className="text-center">¿Estás Seguro de Eliminar Este Registro?</AlertDialogTitle>
+                            <AlertDialogDescription className="text-center">
                               Esta acción no se puede deshacer. La validación {validation.validation_code} será eliminada permanentemente.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
-                          <AlertDialogFooter>
+                          <AlertDialogFooter className="justify-center">
                             <AlertDialogCancel className="bg-background hover:bg-accent hover:text-accent-foreground border-border">
                               Cancelar
                             </AlertDialogCancel>

@@ -1,10 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import StatsCard from './StatsCard';
-import AnalyticsCharts from './AnalyticsCharts';
+import AnalyticsSection from './AnalyticsSection';
 import ExportOptions from './ExportOptions';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 import { 
@@ -14,7 +13,7 @@ import {
   CheckCircle,
   Search,
   FlaskConical,
-  BarChart3
+  FileText
 } from 'lucide-react';
 import { UserRole, ValidationFilters as Filters, Validation, EquipmentType } from '@/types/validation';
 import { getValidationStatus, formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
@@ -131,6 +130,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
     validated: validations.filter(v => v.status === 'validado' || v.status === 'primera_revision' || v.status === 'segunda_revision').length,
     expiring: validations.filter(v => v.status === 'proximo_vencer').length,
     expired: validations.filter(v => v.status === 'vencido').length,
+    protocols: validations.filter(v => v.files && v.files.length > 0).length,
   };
 
   const getStatusBadge = (status: string, expiryDate: string) => {
@@ -178,7 +178,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
   return (
     <div className="p-6 space-y-6">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatsCard
           title={t('stats.total')}
           value={stats.total}
@@ -190,6 +190,12 @@ const Dashboard = ({ userRole }: DashboardProps) => {
           value={stats.validated}
           icon={CheckCircle}
           variant="success"
+        />
+        <StatsCard
+          title="Protocolos Realizados"
+          value={stats.protocols}
+          icon={FileText}
+          variant="info"
         />
         <StatsCard
           title={t('stats.expiring')}
@@ -208,33 +214,23 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       {/* Export Options */}
       <ExportOptions validations={validations} />
 
-      {/* Analytics Charts */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center">
-            <BarChart3 className="mr-2 h-5 w-5" />
-            {t('dashboard.analytics')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <AnalyticsCharts validations={validations} />
-        </CardContent>
-      </Card>
+      {/* Analytics Section */}
+      <AnalyticsSection validations={validations} />
 
       {/* Quick Search */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center">
+          <CardTitle className="flex items-center justify-center">
             <Search className="mr-2 h-5 w-5" />
             {t('dashboard.quickSearch')}
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex justify-center">
           <Input
             placeholder={t('dashboard.searchPlaceholder')}
             value={quickSearch}
             onChange={(e) => setQuickSearch(e.target.value)}
-            className="max-w-md"
+            className="max-w-md text-center"
           />
         </CardContent>
       </Card>
@@ -249,7 +245,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       {/* Recent Validations */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('dashboard.recent')}</CardTitle>
+          <CardTitle className="text-center">{t('dashboard.recent')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -258,11 +254,11 @@ const Dashboard = ({ userRole }: DashboardProps) => {
                 <div className="flex items-center space-x-4">
                   {getEquipmentIcon(validation.equipment_type)}
                   <div>
-                    <h4 className="font-semibold">{validation.product?.name}</h4>
-                    <p className="text-sm text-muted-foreground">
+                    <h4 className="font-semibold text-center">{validation.product?.name}</h4>
+                    <p className="text-sm text-muted-foreground text-center">
                       {validation.product?.code} | {validation.validation_code}
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-xs text-muted-foreground text-center">
                       {t('dashboard.equipment')}: {validation.equipment_type} | 
                       {getValidationTypeLabel(validation.validation_type)} | 
                       {t('dashboard.expires')}: {formatDate(validation.expiry_date)}
