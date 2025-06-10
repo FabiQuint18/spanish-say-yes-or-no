@@ -5,7 +5,7 @@ import { Language } from '@/types/validation';
 interface LanguageContextType {
   language: Language;
   setLanguage: (language: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -23,6 +23,18 @@ const translations = {
     'login.password': 'Contraseña',
     'login.button': 'Iniciar sesión',
     'login.loading': 'Iniciando sesión...',
+    'login.success': 'Inicio de sesión exitoso',
+    'login.welcome': 'Bienvenido al sistema',
+    'login.error': 'Error de autenticación',
+    'login.logout': 'Sesión cerrada',
+    'login.logoutSuccess': 'Has cerrado sesión exitosamente',
+    'login.logoutError': 'No se pudo cerrar la sesión',
+    'login.redirecting': 'Redirigiendo...',
+    'login.socialLogin': 'Iniciando sesión con {provider}',
+    'login.socialError': 'No se pudo iniciar sesión. Verifica que el proveedor esté habilitado.',
+    'login.continueGoogle': 'Continuar con Google',
+    'login.continueMicrosoft': 'Continuar con Microsoft',
+    'login.orContinue': 'O continúa con email',
     
     // Sidebar Menu
     'menu.dashboard': 'Dashboard',
@@ -82,9 +94,26 @@ const translations = {
     'dashboard.byStatus': 'Por Estado',
     'dashboard.byEquipment': 'Por Equipo',
     
+    // Validations Module
+    'validations.subtitle': 'Gestiona Las Validaciones Del Sistema',
+    'validations.new': 'Nueva Validación',
+    'validations.completed': 'Validaciones Completadas',
+    'validations.next30days': 'En Los Próximos 30 Días',
+    'validations.immediate': 'Requieren Atención Inmediata',
+    'validations.protocols': 'Protocolos Realizados',
+    'validations.withDocumentation': 'Con Documentación',
+    
     // Common
     'select.placeholder': 'Seleccionar',
-    'search.placeholder': 'Buscar'
+    'search.placeholder': 'Buscar',
+    'common.loading': 'Cargando...',
+    'common.error': 'Error',
+    'common.save': 'Guardar',
+    'common.cancel': 'Cancelar',
+    'common.edit': 'Editar',
+    'common.delete': 'Eliminar',
+    'common.add': 'Agregar',
+    'common.actions': 'Acciones'
   },
   en: {
     // Header
@@ -98,6 +127,18 @@ const translations = {
     'login.password': 'Password',
     'login.button': 'Sign In',
     'login.loading': 'Signing in...',
+    'login.success': 'Login successful',
+    'login.welcome': 'Welcome to the system',
+    'login.error': 'Authentication error',
+    'login.logout': 'Session closed',
+    'login.logoutSuccess': 'You have successfully logged out',
+    'login.logoutError': 'Could not log out',
+    'login.redirecting': 'Redirecting...',
+    'login.socialLogin': 'Signing in with {provider}',
+    'login.socialError': 'Could not sign in. Check that the provider is enabled.',
+    'login.continueGoogle': 'Continue with Google',
+    'login.continueMicrosoft': 'Continue with Microsoft',
+    'login.orContinue': 'Or continue with email',
     
     // Sidebar Menu
     'menu.dashboard': 'Dashboard',
@@ -157,9 +198,26 @@ const translations = {
     'dashboard.byStatus': 'By Status',
     'dashboard.byEquipment': 'By Equipment',
     
+    // Validations Module
+    'validations.subtitle': 'Manage System Validations',
+    'validations.new': 'New Validation',
+    'validations.completed': 'Completed Validations',
+    'validations.next30days': 'In The Next 30 Days',
+    'validations.immediate': 'Require Immediate Attention',
+    'validations.protocols': 'Protocols Completed',
+    'validations.withDocumentation': 'With Documentation',
+    
     // Common
     'select.placeholder': 'Select',
-    'search.placeholder': 'Search'
+    'search.placeholder': 'Search',
+    'common.loading': 'Loading...',
+    'common.error': 'Error',
+    'common.save': 'Save',
+    'common.cancel': 'Cancel',
+    'common.edit': 'Edit',
+    'common.delete': 'Delete',
+    'common.add': 'Add',
+    'common.actions': 'Actions'
   },
   pt: {
     // Header
@@ -173,6 +231,18 @@ const translations = {
     'login.password': 'Senha',
     'login.button': 'Entrar',
     'login.loading': 'Entrando...',
+    'login.success': 'Login bem-sucedido',
+    'login.welcome': 'Bem-vindo ao sistema',
+    'login.error': 'Erro de autenticação',
+    'login.logout': 'Sessão encerrada',
+    'login.logoutSuccess': 'Você saiu com sucesso',
+    'login.logoutError': 'Não foi possível sair',
+    'login.redirecting': 'Redirecionando...',
+    'login.socialLogin': 'Entrando com {provider}',
+    'login.socialError': 'Não foi possível entrar. Verifique se o provedor está habilitado.',
+    'login.continueGoogle': 'Continuar com Google',
+    'login.continueMicrosoft': 'Continuar com Microsoft',
+    'login.orContinue': 'Ou continue com email',
     
     // Sidebar Menu
     'menu.dashboard': 'Dashboard',
@@ -232,17 +302,43 @@ const translations = {
     'dashboard.byStatus': 'Por Status',
     'dashboard.byEquipment': 'Por Equipamento',
     
+    // Validations Module
+    'validations.subtitle': 'Gerencie as Validações do Sistema',
+    'validations.new': 'Nova Validação',
+    'validations.completed': 'Validações Concluídas',
+    'validations.next30days': 'Nos Próximos 30 Dias',
+    'validations.immediate': 'Requerem Atenção Imediata',
+    'validations.protocols': 'Protocolos Realizados',
+    'validations.withDocumentation': 'Com Documentação',
+    
     // Common
     'select.placeholder': 'Selecionar',
-    'search.placeholder': 'Buscar'
+    'search.placeholder': 'Buscar',
+    'common.loading': 'Carregando...',
+    'common.error': 'Erro',
+    'common.save': 'Salvar',
+    'common.cancel': 'Cancelar',
+    'common.edit': 'Editar',
+    'common.delete': 'Excluir',
+    'common.add': 'Adicionar',
+    'common.actions': 'Ações'
   }
 };
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
   const [language, setLanguage] = useState<Language>('es');
 
-  const t = (key: string): string => {
-    return translations[language][key] || key;
+  const t = (key: string, params?: Record<string, string>): string => {
+    let translation = translations[language][key] || key;
+    
+    // Handle parameter substitution
+    if (params) {
+      Object.entries(params).forEach(([param, value]) => {
+        translation = translation.replace(`{${param}}`, value);
+      });
+    }
+    
+    return translation;
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -85,21 +84,21 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     
     switch (status) {
       case 'validado':
-        return <Badge className="bg-green-100 text-green-800">Validado</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('status.validado')}</Badge>;
       case 'proximo_vencer':
-        return <Badge className="bg-yellow-100 text-yellow-800">Próximo a Vencer ({daysUntilExpiry} días)</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.proximo')} ({daysUntilExpiry} {t('dashboard.days')})</Badge>;
       case 'vencido':
-        return <Badge className="bg-red-100 text-red-800">Vencido</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{t('status.vencido')}</Badge>;
       case 'en_revalidacion':
-        return <Badge className="bg-blue-100 text-blue-800">En Revalidación</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">{t('status.revalidacion')}</Badge>;
       case 'en_validacion':
-        return <Badge className="bg-purple-100 text-purple-800">En Validación</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800">{t('status.en_validacion')}</Badge>;
       case 'por_revalidar':
-        return <Badge className="bg-orange-100 text-orange-800">Por Revalidar</Badge>;
+        return <Badge className="bg-orange-100 text-orange-800">{t('status.por_revalidar')}</Badge>;
       case 'primera_revision':
-        return <Badge className="bg-cyan-100 text-cyan-800">Primera Revisión (Estado Validado)</Badge>;
+        return <Badge className="bg-cyan-100 text-cyan-800">{t('status.primera_revision')} ({t('status.validado')})</Badge>;
       case 'segunda_revision':
-        return <Badge className="bg-indigo-100 text-indigo-800">Segunda Revisión (Estado Validado)</Badge>;
+        return <Badge className="bg-indigo-100 text-indigo-800">{t('status.segunda_revision')} ({t('status.validado')})</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -129,11 +128,11 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
   const getValidationTypeLabel = (type: ValidationType) => {
     switch (type) {
       case 'procesos':
-        return 'Procesos';
+        return t('validation.procesos');
       case 'limpieza':
-        return 'Limpieza';
+        return t('validation.limpieza');
       case 'metodos_analiticos':
-        return 'Métodos Analíticos';
+        return t('validation.metodos');
       default:
         return type;
     }
@@ -164,23 +163,15 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
       : `${getValidationTypeLabel(reportType as ValidationType)}${reportSubcategory !== 'all' && reportSubcategory !== 'no_aplica' ? ` - ${getSubcategoryLabel(reportType as ValidationType, reportSubcategory)}` : ''}`;
 
     toast({
-      title: "Generando PDF",
-      description: `Preparando reporte: ${reportTitle}`,
+      title: "PDF Generado Exitosamente",
+      description: `Reporte de ${reportTitle} creado correctamente`,
     });
     
-    // Simulate PDF generation
-    setTimeout(() => {
-      toast({
-        title: "PDF Generado",
-        description: `Reporte de ${reportTitle} listo para descarga`,
-      });
-      
-      // Create a mock download
-      const link = document.createElement('a');
-      link.href = '#';
-      link.download = `reporte-${reportTitle.toLowerCase().replace(/ /g, '-')}.pdf`;
-      link.click();
-    }, 2000);
+    // Create a mock download
+    const link = document.createElement('a');
+    link.href = '#';
+    link.download = `reporte-${reportTitle.toLowerCase().replace(/ /g, '-')}.pdf`;
+    link.click();
   };
 
   const getSubcategoryOptions = (validationType: string) => {
@@ -242,7 +233,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                 className="bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Nueva Validación
+                {t('validations.new')}
               </Button>
               <Dialog>
                 <DialogTrigger asChild>
@@ -299,21 +290,21 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
               onClick={() => setFilterType('procesos')}
               className={filterType === 'procesos' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
             >
-              Procesos ({validations.filter(v => v.validation_type === 'procesos').length})
+              {t('validation.procesos')} ({validations.filter(v => v.validation_type === 'procesos').length})
             </Button>
             <Button
               variant={filterType === 'limpieza' ? 'default' : 'outline'}
               onClick={() => setFilterType('limpieza')}
               className={filterType === 'limpieza' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
             >
-              Limpieza ({validations.filter(v => v.validation_type === 'limpieza').length})
+              {t('validation.limpieza')} ({validations.filter(v => v.validation_type === 'limpieza').length})
             </Button>
             <Button
               variant={filterType === 'metodos_analiticos' ? 'default' : 'outline'}
               onClick={() => setFilterType('metodos_analiticos')}
               className={filterType === 'metodos_analiticos' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
             >
-              Métodos Analíticos ({validations.filter(v => v.validation_type === 'metodos_analiticos').length})
+              {t('validation.metodos')} ({validations.filter(v => v.validation_type === 'metodos_analiticos').length})
             </Button>
           </div>
 
@@ -341,9 +332,9 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                     </SelectTrigger>
                     <SelectContent className="bg-popover border border-border">
                       <SelectItem value="all">Todas las Validaciones</SelectItem>
-                      <SelectItem value="procesos">Procesos</SelectItem>
-                      <SelectItem value="metodos_analiticos">Métodos Analíticos</SelectItem>
-                      <SelectItem value="limpieza">Limpieza</SelectItem>
+                      <SelectItem value="procesos">{t('validation.procesos')}</SelectItem>
+                      <SelectItem value="metodos_analiticos">{t('validation.metodos')}</SelectItem>
+                      <SelectItem value="limpieza">{t('validation.limpieza')}</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -473,13 +464,13 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                           </AlertDialogHeader>
                           <AlertDialogFooter className="justify-center">
                             <AlertDialogCancel className="bg-background hover:bg-accent hover:text-accent-foreground border-border">
-                              Cancelar
+                              {t('common.cancel')}
                             </AlertDialogCancel>
                             <AlertDialogAction 
                               onClick={() => handleDelete(validation)}
                               className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                             >
-                              Eliminar
+                              {t('common.delete')}
                             </AlertDialogAction>
                           </AlertDialogFooter>
                         </AlertDialogContent>
@@ -499,7 +490,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                 onClick={clearFilters} 
                 className="mt-2 bg-background hover:bg-accent hover:text-accent-foreground border-border"
               >
-                Limpiar Filtros
+                {t('filters.clear')}
               </Button>
             </div>
           )}
