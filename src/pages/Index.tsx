@@ -95,6 +95,30 @@ const Index = () => {
     }
   };
 
+  const handleSocialLogin = async (provider: 'google' | 'azure') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Redirigiendo...",
+        description: `Iniciando sesión con ${provider === 'google' ? 'Google' : 'Microsoft'}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error de autenticación",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleTabChange = (tab: string) => {
     console.log('Tab changed to:', tab);
     setActiveTab(tab);
@@ -166,9 +190,28 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
     setLoading(false);
   };
 
-  const handleSocialLogin = (provider: string) => {
-    console.log(`Iniciando sesión con ${provider}`);
-    // Aquí iría la implementación real del login social
+  const handleSocialLogin = async (provider: 'google' | 'azure') => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: provider,
+        options: {
+          redirectTo: window.location.origin
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Redirigiendo...",
+        description: `Iniciando sesión con ${provider === 'google' ? 'Google' : 'Microsoft'}`,
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error de autenticación",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -211,7 +254,7 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
           <Button
             type="button"
             variant="outline"
-            onClick={() => handleSocialLogin('microsoft')}
+            onClick={() => handleSocialLogin('azure')}
             className="w-full bg-background hover:bg-accent hover:text-accent-foreground border-border"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">

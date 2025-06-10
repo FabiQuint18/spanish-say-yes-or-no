@@ -2,6 +2,10 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Package, Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
@@ -9,13 +13,31 @@ import { useToast } from '@/hooks/use-toast';
 const ProductsModule = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    code: '',
+    name: '',
+    type: '',
+    description: ''
+  });
 
   const handleAddProduct = () => {
+    setShowForm(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     toast({
-      title: "Nuevo Producto",
-      description: "Abriendo formulario para agregar nuevo producto",
+      title: "Producto Creado",
+      description: `El producto ${formData.name} ha sido agregado exitosamente`,
     });
-    // Aquí se abriría el formulario de nuevo producto
+    setShowForm(false);
+    setFormData({ code: '', name: '', type: '', description: '' });
+  };
+
+  const handleClose = () => {
+    setShowForm(false);
+    setFormData({ code: '', name: '', type: '', description: '' });
   };
 
   return (
@@ -93,6 +115,67 @@ const ProductsModule = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Product Form Dialog */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="bg-popover border border-border">
+          <DialogHeader>
+            <DialogTitle className="text-center">Agregar Nuevo Producto</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="code">Código Del Producto</Label>
+              <Input
+                id="code"
+                value={formData.code}
+                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
+                placeholder="PT-001"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="name">Nombre Del Producto</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Paracetamol 500mg"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="type">Tipo De Producto</Label>
+              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="producto_terminado">Producto Terminado</SelectItem>
+                  <SelectItem value="materia_prima">Materia Prima</SelectItem>
+                  <SelectItem value="material_envase">Material De Envase</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="description">Descripción</Label>
+              <Input
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                placeholder="Descripción del producto"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={handleClose}>
+                Cancelar
+              </Button>
+              <Button type="submit">
+                Agregar Producto
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

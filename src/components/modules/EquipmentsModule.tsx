@@ -2,6 +2,10 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { FlaskConical, Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
@@ -9,13 +13,32 @@ import { useToast } from '@/hooks/use-toast';
 const EquipmentsModule = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
+  const [showForm, setShowForm] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    type: '',
+    model: '',
+    serial: '',
+    location: ''
+  });
 
   const handleAddEquipment = () => {
+    setShowForm(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     toast({
-      title: "Nuevo Equipo",
-      description: "Abriendo formulario para agregar nuevo equipo",
+      title: "Equipo Agregado",
+      description: `El equipo ${formData.name} ha sido registrado exitosamente`,
     });
-    // Aquí se abriría el formulario de nuevo equipo
+    setShowForm(false);
+    setFormData({ name: '', type: '', model: '', serial: '', location: '' });
+  };
+
+  const handleClose = () => {
+    setShowForm(false);
+    setFormData({ name: '', type: '', model: '', serial: '', location: '' });
   };
 
   return (
@@ -93,6 +116,82 @@ const EquipmentsModule = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Equipment Form Dialog */}
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+        <DialogContent className="bg-popover border border-border">
+          <DialogHeader>
+            <DialogTitle className="text-center">Agregar Nuevo Equipo</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+              <Label htmlFor="name">Nombre Del Equipo</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="HPLC-001"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="type">Tipo De Equipo</Label>
+              <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="HPLC">HPLC</SelectItem>
+                  <SelectItem value="GC">GC</SelectItem>
+                  <SelectItem value="UV-VIS">UV-VIS</SelectItem>
+                  <SelectItem value="NIR">NIR</SelectItem>
+                  <SelectItem value="RAMAN">RAMAN</SelectItem>
+                  <SelectItem value="IR">IR</SelectItem>
+                  <SelectItem value="AA">AA</SelectItem>
+                  <SelectItem value="Karl Fischer">Karl Fischer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="model">Modelo</Label>
+              <Input
+                id="model"
+                value={formData.model}
+                onChange={(e) => setFormData({ ...formData, model: e.target.value })}
+                placeholder="Agilent 1260"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="serial">Número De Serie</Label>
+              <Input
+                id="serial"
+                value={formData.serial}
+                onChange={(e) => setFormData({ ...formData, serial: e.target.value })}
+                placeholder="ABC123456"
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="location">Ubicación</Label>
+              <Input
+                id="location"
+                value={formData.location}
+                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                placeholder="Laboratorio A"
+              />
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={handleClose}>
+                Cancelar
+              </Button>
+              <Button type="submit">
+                Agregar Equipo
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

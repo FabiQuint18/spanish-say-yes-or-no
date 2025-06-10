@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -85,21 +84,21 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     
     switch (status) {
       case 'validado':
-        return <Badge className="bg-green-100 text-green-800">{t('status.validado')}</Badge>;
+        return <Badge className="bg-green-100 text-green-800">Validado</Badge>;
       case 'proximo_vencer':
-        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.proximo')} ({daysUntilExpiry} días)</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">Próximo a Vencer ({daysUntilExpiry} días)</Badge>;
       case 'vencido':
-        return <Badge className="bg-red-100 text-red-800">{t('status.vencido')}</Badge>;
+        return <Badge className="bg-red-100 text-red-800">Vencido</Badge>;
       case 'en_revalidacion':
-        return <Badge className="bg-blue-100 text-blue-800">{t('status.revalidacion')}</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800">En Revalidación</Badge>;
       case 'en_validacion':
-        return <Badge className="bg-purple-100 text-purple-800">{t('status.en_validacion')}</Badge>;
+        return <Badge className="bg-purple-100 text-purple-800">En Validación</Badge>;
       case 'por_revalidar':
-        return <Badge className="bg-orange-100 text-orange-800">{t('status.por_revalidar')}</Badge>;
+        return <Badge className="bg-orange-100 text-orange-800">Por Revalidar</Badge>;
       case 'primera_revision':
-        return <Badge className="bg-cyan-100 text-cyan-800">{t('status.primera_revision')}</Badge>;
+        return <Badge className="bg-cyan-100 text-cyan-800">Primera Revisión (Estado Validado)</Badge>;
       case 'segunda_revision':
-        return <Badge className="bg-indigo-100 text-indigo-800">{t('status.segunda_revision')}</Badge>;
+        return <Badge className="bg-indigo-100 text-indigo-800">Segunda Revisión (Estado Validado)</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -124,6 +123,19 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     };
 
     return labels[subcategory] || subcategory;
+  };
+
+  const getValidationTypeLabel = (type: ValidationType) => {
+    switch (type) {
+      case 'procesos':
+        return 'Procesos';
+      case 'limpieza':
+        return 'Limpieza';
+      case 'metodos_analiticos':
+        return 'Métodos Analíticos';
+      default:
+        return type;
+    }
   };
 
   const handleGenerateReport = () => {
@@ -367,8 +379,8 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
               <TableRow>
                 <TableHead className="text-center">Código del Documento</TableHead>
                 <TableHead className="text-center">Código de Producto o Materia Prima</TableHead>
-                <TableHead className="text-center">Producto</TableHead>
-                <TableHead className="text-center">Tipo</TableHead>
+                <TableHead className="text-center">Producto o Materia Prima</TableHead>
+                <TableHead className="text-center">Tipo de Validación</TableHead>
                 <TableHead className="text-center">Subcategoría</TableHead>
                 <TableHead className="text-center">Equipo</TableHead>
                 <TableHead className="text-center">Estado</TableHead>
@@ -387,7 +399,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                     {validation.product?.code || '-'}
                   </TableCell>
                   <TableCell className="text-center">{validation.product?.name}</TableCell>
-                  <TableCell className="text-center">{validation.validation_type}</TableCell>
+                  <TableCell className="text-center">{getValidationTypeLabel(validation.validation_type)}</TableCell>
                   <TableCell className="text-center">
                     {getSubcategoryLabel(validation.validation_type, validation.subcategory)}
                   </TableCell>

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -51,7 +52,19 @@ const Dashboard = ({ userRole }: DashboardProps) => {
         type: 'producto_terminado',
         created_at: '2024-01-15T00:00:00Z',
         updated_at: '2024-01-15T00:00:00Z',
-      }
+      },
+      files: [
+        {
+          id: 'file-1',
+          validation_id: '1',
+          file_name: 'Protocolo_Paracetamol_500mg_Valoracion.pdf',
+          file_url: '/mock-files/protocolo-paracetamol.pdf',
+          file_size: 2048576,
+          file_type: 'application/pdf',
+          uploaded_at: '2024-01-15T10:30:00Z',
+          uploaded_by: 'user1',
+        }
+      ]
     },
     {
       id: '2',
@@ -150,9 +163,9 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       case 'por_revalidar':
         return <Badge className="bg-orange-100 text-orange-800">{t('status.por_revalidar')}</Badge>;
       case 'primera_revision':
-        return <Badge className="bg-cyan-100 text-cyan-800">{t('status.primera_revision')}</Badge>;
+        return <Badge className="bg-cyan-100 text-cyan-800">Primera Revisión (Estado Validado)</Badge>;
       case 'segunda_revision':
-        return <Badge className="bg-indigo-100 text-indigo-800">{t('status.segunda_revision')}</Badge>;
+        return <Badge className="bg-indigo-100 text-indigo-800">Segunda Revisión (Estado Validado)</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -161,11 +174,11 @@ const Dashboard = ({ userRole }: DashboardProps) => {
   const getValidationTypeLabel = (type: string) => {
     switch (type) {
       case 'procesos':
-        return t('validation.procesos');
+        return 'Procesos';
       case 'limpieza':
-        return t('validation.limpieza');
+        return 'Limpieza';
       case 'metodos_analiticos':
-        return t('validation.metodos');
+        return 'Métodos Analíticos';
       default:
         return type;
     }
@@ -195,7 +208,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
           title="Protocolos Realizados"
           value={stats.protocols}
           icon={FileText}
-          variant="info"
+          variant="default"
         />
         <StatsCard
           title={t('stats.expiring')}
