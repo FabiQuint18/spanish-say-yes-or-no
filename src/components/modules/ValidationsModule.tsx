@@ -13,6 +13,7 @@ const ValidationsModule = () => {
   const { toast } = useToast();
   const [validations, setValidations] = useState<Validation[]>([]);
   const [showForm, setShowForm] = useState(false);
+  const [editingValidation, setEditingValidation] = useState<Validation | null>(null);
 
   // Mock data con subcategorías y archivos
   const mockValidations: Validation[] = [
@@ -24,7 +25,7 @@ const ValidationsModule = () => {
       validation_type: 'metodos_analiticos',
       subcategory: 'valoracion',
       issue_date: '2024-01-15',
-      expiry_date: '2029-01-15',
+      expiry_date: '2026-01-15',
       status: 'validado',
       created_by: 'user1',
       updated_by: 'user1',
@@ -42,8 +43,8 @@ const ValidationsModule = () => {
         {
           id: 'file-1',
           validation_id: '1',
-          file_name: 'Validacion_Paracetamol_500mg_Valoracion.pdf',
-          file_url: '/mock-files/validacion-paracetamol.pdf',
+          file_name: 'Protocolo_Paracetamol_500mg_Valoracion.pdf',
+          file_url: '/mock-files/protocolo-paracetamol.pdf',
           file_size: 2048576,
           file_type: 'application/pdf',
           uploaded_at: '2024-01-15T10:30:00Z',
@@ -178,10 +179,8 @@ const ValidationsModule = () => {
   }, []);
 
   const handleEdit = (validation: Validation) => {
-    toast({
-      title: "Editar Validación",
-      description: `Editando validación ${validation.validation_code}`,
-    });
+    setEditingValidation(validation);
+    setShowForm(true);
   };
 
   const handleDelete = (id: string) => {
@@ -189,36 +188,69 @@ const ValidationsModule = () => {
   };
 
   const handleAdd = () => {
+    setEditingValidation(null);
     setShowForm(true);
   };
 
   const handleFormSubmit = (formData: any) => {
-    const newValidation: Validation = {
-      id: Date.now().toString(),
-      product_id: Date.now().toString(),
-      validation_code: formData.validation_code,
-      equipment_type: formData.equipment_type,
-      validation_type: formData.validation_type,
-      subcategory: formData.subcategory,
-      issue_date: formData.issue_date,
-      expiry_date: formData.expiry_date,
-      status: 'en_validacion',
-      created_by: 'current_user',
-      updated_by: 'current_user',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      product: {
+    if (editingValidation) {
+      // Update existing validation
+      setValidations(prev => 
+        prev.map(v => 
+          v.id === editingValidation.id 
+            ? {
+                ...v,
+                validation_code: formData.validation_code,
+                equipment_type: formData.equipment_type,
+                validation_type: formData.validation_type,
+                subcategory: formData.subcategory,
+                issue_date: formData.issue_date,
+                expiry_date: formData.expiry_date,
+                status: formData.status,
+                updated_at: new Date().toISOString(),
+                product: v.product ? {
+                  ...v.product,
+                  code: formData.product_code,
+                  name: formData.product_name,
+                } : undefined
+              }
+            : v
+        )
+      );
+    } else {
+      // Create new validation
+      const newValidation: Validation = {
         id: Date.now().toString(),
-        code: formData.product_code,
-        name: formData.product_name,
-        type: 'producto_terminado',
+        product_id: Date.now().toString(),
+        validation_code: formData.validation_code,
+        equipment_type: formData.equipment_type,
+        validation_type: formData.validation_type,
+        subcategory: formData.subcategory,
+        issue_date: formData.issue_date,
+        expiry_date: formData.expiry_date,
+        status: formData.status,
+        created_by: 'current_user',
+        updated_by: 'current_user',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
-      },
-      files: []
-    };
+        product: {
+          id: Date.now().toString(),
+          code: formData.product_code,
+          name: formData.product_name,
+          type: 'producto_terminado',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        files: []
+      };
 
-    setValidations(prev => [newValidation, ...prev]);
+      setValidations(prev => [newValidation, ...prev]);
+    }
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
+    setEditingValidation(null);
   };
 
   const handleFileUpload = (validationId: string, file: File) => {
@@ -323,14 +355,14 @@ const ValidationsModule = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              En Validación
+              Protocolos Realizados
             </CardTitle>
             <ClipboardCheck className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.inValidation}</div>
+            <div className="text-2xl font-bold">{validations.filter(v => v.files && v.files.length > 0).length}</div>
             <p className="text-xs text-muted-foreground">
-              En Proceso
+              Con Documentación
             </p>
           </CardContent>
         </Card>
@@ -349,8 +381,9 @@ const ValidationsModule = () => {
       {/* Validation Form Modal */}
       <ValidationForm
         isOpen={showForm}
-        onClose={() => setShowForm(false)}
+        onClose={handleCloseForm}
         onSubmit={handleFormSubmit}
+        editingValidation={editingValidation}
       />
     </div>
   );

@@ -9,7 +9,7 @@ export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos';
 
 // Nuevas subcategorías específicas
 export type ProcessSubcategory = 'fabricacion' | 'envasado';
-export type AnalyticalSubcategory = 'valoracion' | 'disolucion' | 'impurezas' | 'uniformidad_unidades_dosificacion' | 'identificacion';
+export type AnalyticalSubcategory = 'valoracion' | 'disolucion' | 'impurezas' | 'uniformidad_unidades_dosificacion' | 'identificacion' | 'trazas';
 export type CleaningSubcategory = 'no_aplica';
 
 export type UserRole = 'administrador' | 'analista' | 'visualizador';
@@ -76,3 +76,14 @@ export interface ValidationFilters {
   expiryDateFrom?: string;
   expiryDateTo?: string;
 }
+
+// Función para calcular el vencimiento de métodos analíticos (2 años)
+export const calculateExpiryDate = (issueDate: string, validationType: ValidationType): string => {
+  const issue = new Date(issueDate);
+  if (validationType === 'metodos_analiticos') {
+    issue.setFullYear(issue.getFullYear() + 2);
+  } else {
+    issue.setFullYear(issue.getFullYear() + 5);
+  }
+  return issue.toISOString().split('T')[0];
+};

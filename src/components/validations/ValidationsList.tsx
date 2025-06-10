@@ -139,7 +139,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     
     if (filteredForReport.length === 0) {
       toast({
-        title: "Sin datos",
+        title: "Sin Datos",
         description: "No hay validaciones que coincidan con los filtros seleccionados",
         variant: "destructive",
       });
@@ -147,8 +147,8 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     }
 
     const reportTitle = reportType === 'all' 
-      ? 'Todas las validaciones' 
-      : `${reportType}${reportSubcategory !== 'all' ? ` - ${getSubcategoryLabel(reportType as ValidationType, reportSubcategory)}` : ''}`;
+      ? 'Todas las Validaciones' 
+      : `${reportType}${reportSubcategory !== 'all' && reportSubcategory !== 'no_aplica' ? ` - ${getSubcategoryLabel(reportType as ValidationType, reportSubcategory)}` : ''}`;
 
     toast({
       title: "Generando PDF",
@@ -157,7 +157,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     
     setTimeout(() => {
       toast({
-        title: "PDF generado",
+        title: "PDF Generado",
         description: `Reporte de ${reportTitle} listo para descarga`,
       });
     }, 2000);
@@ -191,7 +191,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
   const handleDelete = (validation: Validation) => {
     onDelete(validation.id);
     toast({
-      title: "Validación eliminada",
+      title: "Validación Eliminada",
       description: `La validación ${validation.validation_code} ha sido eliminada`,
     });
   };
@@ -302,7 +302,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
             <CardHeader>
               <CardTitle className="flex items-center text-lg">
                 <Printer className="mr-2 h-5 w-5" />
-                Generar Reporte PDF
+                Generar Reporte de Validaciones
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -320,7 +320,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                       <SelectValue placeholder="Seleccionar tipo" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover border border-border">
-                      <SelectItem value="all">Todas las validaciones</SelectItem>
+                      <SelectItem value="all">Todas las Validaciones</SelectItem>
                       <SelectItem value="procesos">Procesos</SelectItem>
                       <SelectItem value="metodos_analiticos">Métodos Analíticos</SelectItem>
                       <SelectItem value="limpieza">Limpieza</SelectItem>
@@ -339,7 +339,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                       <SelectValue placeholder="Seleccionar subcategoría" />
                     </SelectTrigger>
                     <SelectContent className="bg-popover border border-border">
-                      <SelectItem value="all">Todas las subcategorías</SelectItem>
+                      <SelectItem value="all">Todas las Subcategorías</SelectItem>
                       {getSubcategoryOptions(reportType).map((option) => (
                         <SelectItem key={option.value} value={option.value}>
                           {option.label}
@@ -355,7 +355,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                     className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                   >
                     <Printer className="mr-2 h-4 w-4" />
-                    Generar PDF
+                    Generar Reporte PDF
                   </Button>
                 </div>
               </div>
@@ -365,7 +365,8 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Código</TableHead>
+                <TableHead>Código del Documento</TableHead>
+                <TableHead>Código de Producto o Materia Prima</TableHead>
                 <TableHead>Producto</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead>Subcategoría</TableHead>
@@ -381,6 +382,9 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                 <TableRow key={validation.id}>
                   <TableCell className="font-medium">
                     {validation.validation_code}
+                  </TableCell>
+                  <TableCell className="font-medium">
+                    {validation.product?.code || '-'}
                   </TableCell>
                   <TableCell>{validation.product?.name}</TableCell>
                   <TableCell>{validation.validation_type}</TableCell>
@@ -442,7 +446,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                         </AlertDialogTrigger>
                         <AlertDialogContent className="bg-popover border border-border">
                           <AlertDialogHeader>
-                            <AlertDialogTitle>¿Estás seguro de eliminar este registro?</AlertDialogTitle>
+                            <AlertDialogTitle>¿Estás Seguro de Eliminar Este Registro?</AlertDialogTitle>
                             <AlertDialogDescription>
                               Esta acción no se puede deshacer. La validación {validation.validation_code} será eliminada permanentemente.
                             </AlertDialogDescription>
@@ -475,7 +479,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
                 onClick={clearFilters} 
                 className="mt-2 bg-background hover:bg-accent hover:text-accent-foreground border-border"
               >
-                Limpiar filtros
+                Limpiar Filtros
               </Button>
             </div>
           )}

@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,15 +7,16 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ValidationType } from '@/types/validation';
+import { ValidationType, ValidationStatus, Validation, calculateExpiryDate } from '@/types/validation';
 
 interface ValidationFormProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (validation: any) => void;
+  editingValidation?: Validation | null;
 }
 
-const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
+const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: ValidationFormProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState({
     validation_code: '',
@@ -24,9 +25,38 @@ const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
     validation_type: '',
     subcategory: '',
     equipment_type: '',
+    status: '',
     issue_date: '',
     expiry_date: '',
   });
+
+  useEffect(() => {
+    if (editingValidation) {
+      setFormData({
+        validation_code: editingValidation.validation_code,
+        product_code: editingValidation.product?.code || '',
+        product_name: editingValidation.product?.name || '',
+        validation_type: editingValidation.validation_type,
+        subcategory: editingValidation.subcategory || '',
+        equipment_type: editingValidation.equipment_type,
+        status: editingValidation.status,
+        issue_date: editingValidation.issue_date,
+        expiry_date: editingValidation.expiry_date,
+      });
+    } else {
+      setFormData({
+        validation_code: '',
+        product_code: '',
+        product_name: '',
+        validation_type: '',
+        subcategory: '',
+        equipment_type: '',
+        status: '',
+        issue_date: '',
+        expiry_date: '',
+      });
+    }
+  }, [editingValidation, isOpen]);
 
   const getSubcategoryOptions = (validationType: string) => {
     switch (validationType) {
@@ -53,10 +83,23 @@ const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
     }
   };
 
+  const getStatusOptions = (): Array<{value: ValidationStatus, label: string}> => {
+    return [
+      { value: 'validado', label: 'Validado' },
+      { value: 'proximo_vencer', label: 'Próximo a Vencer' },
+      { value: 'vencido', label: 'Vencido' },
+      { value: 'en_revalidacion', label: 'En Revalidación' },
+      { value: 'en_validacion', label: 'En Validación' },
+      { value: 'por_revalidar', label: 'Por Revalidar' },
+      { value: 'primera_revision', label: 'Primera Revisión' },
+      { value: 'segunda_revision', label: 'Segunda Revisión' },
+    ];
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.validation_code || !formData.validation_type) {
+    if (!formData.validation_code || !formData.validation_type || !formData.status) {
       toast({
         title: "Error",
         description: "Por favor completa los campos requeridos",
@@ -65,35 +108,53 @@ const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
       return;
     }
 
-    onSubmit(formData);
+    const submissionData = {
+      ...formData,
+      expiry_date: formData.expiry_date || calculateExpiryDate(formData.issue_date, formData.validation_type as ValidationType)
+    };
+
+    onSubmit(submissionData);
     onClose();
     
     toast({
-      title: "Validación Creada",
-      description: `Nueva validación ${formData.validation_code} creada exitosamente`,
+      title: editingValidation ? "Validación Actualizada" : "Validación Creada",
+      description: `${editingValidation ? 'Actualización de' : 'Nueva'} validación ${formData.validation_code} ${editingValidation ? 'actualizada' : 'creada'} exitosamente`,
     });
   };
 
   const updateField = (field: string, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      [field]: value,
-      // Reset subcategory when validation type changes
-      ...(field === 'validation_type' ? { subcategory: '' } : {})
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [field]: value,
+        // Reset subcategory when validation type changes
+        ...(field === 'validation_type' ? { subcategory: '' } : {})
+      };
+
+      // Auto-calculate expiry date when issue date or validation type changes
+      if (field === 'issue_date' || field === 'validation_type') {
+        if (newData.issue_date && newData.validation_type) {
+          newData.expiry_date = calculateExpiryDate(newData.issue_date, newData.validation_type as ValidationType);
+        }
+      }
+
+      return newData;
+    });
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl bg-popover border border-border">
         <DialogHeader>
-          <DialogTitle>Nueva Validación</DialogTitle>
+          <DialogTitle>
+            {editingValidation ? 'Editar Validación' : 'Nueva Validación'}
+          </DialogTitle>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="validation_code">Código de Validación *</Label>
+              <Label htmlFor="validation_code">Código del Documento *</Label>
               <Input
                 id="validation_code"
                 value={formData.validation_code}
@@ -104,7 +165,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
             </div>
 
             <div>
-              <Label htmlFor="product_code">Código de Producto</Label>
+              <Label htmlFor="product_code">Código de Producto o Materia Prima</Label>
               <Input
                 id="product_code"
                 value={formData.product_code}
@@ -183,6 +244,25 @@ const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
             </div>
 
             <div>
+              <Label htmlFor="status">Estado *</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value) => updateField('status', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getStatusOptions().map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
               <Label htmlFor="issue_date">Fecha de Emisión</Label>
               <Input
                 id="issue_date"
@@ -199,7 +279,13 @@ const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
                 type="date"
                 value={formData.expiry_date}
                 onChange={(e) => updateField('expiry_date', e.target.value)}
+                placeholder={formData.validation_type === 'metodos_analiticos' ? 'Auto-calculado (2 años)' : 'Auto-calculado (5 años)'}
               />
+              {formData.validation_type === 'metodos_analiticos' && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Los métodos analíticos se vencen 2 años después de la fecha de emisión
+                </p>
+              )}
             </div>
           </div>
 
@@ -208,7 +294,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit }: ValidationFormProps) => {
               Cancelar
             </Button>
             <Button type="submit">
-              Crear Validación
+              {editingValidation ? 'Actualizar Validación' : 'Crear Validación'}
             </Button>
           </div>
         </form>
