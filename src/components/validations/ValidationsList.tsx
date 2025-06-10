@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -110,7 +111,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
     const labels: Record<string, string> = {
       // Procesos
       'fabricacion': 'Fabricación',
-      'envasado': 'Envasado',
+      'empaque': 'Empaque',
       // Métodos Analíticos
       'valoracion': 'Valoración',
       'disolucion': 'Disolución',
@@ -160,18 +161,25 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
 
     const reportTitle = reportType === 'all' 
       ? 'Todas las Validaciones' 
-      : `${reportType}${reportSubcategory !== 'all' && reportSubcategory !== 'no_aplica' ? ` - ${getSubcategoryLabel(reportType as ValidationType, reportSubcategory)}` : ''}`;
+      : `${getValidationTypeLabel(reportType as ValidationType)}${reportSubcategory !== 'all' && reportSubcategory !== 'no_aplica' ? ` - ${getSubcategoryLabel(reportType as ValidationType, reportSubcategory)}` : ''}`;
 
     toast({
       title: "Generando PDF",
       description: `Preparando reporte: ${reportTitle}`,
     });
     
+    // Simulate PDF generation
     setTimeout(() => {
       toast({
         title: "PDF Generado",
         description: `Reporte de ${reportTitle} listo para descarga`,
       });
+      
+      // Create a mock download
+      const link = document.createElement('a');
+      link.href = '#';
+      link.download = `reporte-${reportTitle.toLowerCase().replace(/ /g, '-')}.pdf`;
+      link.click();
     }, 2000);
   };
 
@@ -180,7 +188,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
       case 'procesos':
         return [
           { value: 'fabricacion', label: 'Fabricación' },
-          { value: 'envasado', label: 'Envasado' },
+          { value: 'empaque', label: 'Empaque' },
         ];
       case 'metodos_analiticos':
         return [

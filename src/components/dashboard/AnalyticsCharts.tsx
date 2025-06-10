@@ -80,17 +80,17 @@ const AnalyticsCharts = ({ validations }: AnalyticsChartsProps) => {
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
       {/* Validation Types Chart */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t('dashboard.byType')}</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle>Por Tipo de Validación</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex justify-center">
           <ChartContainer
             config={{
               procesos: { label: t('validation.procesos'), color: '#3b82f6' },
               limpieza: { label: t('validation.limpieza'), color: '#10b981' },
               metodos: { label: t('validation.metodos'), color: '#f59e0b' },
             }}
-            className="h-[200px]"
+            className="h-[200px] w-full"
           >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -116,10 +116,10 @@ const AnalyticsCharts = ({ validations }: AnalyticsChartsProps) => {
 
       {/* Status Chart */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t('dashboard.byStatus')}</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle>Por Estado</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex justify-center">
           <ChartContainer
             config={{
               validado: { label: t('status.validado'), color: '#10b981' },
@@ -127,12 +127,16 @@ const AnalyticsCharts = ({ validations }: AnalyticsChartsProps) => {
               vencido: { label: t('status.vencido'), color: '#ef4444' },
               revalidacion: { label: t('status.revalidacion'), color: '#8b5cf6' },
             }}
-            className="h-[200px]"
+            className="h-[200px] w-full"
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={statusData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10 }} 
+                  textAnchor="middle"
+                />
                 <YAxis />
                 <Bar dataKey="value" fill="#3b82f6" />
                 <ChartTooltip content={<ChartTooltipContent />} />
@@ -144,20 +148,23 @@ const AnalyticsCharts = ({ validations }: AnalyticsChartsProps) => {
 
       {/* Equipment Chart */}
       <Card>
-        <CardHeader>
-          <CardTitle>{t('dashboard.byEquipment')}</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle>Por Equipo</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="flex justify-center">
           <ChartContainer
             config={{
               equipment: { label: 'Equipment', color: '#3b82f6' },
             }}
-            className="h-[200px]"
+            className="h-[200px] w-full"
           >
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={equipmentData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
+                <XAxis 
+                  dataKey="name" 
+                  textAnchor="middle"
+                />
                 <YAxis />
                 <Bar dataKey="value" fill="#3b82f6" />
                 <ChartTooltip content={<ChartTooltipContent />} />

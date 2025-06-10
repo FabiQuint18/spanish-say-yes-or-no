@@ -1,12 +1,35 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Settings, Save } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useToast } from '@/hooks/use-toast';
 
 const SettingsModule = () => {
   const { t } = useLanguage();
+  const { toast } = useToast();
+  const [companyName, setCompanyName] = useState('Mi Empresa S.A.');
+  const [adminEmail, setAdminEmail] = useState('admin@empresa.com');
+  const [alertDays, setAlertDays] = useState('30');
+  const [revalidationPeriod, setRevalidationPeriod] = useState('365');
+
+  const handleSaveChanges = () => {
+    // Simulate saving changes
+    toast({
+      title: "Configuración Guardada",
+      description: "Los cambios han sido guardados exitosamente",
+    });
+    
+    // Here you would typically save to a database or API
+    console.log('Saving settings:', {
+      companyName,
+      adminEmail,
+      alertDays,
+      revalidationPeriod
+    });
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -17,7 +40,7 @@ const SettingsModule = () => {
             Configuración del sistema
           </p>
         </div>
-        <Button>
+        <Button onClick={handleSaveChanges}>
           <Save className="mr-2 h-4 w-4" />
           Guardar Cambios
         </Button>
@@ -35,17 +58,21 @@ const SettingsModule = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Nombre de la Empresa</label>
-                <input 
+                <Input 
                   type="text" 
-                  className="w-full mt-1 px-3 py-2 border border-input rounded-md bg-background"
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  className="w-full mt-1"
                   placeholder="Mi Empresa S.A."
                 />
               </div>
               <div>
                 <label className="text-sm font-medium">Email de Administrador</label>
-                <input 
+                <Input 
                   type="email" 
-                  className="w-full mt-1 px-3 py-2 border border-input rounded-md bg-background"
+                  value={adminEmail}
+                  onChange={(e) => setAdminEmail(e.target.value)}
+                  className="w-full mt-1"
                   placeholder="admin@empresa.com"
                 />
               </div>
@@ -64,9 +91,11 @@ const SettingsModule = () => {
             <div className="space-y-4">
               <div>
                 <label className="text-sm font-medium">Días de Alerta (Próximo a Vencer)</label>
-                <input 
+                <Input 
                   type="number" 
-                  className="w-full mt-1 px-3 py-2 border border-input rounded-md bg-background"
+                  value={alertDays}
+                  onChange={(e) => setAlertDays(e.target.value)}
+                  className="w-full mt-1"
                   placeholder="30"
                   min="1"
                   max="365"
@@ -74,9 +103,11 @@ const SettingsModule = () => {
               </div>
               <div>
                 <label className="text-sm font-medium">Período de Revalidación (días)</label>
-                <input 
+                <Input 
                   type="number" 
-                  className="w-full mt-1 px-3 py-2 border border-input rounded-md bg-background"
+                  value={revalidationPeriod}
+                  onChange={(e) => setRevalidationPeriod(e.target.value)}
+                  className="w-full mt-1"
                   placeholder="365"
                   min="30"
                   max="1825"

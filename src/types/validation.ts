@@ -8,7 +8,7 @@ export type ValidationStatus = 'validado' | 'proximo_vencer' | 'vencido' | 'en_r
 export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos';
 
 // Nuevas subcategorías específicas
-export type ProcessSubcategory = 'fabricacion' | 'envasado';
+export type ProcessSubcategory = 'fabricacion' | 'empaque';
 export type AnalyticalSubcategory = 'valoracion' | 'disolucion' | 'impurezas' | 'uniformidad_unidades_dosificacion' | 'identificacion' | 'trazas';
 export type CleaningSubcategory = 'no_aplica';
 
