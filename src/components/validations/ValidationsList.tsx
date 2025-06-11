@@ -7,9 +7,10 @@ import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Validation, UserRole } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
-import { Search, Edit, Trash2, Download, Upload, FileText, Plus } from 'lucide-react';
+import { Search, Edit, Trash2, Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ValidationFiles from './ValidationFiles';
+import ValidationFilters from '@/components/filters/ValidationFilters';
 
 interface ValidationsListProps {
   validations: Validation[];
@@ -32,12 +33,54 @@ const ValidationsList = ({
 }: ValidationsListProps) => {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
+  const [filters, setFilters] = useState({});
 
-  const filteredValidations = validations.filter(validation =>
-    validation.validation_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    validation.product?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    validation.product?.code.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Aplicar filtros
+  const applyFilters = (validationsList: Validation[]): Validation[] => {
+    let filtered = validationsList;
+
+    // Aplicar búsqueda
+    if (searchTerm) {
+      filtered = filtered.filter(validation =>
+        validation.validation_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        validation.product?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        validation.product?.code.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Aplicar filtros adicionales
+    if (filters.validationType) {
+      filtered = filtered.filter(v => v.validation_type === filters.validationType);
+    }
+
+    if (filters.subcategory) {
+      filtered = filtered.filter(v => v.subcategory === filters.subcategory);
+    }
+
+    if (filters.validationCode) {
+      filtered = filtered.filter(v => 
+        v.validation_code.toLowerCase().includes(filters.validationCode.toLowerCase())
+      );
+    }
+
+    if (filters.productCode) {
+      filtered = filtered.filter(v => 
+        v.product?.code.toLowerCase().includes(filters.productCode.toLowerCase())
+      );
+    }
+
+    if (filters.equipmentType) {
+      filtered = filtered.filter(v => v.equipment_type === filters.equipmentType);
+    }
+
+    if (filters.status) {
+      filtered = filtered.filter(v => v.status === filters.status);
+    }
+
+    return filtered;
+  };
+
+  const filteredValidations = applyFilters(validations);
 
   const getStatusBadge = (status: string, expiryDate: string) => {
     const daysUntilExpiry = getDaysUntilExpiry(expiryDate);
@@ -67,13 +110,13 @@ const ValidationsList = ({
   const getValidationTypeLabel = (type: string) => {
     switch (type) {
       case 'procesos':
-        return 'Procesos';
+        return `${t('validations.type')} de Procesos`;
       case 'limpieza':
-        return 'Limpieza';
+        return `${t('validations.type')} de Limpieza`;
       case 'metodos_analiticos':
-        return 'Métodos Analíticos';
+        return `${t('validations.type')} de Métodos Analíticos`;
       default:
-        return type;
+        return `${t('validations.type')} ${type}`;
     }
   };
 
@@ -101,118 +144,144 @@ const ValidationsList = ({
     }
   };
 
+  const getProductTypeLabel = (type: string) => {
+    switch (type) {
+      case 'producto_terminado':
+        return 'Producto Terminado';
+      case 'materia_prima':
+        return 'Materia Prima';
+      default:
+        return type;
+    }
+  };
+
   // Control de acceso por roles
   const canEdit = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
   const canDelete = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
   const canAdd = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
 
   return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle>{t('validations.list')}</CardTitle>
-            <CardDescription>
-              {t('validations.manage')}
-            </CardDescription>
-          </div>
-          {canAdd && (
-            <Button onClick={onAdd}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t('validations.new')}
-            </Button>
-          )}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Search className="h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder={t('validations.search')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="max-w-sm"
-            />
-          </div>
+    <div className="space-y-6">
+      {/* Filtros de validaciones */}
+      <ValidationFilters
+        filters={filters}
+        onFiltersChange={setFilters}
+        onClearFilters={() => setFilters({})}
+      />
 
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Código de Validación</TableHead>
-                <TableHead>Producto</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Subcategoría</TableHead>
-                <TableHead>Equipo</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Fecha de Vencimiento</TableHead>
-                <TableHead>Protocolos</TableHead>
-                {(canEdit || canDelete) && <TableHead>Acciones</TableHead>}
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredValidations.map((validation) => (
-                <TableRow key={validation.id}>
-                  <TableCell className="font-medium">
-                    {validation.validation_code}
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{validation.product?.name}</div>
-                      <div className="text-sm text-muted-foreground">{validation.product?.code}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>{getValidationTypeLabel(validation.validation_type)}</TableCell>
-                  <TableCell>{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
-                  <TableCell>{validation.equipment_type}</TableCell>
-                  <TableCell>{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
-                  <TableCell>{formatDate(validation.expiry_date)}</TableCell>
-                  <TableCell>
-                    <ValidationFiles
-                      validationId={validation.id}
-                      files={validation.files || []}
-                      onFileUpload={canEdit ? onFileUpload : undefined}
-                      onFileDelete={canDelete ? onFileDelete : undefined}
-                      readOnly={!canEdit}
-                    />
-                  </TableCell>
-                  {(canEdit || canDelete) && (
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>{t('validations.list')}</CardTitle>
+              <CardDescription>
+                {t('validations.manage')}
+              </CardDescription>
+            </div>
+            {canAdd && (
+              <Button onClick={onAdd}>
+                <Plus className="mr-2 h-4 w-4" />
+                {t('validations.new')}
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder={t('validations.search')}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Código de Validación</TableHead>
+                  <TableHead>Producto o Materia Prima</TableHead>
+                  <TableHead>Código de Producto o Materia Prima</TableHead>
+                  <TableHead>Tipo de Validaciones</TableHead>
+                  <TableHead>Subcategoría</TableHead>
+                  <TableHead>Equipo</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Fecha de Vencimiento</TableHead>
+                  <TableHead>Archivos</TableHead>
+                  {(canEdit || canDelete) && <TableHead>Acciones</TableHead>}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredValidations.map((validation) => (
+                  <TableRow key={validation.id}>
+                    <TableCell className="font-medium">
+                      {validation.validation_code}
+                    </TableCell>
                     <TableCell>
-                      <div className="flex items-center space-x-2">
-                        {canEdit && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onEdit(validation)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                        )}
-                        {canDelete && (
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => onDelete(validation.id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        )}
+                      <div>
+                        <div className="font-medium">{validation.product?.name}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {getProductTypeLabel(validation.product?.type || '')}
+                        </div>
                       </div>
                     </TableCell>
-                  )}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                    <TableCell className="font-medium">
+                      {validation.product?.code}
+                    </TableCell>
+                    <TableCell>{getValidationTypeLabel(validation.validation_type)}</TableCell>
+                    <TableCell>{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
+                    <TableCell>{validation.equipment_type}</TableCell>
+                    <TableCell>{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
+                    <TableCell>{formatDate(validation.expiry_date)}</TableCell>
+                    <TableCell>
+                      <ValidationFiles
+                        validationId={validation.id}
+                        files={validation.files || []}
+                        onFileUpload={canEdit ? onFileUpload : undefined}
+                        onFileDelete={canDelete ? onFileDelete : undefined}
+                        readOnly={!canEdit}
+                      />
+                    </TableCell>
+                    {(canEdit || canDelete) && (
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          {canEdit && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onEdit(validation)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                          )}
+                          {canDelete && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => onDelete(validation.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-          {filteredValidations.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              {searchTerm ? 'No se encontraron validaciones que coincidan con la búsqueda.' : 'No hay validaciones disponibles.'}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+            {filteredValidations.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                {searchTerm ? 'No se encontraron validaciones que coincidan con la búsqueda.' : 'No hay validaciones disponibles.'}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

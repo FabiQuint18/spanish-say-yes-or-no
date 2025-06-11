@@ -62,7 +62,7 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
       id: 'security',
       label: 'Seguridad CFR 21',
       icon: Shield,
-      roles: ['administrador', 'coordinador'],
+      roles: ['administrador'], // Solo administrador tiene acceso
     },
     {
       id: 'settings',
