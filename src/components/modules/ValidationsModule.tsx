@@ -1,15 +1,18 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ClipboardCheck, Plus, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Validation } from '@/types/validation';
+import { Validation, UserRole } from '@/types/validation';
 import ValidationsList from '@/components/validations/ValidationsList';
 import ValidationForm from '@/components/validations/ValidationForm';
 import { useToast } from '@/hooks/use-toast';
 
-const ValidationsModule = () => {
+interface ValidationsModuleProps {
+  userRole?: UserRole;
+}
+
+const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [validations, setValidations] = useState<Validation[]>([]);
@@ -291,6 +294,9 @@ const ValidationsModule = () => {
     inValidation: validations.filter(v => v.status === 'en_validacion').length,
   };
 
+  // Control de acceso por roles
+  const canAdd = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -300,10 +306,12 @@ const ValidationsModule = () => {
             {t('validations.subtitle')}
           </p>
         </div>
-        <Button onClick={handleAdd}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('validations.new')}
-        </Button>
+        {canAdd && (
+          <Button onClick={handleAdd}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('validations.new')}
+          </Button>
+        )}
       </div>
 
       {/* Stats Cards */}
@@ -377,15 +385,18 @@ const ValidationsModule = () => {
         onAdd={handleAdd}
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
+        userRole={userRole}
       />
 
       {/* Validation Form Modal */}
-      <ValidationForm
-        isOpen={showForm}
-        onClose={handleCloseForm}
-        onSubmit={handleFormSubmit}
-        editingValidation={editingValidation}
-      />
+      {canAdd && (
+        <ValidationForm
+          isOpen={showForm}
+          onClose={handleCloseForm}
+          onSubmit={handleFormSubmit}
+          editingValidation={editingValidation}
+        />
+      )}
     </div>
   );
 };

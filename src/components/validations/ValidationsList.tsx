@@ -1,18 +1,15 @@
+
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Upload, Trash2, Edit, Printer, Download, FileText, Filter } from 'lucide-react';
-import { Validation, ValidationType, ValidationFilters } from '@/types/validation';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
+import { Input } from '@/components/ui/input';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Validation, UserRole } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
+import { Search, Edit, Trash2, Download, Upload, FileText, Plus } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import ValidationFiles from './ValidationFiles';
-import ValidationFiltersComponent from '@/components/filters/ValidationFilters';
 
 interface ValidationsListProps {
   validations: Validation[];
@@ -21,63 +18,26 @@ interface ValidationsListProps {
   onAdd: () => void;
   onFileUpload: (validationId: string, file: File) => void;
   onFileDelete: (fileId: string) => void;
+  userRole?: UserRole;
 }
 
-const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, onFileDelete }: ValidationsListProps) => {
+const ValidationsList = ({ 
+  validations, 
+  onEdit, 
+  onDelete, 
+  onAdd, 
+  onFileUpload, 
+  onFileDelete,
+  userRole = 'analista'
+}: ValidationsListProps) => {
   const { t } = useLanguage();
-  const { toast } = useToast();
-  const [filterType, setFilterType] = useState<ValidationType | 'all'>('all');
-  const [selectedValidation, setSelectedValidation] = useState<Validation | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<ValidationFilters>({});
-  const [reportType, setReportType] = useState<string>('all');
-  const [reportSubcategory, setReportSubcategory] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const applyFilters = (validationsList: Validation[]): Validation[] => {
-    return validationsList.filter(validation => {
-      // Apply type filter
-      if (filterType !== 'all' && validation.validation_type !== filterType) {
-        return false;
-      }
-
-      // Apply advanced filters
-      if (filters.validationType && validation.validation_type !== filters.validationType) {
-        return false;
-      }
-
-      if (filters.subcategory && validation.subcategory !== filters.subcategory) {
-        return false;
-      }
-
-      if (filters.validationCode && !validation.validation_code.toLowerCase().includes(filters.validationCode.toLowerCase())) {
-        return false;
-      }
-
-      if (filters.productCode && !validation.product?.code.toLowerCase().includes(filters.productCode.toLowerCase())) {
-        return false;
-      }
-
-      if (filters.equipmentType && validation.equipment_type !== filters.equipmentType) {
-        return false;
-      }
-
-      if (filters.status && validation.status !== filters.status) {
-        return false;
-      }
-
-      if (filters.expiryDateFrom && validation.expiry_date < filters.expiryDateFrom) {
-        return false;
-      }
-
-      if (filters.expiryDateTo && validation.expiry_date > filters.expiryDateTo) {
-        return false;
-      }
-
-      return true;
-    });
-  };
-
-  const filteredValidations = applyFilters(validations);
+  const filteredValidations = validations.filter(validation =>
+    validation.validation_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    validation.product?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    validation.product?.code.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const getStatusBadge = (status: string, expiryDate: string) => {
     const daysUntilExpiry = getDaysUntilExpiry(expiryDate);
@@ -86,7 +46,7 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
       case 'validado':
         return <Badge className="bg-green-100 text-green-800">{t('status.validado')}</Badge>;
       case 'proximo_vencer':
-        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.proximo')} ({daysUntilExpiry} {t('dashboard.days')})</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.proximo')} ({daysUntilExpiry} días)</Badge>;
       case 'vencido':
         return <Badge className="bg-red-100 text-red-800">{t('status.vencido')}</Badge>;
       case 'en_revalidacion':
@@ -96,407 +56,163 @@ const ValidationsList = ({ validations, onEdit, onDelete, onAdd, onFileUpload, o
       case 'por_revalidar':
         return <Badge className="bg-orange-100 text-orange-800">{t('status.por_revalidar')}</Badge>;
       case 'primera_revision':
-        return <Badge className="bg-cyan-100 text-cyan-800">{t('status.primera_revision')} ({t('status.validado')})</Badge>;
+        return <Badge className="bg-cyan-100 text-cyan-800">Primera Revisión</Badge>;
       case 'segunda_revision':
-        return <Badge className="bg-indigo-100 text-indigo-800">{t('status.segunda_revision')} ({t('status.validado')})</Badge>;
+        return <Badge className="bg-indigo-100 text-indigo-800">Segunda Revisión</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  const getSubcategoryLabel = (type: ValidationType, subcategory?: string) => {
-    if (!subcategory) return '-';
-
-    const labels: Record<string, string> = {
-      // Procesos
-      'fabricacion': 'Fabricación',
-      'empaque': 'Empaque',
-      // Métodos Analíticos
-      'valoracion': 'Valoración',
-      'disolucion': 'Disolución',
-      'impurezas': 'Impurezas',
-      'uniformidad_unidades_dosificacion': 'Uniformidad UD',
-      'identificacion': 'Identificación',
-      'trazas': 'Trazas',
-      // Limpieza
-      'no_aplica': 'NA',
-    };
-
-    return labels[subcategory] || subcategory;
-  };
-
-  const getValidationTypeLabel = (type: ValidationType) => {
+  const getValidationTypeLabel = (type: string) => {
     switch (type) {
       case 'procesos':
-        return t('validation.procesos');
+        return 'Procesos';
       case 'limpieza':
-        return t('validation.limpieza');
+        return 'Limpieza';
       case 'metodos_analiticos':
-        return t('validation.metodos');
+        return 'Métodos Analíticos';
       default:
         return type;
     }
   };
 
-  const handleGenerateReport = () => {
-    let filteredForReport = validations;
+  const getSubcategoryLabel = (validationType: string, subcategory?: string) => {
+    if (!subcategory) return 'N/A';
     
-    if (reportType !== 'all') {
-      filteredForReport = filteredForReport.filter(v => v.validation_type === reportType);
-      
-      if (reportSubcategory !== 'all') {
-        filteredForReport = filteredForReport.filter(v => v.subcategory === reportSubcategory);
-      }
-    }
-    
-    if (filteredForReport.length === 0) {
-      toast({
-        title: "Sin Datos",
-        description: "No hay validaciones que coincidan con los filtros seleccionados",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const reportTitle = reportType === 'all' 
-      ? 'Todas las Validaciones' 
-      : `${getValidationTypeLabel(reportType as ValidationType)}${reportSubcategory !== 'all' && reportSubcategory !== 'no_aplica' ? ` - ${getSubcategoryLabel(reportType as ValidationType, reportSubcategory)}` : ''}`;
-
-    toast({
-      title: "PDF Generado Exitosamente",
-      description: `Reporte de ${reportTitle} creado correctamente`,
-    });
-    
-    // Create a mock download
-    const link = document.createElement('a');
-    link.href = '#';
-    link.download = `reporte-${reportTitle.toLowerCase().replace(/ /g, '-')}.pdf`;
-    link.click();
-  };
-
-  const getSubcategoryOptions = (validationType: string) => {
     switch (validationType) {
       case 'procesos':
-        return [
-          { value: 'fabricacion', label: 'Fabricación' },
-          { value: 'empaque', label: 'Empaque' },
-        ];
+        return subcategory === 'fabricacion' ? 'Fabricación' : 
+               subcategory === 'empaque' ? 'Empaque' : subcategory;
       case 'metodos_analiticos':
-        return [
-          { value: 'valoracion', label: 'Valoración' },
-          { value: 'disolucion', label: 'Disolución' },
-          { value: 'impurezas', label: 'Impurezas' },
-          { value: 'uniformidad_unidades_dosificacion', label: 'Uniformidad UD' },
-          { value: 'identificacion', label: 'Identificación' },
-          { value: 'trazas', label: 'Trazas' },
-        ];
+        switch (subcategory) {
+          case 'valoracion': return 'Valoración';
+          case 'disolucion': return 'Disolución';
+          case 'impurezas': return 'Impurezas';
+          case 'uniformidad_unidades_dosificacion': return 'Uniformidad de Unidades de Dosificación';
+          case 'identificacion': return 'Identificación';
+          case 'trazas': return 'Trazas';
+          default: return subcategory;
+        }
       case 'limpieza':
-        return [
-          { value: 'no_aplica', label: 'NA' },
-        ];
+        return 'No Aplica';
       default:
-        return [];
+        return subcategory;
     }
   };
 
-  const handleDelete = (validation: Validation) => {
-    onDelete(validation.id);
-    toast({
-      title: "Validación Eliminada",
-      description: `La validación ${validation.validation_code} ha sido eliminada`,
-    });
-  };
-
-  const clearFilters = () => {
-    setFilters({});
-    setFilterType('all');
-    setShowFilters(false);
-  };
+  // Control de acceso por roles
+  const canEdit = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+  const canDelete = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+  const canAdd = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-center flex-1">Lista de Validaciones</CardTitle>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowFilters(!showFilters)}
-                className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
-              >
-                <Filter className="mr-2 h-4 w-4" />
-                Filtros Avanzados
-              </Button>
-              <Button 
-                onClick={onAdd}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground"
-              >
-                <Plus className="mr-2 h-4 w-4" />
-                {t('validations.new')}
-              </Button>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button 
-                    variant="outline"
-                    className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    Cargar Archivo
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="bg-popover border border-border">
-                  <DialogHeader>
-                    <DialogTitle className="text-center">Cargar Validaciones</DialogTitle>
-                  </DialogHeader>
-                  <div className="py-4">
-                    <p className="text-sm text-muted-foreground mb-4 text-center">
-                      Selecciona un archivo Excel o CSV para cargar validaciones masivamente
-                    </p>
-                    <input
-                      type="file"
-                      accept=".xlsx,.xls,.csv"
-                      className="w-full p-2 border border-border rounded bg-background text-foreground"
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>{t('validations.list')}</CardTitle>
+            <CardDescription>
+              {t('validations.manage')}
+            </CardDescription>
           </div>
-        </CardHeader>
-        <CardContent>
-          {/* Advanced Filters */}
-          {showFilters && (
-            <div className="mb-6">
-              <ValidationFiltersComponent
-                filters={filters}
-                onFiltersChange={setFilters}
-                onClearFilters={clearFilters}
-              />
-            </div>
+          {canAdd && (
+            <Button onClick={onAdd}>
+              <Plus className="mr-2 h-4 w-4" />
+              {t('validations.new')}
+            </Button>
           )}
-
-          {/* Quick Type Filters */}
-          <div className="flex gap-2 mb-6 justify-center flex-wrap">
-            <Button
-              variant={filterType === 'all' ? 'default' : 'outline'}
-              onClick={() => setFilterType('all')}
-              className={filterType === 'all' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
-            >
-              Todas ({validations.length})
-            </Button>
-            <Button
-              variant={filterType === 'procesos' ? 'default' : 'outline'}
-              onClick={() => setFilterType('procesos')}
-              className={filterType === 'procesos' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
-            >
-              {t('validation.procesos')} ({validations.filter(v => v.validation_type === 'procesos').length})
-            </Button>
-            <Button
-              variant={filterType === 'limpieza' ? 'default' : 'outline'}
-              onClick={() => setFilterType('limpieza')}
-              className={filterType === 'limpieza' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
-            >
-              {t('validation.limpieza')} ({validations.filter(v => v.validation_type === 'limpieza').length})
-            </Button>
-            <Button
-              variant={filterType === 'metodos_analiticos' ? 'default' : 'outline'}
-              onClick={() => setFilterType('metodos_analiticos')}
-              className={filterType === 'metodos_analiticos' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' : 'bg-background hover:bg-accent hover:text-accent-foreground border-border'}
-            >
-              {t('validation.metodos')} ({validations.filter(v => v.validation_type === 'metodos_analiticos').length})
-            </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Search className="h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder={t('validations.search')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="max-w-sm"
+            />
           </div>
-
-          {/* Report Generation Section */}
-          <Card className="mb-6">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-center text-lg">
-                <Printer className="mr-2 h-5 w-5" />
-                Generar Reporte de Validaciones
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-center">Tipo de Validación</label>
-                  <Select 
-                    value={reportType} 
-                    onValueChange={(value) => {
-                      setReportType(value);
-                      setReportSubcategory('all');
-                    }}
-                  >
-                    <SelectTrigger className="bg-background border-border">
-                      <SelectValue placeholder="Seleccionar tipo" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border border-border">
-                      <SelectItem value="all">Todas las Validaciones</SelectItem>
-                      <SelectItem value="procesos">{t('validation.procesos')}</SelectItem>
-                      <SelectItem value="metodos_analiticos">{t('validation.metodos')}</SelectItem>
-                      <SelectItem value="limpieza">{t('validation.limpieza')}</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-center">Subcategoría</label>
-                  <Select 
-                    value={reportSubcategory} 
-                    onValueChange={setReportSubcategory}
-                    disabled={reportType === 'all'}
-                  >
-                    <SelectTrigger className="bg-background border-border">
-                      <SelectValue placeholder="Seleccionar subcategoría" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-popover border border-border">
-                      <SelectItem value="all">Todas las Subcategorías</SelectItem>
-                      {getSubcategoryOptions(reportType).map((option) => (
-                        <SelectItem key={option.value} value={option.value}>
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Button 
-                    onClick={handleGenerateReport}
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
-                  >
-                    <Printer className="mr-2 h-4 w-4" />
-                    Generar Reporte PDF
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="text-center">Código del Documento</TableHead>
-                <TableHead className="text-center">Código de Producto o Materia Prima</TableHead>
-                <TableHead className="text-center">Producto o Materia Prima</TableHead>
-                <TableHead className="text-center">Tipo de Validación</TableHead>
-                <TableHead className="text-center">Subcategoría</TableHead>
-                <TableHead className="text-center">Equipo</TableHead>
-                <TableHead className="text-center">Estado</TableHead>
-                <TableHead className="text-center">Vencimiento</TableHead>
-                <TableHead className="text-center">Archivos</TableHead>
-                <TableHead className="text-center">Acciones</TableHead>
+                <TableHead>Código de Validación</TableHead>
+                <TableHead>Producto</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Subcategoría</TableHead>
+                <TableHead>Equipo</TableHead>
+                <TableHead>Estado</TableHead>
+                <TableHead>Fecha de Vencimiento</TableHead>
+                <TableHead>Protocolos</TableHead>
+                {(canEdit || canDelete) && <TableHead>Acciones</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredValidations.map((validation) => (
                 <TableRow key={validation.id}>
-                  <TableCell className="font-medium text-center">
+                  <TableCell className="font-medium">
                     {validation.validation_code}
                   </TableCell>
-                  <TableCell className="font-medium text-center">
-                    {validation.product?.code || '-'}
+                  <TableCell>
+                    <div>
+                      <div className="font-medium">{validation.product?.name}</div>
+                      <div className="text-sm text-muted-foreground">{validation.product?.code}</div>
+                    </div>
                   </TableCell>
-                  <TableCell className="text-center">{validation.product?.name}</TableCell>
-                  <TableCell className="text-center">{getValidationTypeLabel(validation.validation_type)}</TableCell>
-                  <TableCell className="text-center">
-                    {getSubcategoryLabel(validation.validation_type, validation.subcategory)}
+                  <TableCell>{getValidationTypeLabel(validation.validation_type)}</TableCell>
+                  <TableCell>{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
+                  <TableCell>{validation.equipment_type}</TableCell>
+                  <TableCell>{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
+                  <TableCell>{formatDate(validation.expiry_date)}</TableCell>
+                  <TableCell>
+                    <ValidationFiles
+                      validationId={validation.id}
+                      files={validation.files || []}
+                      onFileUpload={canEdit ? onFileUpload : undefined}
+                      onFileDelete={canDelete ? onFileDelete : undefined}
+                      readOnly={!canEdit}
+                    />
                   </TableCell>
-                  <TableCell className="text-center">{validation.equipment_type}</TableCell>
-                  <TableCell className="text-center">
-                    {getStatusBadge(validation.status, validation.expiry_date)}
-                  </TableCell>
-                  <TableCell className="text-center">{formatDate(validation.expiry_date)}</TableCell>
-                  <TableCell className="text-center">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
-                        >
-                          <FileText className="h-4 w-4" />
-                          {validation.files?.length || 0}
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-4xl bg-popover border border-border">
-                        <DialogHeader>
-                          <DialogTitle className="text-center">
-                            Archivos - {validation.validation_code}
-                          </DialogTitle>
-                        </DialogHeader>
-                        <ValidationFiles
-                          validationId={validation.id}
-                          files={validation.files || []}
-                          onFileUpload={onFileUpload}
-                          onFileDelete={onFileDelete}
-                        />
-                      </DialogContent>
-                    </Dialog>
-                  </TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex gap-2 justify-center">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => onEdit(validation)}
-                        className="bg-background hover:bg-accent hover:text-accent-foreground border-border"
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button 
-                            variant="outline" 
+                  {(canEdit || canDelete) && (
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        {canEdit && (
+                          <Button
+                            variant="outline"
                             size="sm"
-                            className="bg-background hover:bg-destructive/10 hover:text-destructive border-border"
+                            onClick={() => onEdit(validation)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                        )}
+                        {canDelete && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => onDelete(validation.id)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent className="bg-popover border border-border">
-                          <AlertDialogHeader>
-                            <AlertDialogTitle className="text-center">¿Estás Seguro de Eliminar Este Registro?</AlertDialogTitle>
-                            <AlertDialogDescription className="text-center">
-                              Esta acción no se puede deshacer. La validación {validation.validation_code} será eliminada permanentemente.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter className="justify-center">
-                            <AlertDialogCancel className="bg-background hover:bg-accent hover:text-accent-foreground border-border">
-                              {t('common.cancel')}
-                            </AlertDialogCancel>
-                            <AlertDialogAction 
-                              onClick={() => handleDelete(validation)}
-                              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-                            >
-                              {t('common.delete')}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </TableCell>
+                        )}
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
           </Table>
 
           {filteredValidations.length === 0 && (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No se encontraron validaciones con los filtros aplicados</p>
-              <Button 
-                variant="outline" 
-                onClick={clearFilters} 
-                className="mt-2 bg-background hover:bg-accent hover:text-accent-foreground border-border"
-              >
-                {t('filters.clear')}
-              </Button>
+            <div className="text-center py-8 text-muted-foreground">
+              {searchTerm ? 'No se encontraron validaciones que coincidan con la búsqueda.' : 'No hay validaciones disponibles.'}
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 

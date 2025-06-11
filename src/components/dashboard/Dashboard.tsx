@@ -7,6 +7,8 @@ import AnalyticsSection from './AnalyticsSection';
 import ExportOptions from './ExportOptions';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 import ExpiryNotifications from '@/components/notifications/ExpiryNotifications';
+import SecurityManager from '@/components/security/SecurityManager';
+import UsersModule from '@/components/modules/UsersModule';
 import { 
   ClipboardCheck, 
   AlertTriangle, 
@@ -22,9 +24,10 @@ import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DashboardProps {
   userRole: UserRole;
+  activeTab?: string;
 }
 
-const Dashboard = ({ userRole }: DashboardProps) => {
+const Dashboard = ({ userRole, activeTab }: DashboardProps) => {
   const { t } = useLanguage();
   const [quickSearch, setQuickSearch] = useState('');
   const [filters, setFilters] = useState<Filters>({});
@@ -139,6 +142,15 @@ const Dashboard = ({ userRole }: DashboardProps) => {
     setValidations(mockValidations);
   }, []);
 
+  // Renderizar módulos específicos según activeTab
+  if (activeTab === 'security') {
+    return <SecurityManager />;
+  }
+
+  if (activeTab === 'users') {
+    return <UsersModule />;
+  }
+
   const applyFilters = (validationsList: Validation[]): Validation[] => {
     let filtered = validationsList;
 
@@ -235,6 +247,10 @@ const Dashboard = ({ userRole }: DashboardProps) => {
     return <FlaskConical className="h-4 w-4" />;
   };
 
+  // Control de acceso por roles
+  const canViewAnalytics = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'visualizador';
+  const canViewExportOptions = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+
   return (
     <div className="p-6 space-y-6">
       {/* Componente de notificaciones de vencimiento */}
@@ -274,11 +290,11 @@ const Dashboard = ({ userRole }: DashboardProps) => {
         />
       </div>
 
-      {/* Export Options */}
-      <ExportOptions validations={validations} />
+      {/* Export Options - Solo para admin, coordinador y analista */}
+      {canViewExportOptions && <ExportOptions validations={validations} />}
 
-      {/* Analytics Section */}
-      <AnalyticsSection validations={validations} />
+      {/* Analytics Section - Solo para admin, coordinador y visualizador */}
+      {canViewAnalytics && <AnalyticsSection validations={validations} />}
 
       {/* Quick Search */}
       <Card>
@@ -341,3 +357,5 @@ const Dashboard = ({ userRole }: DashboardProps) => {
 };
 
 export default Dashboard;
+
+}

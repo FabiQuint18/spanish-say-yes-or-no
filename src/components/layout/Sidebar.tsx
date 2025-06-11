@@ -7,7 +7,8 @@ import {
   ClipboardCheck, 
   Users, 
   Settings,
-  FlaskConical
+  FlaskConical,
+  Shield
 } from 'lucide-react';
 import { UserRole } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -31,31 +32,37 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
       id: 'dashboard',
       label: t('menu.dashboard'),
       icon: LayoutDashboard,
-      roles: ['administrador', 'analista', 'visualizador'],
+      roles: ['administrador', 'coordinador', 'analista', 'visualizador'],
     },
     {
       id: 'products',
       label: t('menu.products'),
       icon: Package,
-      roles: ['administrador', 'analista', 'visualizador'],
+      roles: ['administrador', 'coordinador', 'analista'],
     },
     {
       id: 'validations',
       label: t('menu.validations'),
       icon: ClipboardCheck,
-      roles: ['administrador', 'analista', 'visualizador'],
+      roles: ['administrador', 'coordinador', 'analista', 'visualizador'],
     },
     {
       id: 'equipments',
       label: t('menu.equipments'),
       icon: FlaskConical,
-      roles: ['administrador', 'analista', 'visualizador'],
+      roles: ['administrador', 'coordinador', 'analista'],
     },
     {
       id: 'users',
       label: t('menu.users'),
       icon: Users,
       roles: ['administrador'],
+    },
+    {
+      id: 'security',
+      label: 'Seguridad CFR 21',
+      icon: Shield,
+      roles: ['administrador', 'coordinador'],
     },
     {
       id: 'settings',

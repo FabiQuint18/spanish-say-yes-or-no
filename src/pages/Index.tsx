@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -9,7 +8,11 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Shield, Mail, Lock, AlertTriangle } from 'lucide-react';
 import { toast } from '@/components/ui/sonner';
 import Dashboard from '@/components/dashboard/Dashboard';
+import ValidationsModule from '@/components/modules/ValidationsModule';
+import ProductsModule from '@/components/modules/ProductsModule';
+import EquipmentsModule from '@/components/modules/EquipmentsModule';
 import Header from '@/components/layout/Header';
+import Sidebar from '@/components/layout/Sidebar';
 import { UserRole } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -56,6 +59,7 @@ const Index = () => {
   const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<UserRole>('visualizador');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -245,6 +249,7 @@ const Index = () => {
         // Para usuarios demo, solo limpiar el estado local
         setUser(null);
         setUserRole('visualizador');
+        setActiveTab('dashboard');
         console.log('Logout de usuario demo exitoso');
       } else {
         // Para usuarios de Supabase
@@ -253,6 +258,25 @@ const Index = () => {
       toast.success('Sesión cerrada exitosamente');
     } catch (error) {
       console.error('Error durante logout:', error);
+    }
+  };
+
+  const renderMainContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard userRole={userRole} activeTab={activeTab} />;
+      case 'validations':
+        return <ValidationsModule userRole={userRole} />;
+      case 'products':
+        return <ProductsModule />;
+      case 'equipments':
+        return <EquipmentsModule />;
+      case 'users':
+      case 'security':
+      case 'settings':
+        return <Dashboard userRole={userRole} activeTab={activeTab} />;
+      default:
+        return <Dashboard userRole={userRole} activeTab={activeTab} />;
     }
   };
 
@@ -390,7 +414,16 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header user={user} onLogout={handleLogout} />
-      <Dashboard userRole={userRole} />
+      <div className="flex h-[calc(100vh-4rem)]">
+        <Sidebar 
+          activeTab={activeTab} 
+          onTabChange={setActiveTab} 
+          userRole={userRole}
+        />
+        <main className="flex-1 overflow-auto">
+          {renderMainContent()}
+        </main>
+      </div>
     </div>
   );
 };
