@@ -28,13 +28,13 @@ const SecurityManager = () => {
     {
       name: 'Bloqueo por Inactividad',
       status: 'active',
-      description: 'Bloqueo automático después de 30 minutos de inactividad',
+      description: 'Bloqueo automático después de 5 minutos de inactividad',
       cfr21Compliant: true
     },
     {
       name: 'Control de Intentos Fallidos',
       status: 'active',
-      description: 'Bloqueo de cuenta después de 3 intentos fallidos',
+      description: 'Bloqueo de cuenta por usuario después de 3 intentos fallidos',
       cfr21Compliant: true
     },
     {
@@ -53,7 +53,9 @@ const SecurityManager = () => {
 
   const [auditLogs] = useState([
     { timestamp: '2024-06-11 10:30:00', user: 'admin@company.com', action: 'Login exitoso', ip: '192.168.1.100' },
+    { timestamp: '2024-06-11 10:28:00', user: 'test@company.com', action: 'Cuenta bloqueada por 3 intentos fallidos', ip: '192.168.1.105' },
     { timestamp: '2024-06-11 10:25:00', user: 'analista@company.com', action: 'Validación VAL-001-2024 editada', ip: '192.168.1.101' },
+    { timestamp: '2024-06-11 10:23:00', user: 'coordinador@company.com', action: 'Sesión cerrada por inactividad (5 minutos)', ip: '192.168.1.103' },
     { timestamp: '2024-06-11 10:20:00', user: 'coordinador@company.com', action: 'Nuevo producto creado', ip: '192.168.1.102' },
   ]);
 
