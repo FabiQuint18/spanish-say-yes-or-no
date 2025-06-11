@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ const ValidationsModule = () => {
   const [showForm, setShowForm] = useState(false);
   const [editingValidation, setEditingValidation] = useState<Validation | null>(null);
 
-  // Mock data con subcategorías y archivos
+  // Mock data actualizado con "empaque" en lugar de "envasado"
   const mockValidations: Validation[] = [
     {
       id: '1',
@@ -154,7 +155,7 @@ const ValidationsModule = () => {
       validation_code: 'VAL-006-2024',
       equipment_type: 'GC',
       validation_type: 'procesos',
-      subcategory: 'envasado',
+      subcategory: 'empaque',
       issue_date: '2024-07-01',
       expiry_date: '2025-07-01',
       status: 'en_validacion',

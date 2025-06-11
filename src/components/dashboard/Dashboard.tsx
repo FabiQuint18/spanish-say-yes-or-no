@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -7,6 +6,7 @@ import StatsCard from './StatsCard';
 import AnalyticsSection from './AnalyticsSection';
 import ExportOptions from './ExportOptions';
 import ValidationFilters from '@/components/filters/ValidationFilters';
+import ExpiryNotifications from '@/components/notifications/ExpiryNotifications';
 import { 
   ClipboardCheck, 
   AlertTriangle, 
@@ -72,6 +72,7 @@ const Dashboard = ({ userRole }: DashboardProps) => {
       validation_code: 'VAL-002-2024',
       equipment_type: 'GC',
       validation_type: 'procesos',
+      subcategory: 'empaque',
       issue_date: '2024-06-15',
       expiry_date: '2025-02-15',
       status: 'en_validacion',
@@ -138,6 +139,52 @@ const Dashboard = ({ userRole }: DashboardProps) => {
     setValidations(mockValidations);
   }, []);
 
+  const applyFilters = (validationsList: Validation[]): Validation[] => {
+    let filtered = validationsList;
+
+    // Aplicar búsqueda rápida
+    if (quickSearch) {
+      filtered = filtered.filter(validation =>
+        validation.validation_code.toLowerCase().includes(quickSearch.toLowerCase()) ||
+        validation.product?.name.toLowerCase().includes(quickSearch.toLowerCase()) ||
+        validation.product?.code.toLowerCase().includes(quickSearch.toLowerCase())
+      );
+    }
+
+    // Aplicar filtros avanzados
+    if (filters.validationType) {
+      filtered = filtered.filter(v => v.validation_type === filters.validationType);
+    }
+
+    if (filters.subcategory) {
+      filtered = filtered.filter(v => v.subcategory === filters.subcategory);
+    }
+
+    if (filters.validationCode) {
+      filtered = filtered.filter(v => 
+        v.validation_code.toLowerCase().includes(filters.validationCode!.toLowerCase())
+      );
+    }
+
+    if (filters.productCode) {
+      filtered = filtered.filter(v => 
+        v.product?.code.toLowerCase().includes(filters.productCode!.toLowerCase())
+      );
+    }
+
+    if (filters.equipmentType) {
+      filtered = filtered.filter(v => v.equipment_type === filters.equipmentType);
+    }
+
+    if (filters.status) {
+      filtered = filtered.filter(v => v.status === filters.status);
+    }
+
+    return filtered;
+  };
+
+  const filteredValidations = applyFilters(validations);
+
   const stats = {
     total: validations.length,
     validated: validations.filter(v => v.status === 'validado' || v.status === 'primera_revision' || v.status === 'segunda_revision').length,
@@ -190,6 +237,9 @@ const Dashboard = ({ userRole }: DashboardProps) => {
 
   return (
     <div className="p-6 space-y-6">
+      {/* Componente de notificaciones de vencimiento */}
+      <ExpiryNotifications validations={validations} userEmail="admin@company.com" />
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatsCard
@@ -262,10 +312,10 @@ const Dashboard = ({ userRole }: DashboardProps) => {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {validations.slice(0, 10).map((validation) => (
+            {filteredValidations.slice(0, 10).map((validation) => (
               <div key={validation.id} className="flex items-center justify-between p-4 border rounded-lg">
                 <div className="flex items-center space-x-4">
-                  {getEquipmentIcon(validation.equipment_type)}
+                  <FlaskConical className="h-4 w-4" />
                   <div>
                     <h4 className="font-semibold text-center">{validation.product?.name}</h4>
                     <p className="text-sm text-muted-foreground text-center">
@@ -273,13 +323,13 @@ const Dashboard = ({ userRole }: DashboardProps) => {
                     </p>
                     <p className="text-xs text-muted-foreground text-center">
                       {t('dashboard.equipment')}: {validation.equipment_type} | 
-                      {getValidationTypeLabel(validation.validation_type)} | 
+                      Métodos Analíticos | 
                       {t('dashboard.expires')}: {formatDate(validation.expiry_date)}
                     </p>
                   </div>
                 </div>
                 <div className="text-right">
-                  {getStatusBadge(validation.status, validation.expiry_date)}
+                  <Badge className="bg-green-100 text-green-800">{t('status.validado')}</Badge>
                 </div>
               </div>
             ))}

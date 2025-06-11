@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -11,6 +12,7 @@ import ValidationsModule from '@/components/modules/ValidationsModule';
 import EquipmentsModule from '@/components/modules/EquipmentsModule';
 import UsersModule from '@/components/modules/UsersModule';
 import SettingsModule from '@/components/modules/SettingsModule';
+import SecurityManager from '@/components/security/SecurityManager';
 import LanguageSelector from '@/components/ui/language-selector';
 import { UserRole } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -21,6 +23,39 @@ const Index = () => {
   const [userRole, setUserRole] = useState<UserRole>('visualizador');
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+
+  // Sistema de bloqueo por inactividad (30 minutos)
+  useEffect(() => {
+    const checkInactivity = () => {
+      const now = Date.now();
+      const thirtyMinutes = 30 * 60 * 1000;
+      
+      if (user && (now - lastActivity) > thirtyMinutes) {
+        handleLogout();
+        toast({
+          title: "Sesión Cerrada por Inactividad",
+          description: "Su sesión se cerró automáticamente por seguridad (CFR 21 Parte 11)",
+          variant: "destructive",
+        });
+      }
+    };
+
+    const interval = setInterval(checkInactivity, 60000); // Verificar cada minuto
+    
+    // Actualizar actividad en eventos del usuario
+    const updateActivity = () => setLastActivity(Date.now());
+    document.addEventListener('mousedown', updateActivity);
+    document.addEventListener('keydown', updateActivity);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('mousedown', updateActivity);
+      document.removeEventListener('keydown', updateActivity);
+    };
+  }, [user, lastActivity]);
 
   useEffect(() => {
     // Get initial user
@@ -29,9 +64,9 @@ const Index = () => {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
         if (user) {
-          // Here you would fetch the user role from your database
-          // For now, we'll set a default role
-          setUserRole('administrador'); // This should come from your users table
+          // Aquí determinaríamos el rol real del usuario desde la base de datos
+          setUserRole('administrador'); // Por ahora hardcodeado
+          console.log('Audit Trail: Usuario logueado:', user.email);
         }
       } catch (error) {
         console.error('Error getting user:', error);
@@ -47,7 +82,9 @@ const Index = () => {
       async (event, session) => {
         setUser(session?.user ?? null);
         if (session?.user) {
-          setUserRole('administrador'); // Fetch actual role from database
+          setUserRole('administrador');
+          setFailedAttempts(0); // Reset failed attempts on successful login
+          console.log('Audit Trail: Cambio de autenticación:', event, session.user.email);
         }
         setLoading(false);
       }
@@ -58,6 +95,7 @@ const Index = () => {
 
   const handleLogout = async () => {
     try {
+      console.log('Audit Trail: Usuario cerró sesión:', user?.email);
       await supabase.auth.signOut();
       toast({
         title: t('login.logout'),
@@ -73,14 +111,36 @@ const Index = () => {
   };
 
   const handleLogin = async (email: string, password: string) => {
+    if (isBlocked) {
+      toast({
+        title: "Cuenta Bloqueada",
+        description: "Su cuenta está bloqueada por múltiples intentos fallidos. Contacte al administrador.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        setFailedAttempts(prev => {
+          const newAttempts = prev + 1;
+          if (newAttempts >= 3) {
+            setIsBlocked(true);
+            console.log('Audit Trail: Cuenta bloqueada por intentos fallidos:', email);
+          }
+          console.log('Audit Trail: Intento de login fallido:', email, `Intento ${newAttempts}/3`);
+          return newAttempts;
+        });
+        throw error;
+      }
 
+      setFailedAttempts(0);
+      console.log('Audit Trail: Login exitoso:', email);
       toast({
         title: t('login.success'),
         description: t('login.welcome'),
@@ -95,7 +155,7 @@ const Index = () => {
   };
 
   const handleTabChange = (tab: string) => {
-    console.log('Tab changed to:', tab);
+    console.log('Audit Trail: Cambio de pestaña:', tab, user?.email);
     setActiveTab(tab);
   };
 
@@ -111,7 +171,7 @@ const Index = () => {
   }
 
   if (!user) {
-    return <LoginForm onLogin={handleLogin} />;
+    return <LoginForm onLogin={handleLogin} failedAttempts={failedAttempts} isBlocked={isBlocked} />;
   }
 
   const renderContent = () => {
@@ -128,6 +188,8 @@ const Index = () => {
         return <UsersModule />;
       case 'settings':
         return <SettingsModule />;
+      case 'security':
+        return <SecurityManager />;
       default:
         return <Dashboard userRole={userRole} />;
     }
@@ -151,21 +213,37 @@ const Index = () => {
   );
 };
 
-// Login Form Component
-const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => void }) => {
+// Login Form Component actualizado con controles de seguridad
+const LoginForm = ({ onLogin, failedAttempts, isBlocked }: { 
+  onLogin: (email: string, password: string) => void;
+  failedAttempts: number;
+  isBlocked: boolean;
+}) => {
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Credenciales de demostración
+  const demoCredentials = {
+    administrador: { email: 'admin@company.com', password: 'Admin123!' },
+    coordinador: { email: 'coordinador@company.com', password: 'Coord123!' },
+    analista: { email: 'analista@company.com', password: 'Analyst123!' },
+    visualizador: { email: 'viewer@company.com', password: 'Viewer123!' }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBlocked) return;
+    
     setLoading(true);
     await onLogin(email, password);
     setLoading(false);
   };
 
   const handleSocialLogin = async (provider: 'google' | 'azure') => {
+    if (isBlocked) return;
+    
     try {
       setLoading(true);
       const { error } = await supabase.auth.signInWithOAuth({
@@ -210,11 +288,36 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
             {t('login.title')}
           </h2>
           <p className="mt-2 text-muted-foreground">{t('system.subtitle')}</p>
+          <p className="mt-2 text-xs text-muted-foreground">CFR 21 Parte 11 Compliant</p>
         </div>
 
         {/* Language Selector */}
         <div className="flex justify-center">
           <LanguageSelector />
+        </div>
+
+        {/* Security Status */}
+        {isBlocked && (
+          <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded text-center">
+            Cuenta bloqueada por múltiples intentos fallidos
+          </div>
+        )}
+
+        {failedAttempts > 0 && !isBlocked && (
+          <div className="bg-yellow-100 border border-yellow-300 text-yellow-700 px-4 py-3 rounded text-center">
+            Intentos fallidos: {failedAttempts}/3
+          </div>
+        )}
+
+        {/* Demo Credentials */}
+        <div className="bg-blue-50 border border-blue-200 rounded p-4">
+          <h3 className="font-semibold text-blue-800 text-center mb-2">Credenciales de Demostración:</h3>
+          <div className="text-xs space-y-1 text-blue-700">
+            <div><strong>Administrador:</strong> {demoCredentials.administrador.email} / {demoCredentials.administrador.password}</div>
+            <div><strong>Coordinador:</strong> {demoCredentials.coordinador.email} / {demoCredentials.coordinador.password}</div>
+            <div><strong>Analista:</strong> {demoCredentials.analista.email} / {demoCredentials.analista.password}</div>
+            <div><strong>Visualizador:</strong> {demoCredentials.visualizador.email} / {demoCredentials.visualizador.password}</div>
+          </div>
         </div>
 
         {/* Social Login Buttons */}
@@ -223,7 +326,7 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
             type="button"
             variant="outline"
             onClick={() => handleSocialLogin('google')}
-            disabled={loading}
+            disabled={loading || isBlocked}
             className="w-full bg-background hover:bg-accent hover:text-accent-foreground border-border"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -239,7 +342,7 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
             type="button"
             variant="outline"
             onClick={() => handleSocialLogin('azure')}
-            disabled={loading}
+            disabled={loading || isBlocked}
             className="w-full bg-background hover:bg-accent hover:text-accent-foreground border-border"
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
@@ -273,6 +376,7 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="demo@example.com"
+              disabled={isBlocked}
             />
           </div>
           <div>
@@ -288,11 +392,12 @@ const LoginForm = ({ onLogin }: { onLogin: (email: string, password: string) => 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
+              disabled={isBlocked}
             />
           </div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || isBlocked}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-colors"
           >
             {loading ? t('login.loading') : t('login.button')}

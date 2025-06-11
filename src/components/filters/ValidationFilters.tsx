@@ -34,7 +34,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
       case 'procesos':
         return [
           { value: 'fabricacion', label: 'Fabricación' },
-          { value: 'envasado', label: 'Envasado' },
+          { value: 'empaque', label: 'Empaque' },
         ];
       case 'metodos_analiticos':
         return [

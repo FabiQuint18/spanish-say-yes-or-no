@@ -7,12 +7,12 @@ export type ValidationStatus = 'validado' | 'proximo_vencer' | 'vencido' | 'en_r
 
 export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos';
 
-// Nuevas subcategorías específicas
+// Nuevas subcategorías específicas con empaque en lugar de envasado
 export type ProcessSubcategory = 'fabricacion' | 'empaque';
 export type AnalyticalSubcategory = 'valoracion' | 'disolucion' | 'impurezas' | 'uniformidad_unidades_dosificacion' | 'identificacion' | 'trazas';
 export type CleaningSubcategory = 'no_aplica';
 
-export type UserRole = 'administrador' | 'analista' | 'visualizador';
+export type UserRole = 'administrador' | 'coordinador' | 'analista' | 'visualizador';
 
 export type Language = 'es' | 'en' | 'pt';
 
@@ -86,4 +86,31 @@ export const calculateExpiryDate = (issueDate: string, validationType: Validatio
     issue.setFullYear(issue.getFullYear() + 5);
   }
   return issue.toISOString().split('T')[0];
+};
+
+// Nueva función para verificar vencimientos próximos
+export const checkExpiringValidations = (validations: Validation[]): {
+  sixMonths: Validation[];
+  threeMonths: Validation[];
+  oneMonth: Validation[];
+} => {
+  const now = new Date();
+  const sixMonthsFromNow = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate());
+  const threeMonthsFromNow = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate());
+  const oneMonthFromNow = new Date(now.getFullYear(), now.getMonth() + 1, now.getDate());
+
+  return {
+    sixMonths: validations.filter(v => {
+      const expiry = new Date(v.expiry_date);
+      return expiry <= sixMonthsFromNow && expiry > threeMonthsFromNow;
+    }),
+    threeMonths: validations.filter(v => {
+      const expiry = new Date(v.expiry_date);
+      return expiry <= threeMonthsFromNow && expiry > oneMonthFromNow;
+    }),
+    oneMonth: validations.filter(v => {
+      const expiry = new Date(v.expiry_date);
+      return expiry <= oneMonthFromNow && expiry > now;
+    })
+  };
 };
