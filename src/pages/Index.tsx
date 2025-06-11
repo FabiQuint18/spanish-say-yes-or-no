@@ -13,6 +13,7 @@ import ProductsModule from '@/components/modules/ProductsModule';
 import EquipmentsModule from '@/components/modules/EquipmentsModule';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
+import LanguageSelector from '@/components/ui/language-selector';
 import { UserRole } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -300,6 +301,10 @@ const Index = () => {
               <div>
                 <CardTitle className="text-2xl font-bold">{t('system.title')}</CardTitle>
                 <CardDescription className="text-base">{t('system.subtitle')}</CardDescription>
+              </div>
+              {/* Selector de idiomas restaurado */}
+              <div className="flex justify-center">
+                <LanguageSelector />
               </div>
             </CardHeader>
             
