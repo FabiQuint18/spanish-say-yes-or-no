@@ -1,16 +1,16 @@
-
-export type ProductType = 'producto_terminado' | 'materia_prima' | 'material_envase';
+export type ProductType = 'producto_terminado' | 'materia_prima' | 'material_empaque';
 
 export type EquipmentType = 'HPLC' | 'GC' | 'UV-VIS' | 'NIR' | 'RAMAN' | 'IR' | 'AA' | 'Karl Fischer';
 
 export type ValidationStatus = 'validado' | 'proximo_vencer' | 'vencido' | 'en_revalidacion' | 'en_validacion' | 'por_revalidar' | 'primera_revision' | 'segunda_revision';
 
-export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos';
+export type ValidationType = 'procesos' | 'limpieza' | 'metodos_analiticos' | 'sistemas_computarizados';
 
 // Nuevas subcategorías específicas con empaque en lugar de envasado
 export type ProcessSubcategory = 'fabricacion' | 'empaque';
 export type AnalyticalSubcategory = 'valoracion' | 'disolucion' | 'impurezas' | 'uniformidad_unidades_dosificacion' | 'identificacion' | 'trazas';
 export type CleaningSubcategory = 'no_aplica';
+export type ComputerizedSubcategory = 'validacion_inicial' | 'revalidacion_periodica';
 
 export type UserRole = 'administrador' | 'coordinador' | 'analista' | 'visualizador';
 
@@ -43,7 +43,7 @@ export interface Validation {
   validation_code: string;
   equipment_type: EquipmentType;
   validation_type: ValidationType;
-  subcategory?: ProcessSubcategory | AnalyticalSubcategory | CleaningSubcategory;
+  subcategory?: ProcessSubcategory | AnalyticalSubcategory | CleaningSubcategory | ComputerizedSubcategory;
   issue_date: string;
   expiry_date: string;
   status: ValidationStatus;
@@ -71,7 +71,7 @@ export interface ValidationFilters {
   validationCode?: string;
   equipmentType?: EquipmentType;
   validationType?: ValidationType;
-  subcategory?: ProcessSubcategory | AnalyticalSubcategory | CleaningSubcategory;
+  subcategory?: ProcessSubcategory | AnalyticalSubcategory | CleaningSubcategory | ComputerizedSubcategory;
   status?: ValidationStatus;
   expiryDateFrom?: string;
   expiryDateTo?: string;

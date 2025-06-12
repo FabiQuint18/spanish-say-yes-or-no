@@ -28,8 +28,8 @@ const ProductsModule = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Producto Creado",
-      description: `El producto ${formData.name} ha sido agregado exitosamente`,
+      title: t('products.created'),
+      description: `${t('products.product')} ${formData.name} ${t('products.added_successfully')}`,
     });
     setShowForm(false);
     setFormData({ code: '', name: '', type: '', description: '' });
@@ -46,12 +46,12 @@ const ProductsModule = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">{t('menu.products')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestiona Los Productos Del Sistema
+            {t('products.manage_system_products')}
           </p>
         </div>
         <Button onClick={handleAddProduct}>
           <Plus className="mr-2 h-4 w-4" />
-          Agregar Producto
+          {t('products.add_product')}
         </Button>
       </div>
 
@@ -59,14 +59,14 @@ const ProductsModule = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Productos Terminados
+              {t('products.finished_products')}
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">24</div>
             <p className="text-xs text-muted-foreground">
-              +2 Desde El Mes Pasado
+              {t('products.increase_last_month')}
             </p>
           </CardContent>
         </Card>
@@ -74,14 +74,14 @@ const ProductsModule = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Materias Primas
+              {t('products.raw_materials')}
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">156</div>
             <p className="text-xs text-muted-foreground">
-              +12 Desde El Mes Pasado
+              {t('products.increase_last_month')}
             </p>
           </CardContent>
         </Card>
@@ -89,14 +89,14 @@ const ProductsModule = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Material De Envase
+              {t('products.packaging_materials')}
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">89</div>
             <p className="text-xs text-muted-foreground">
-              +7 Desde El Mes Pasado
+              {t('products.increase_last_month')}
             </p>
           </CardContent>
         </Card>
@@ -104,14 +104,14 @@ const ProductsModule = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Lista De Productos</CardTitle>
+          <CardTitle>{t('products.product_list')}</CardTitle>
           <CardDescription>
-            Productos Registrados En El Sistema
+            {t('products.registered_products')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="text-center py-8 text-muted-foreground">
-            Módulo De Productos En Desarrollo...
+            {t('products.module_in_development')}
           </div>
         </CardContent>
       </Card>
@@ -120,11 +120,11 @@ const ProductsModule = () => {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="bg-popover border border-border">
           <DialogHeader>
-            <DialogTitle className="text-center">Agregar Nuevo Producto</DialogTitle>
+            <DialogTitle className="text-center">{t('products.add_new_product')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="code">Código Del Producto</Label>
+              <Label htmlFor="code">{t('products.product_code')}</Label>
               <Input
                 id="code"
                 value={formData.code}
@@ -134,7 +134,7 @@ const ProductsModule = () => {
               />
             </div>
             <div>
-              <Label htmlFor="name">Nombre Del Producto</Label>
+              <Label htmlFor="name">{t('products.product_name')}</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -144,33 +144,33 @@ const ProductsModule = () => {
               />
             </div>
             <div>
-              <Label htmlFor="type">Tipo De Producto</Label>
+              <Label htmlFor="type">{t('products.product_type')}</Label>
               <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar tipo" />
+                  <SelectValue placeholder={t('products.select_type')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="producto_terminado">Producto Terminado</SelectItem>
-                  <SelectItem value="materia_prima">Materia Prima</SelectItem>
-                  <SelectItem value="material_envase">Material De Envase</SelectItem>
+                  <SelectItem value="producto_terminado">{t('products.finished_product')}</SelectItem>
+                  <SelectItem value="materia_prima">{t('products.raw_material')}</SelectItem>
+                  <SelectItem value="material_empaque">{t('products.packaging_material')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="description">Descripción</Label>
+              <Label htmlFor="description">{t('products.description')}</Label>
               <Input
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Descripción del producto"
+                placeholder={t('products.product_description')}
               />
             </div>
             <div className="flex gap-2 justify-end">
               <Button type="button" variant="outline" onClick={handleClose}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit">
-                Agregar Producto
+                {t('products.add_product')}
               </Button>
             </div>
           </form>

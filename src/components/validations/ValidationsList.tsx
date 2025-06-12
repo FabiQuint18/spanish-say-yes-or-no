@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Validation, UserRole } from '@/types/validation';
+import { Validation, UserRole, ValidationFilters } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
 import { Search, Edit, Trash2, Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -33,7 +33,7 @@ const ValidationsList = ({
 }: ValidationsListProps) => {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState<ValidationFilters>({});
 
   // Aplicar filtros
   const applyFilters = (validationsList: Validation[]): Validation[] => {
@@ -99,9 +99,9 @@ const ValidationsList = ({
       case 'por_revalidar':
         return <Badge className="bg-orange-100 text-orange-800">{t('status.por_revalidar')}</Badge>;
       case 'primera_revision':
-        return <Badge className="bg-cyan-100 text-cyan-800">Primera Revisión</Badge>;
+        return <Badge className="bg-cyan-100 text-cyan-800">{t('status.primera_revision')}</Badge>;
       case 'segunda_revision':
-        return <Badge className="bg-indigo-100 text-indigo-800">Segunda Revisión</Badge>;
+        return <Badge className="bg-indigo-100 text-indigo-800">{t('status.segunda_revision')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -110,13 +110,15 @@ const ValidationsList = ({
   const getValidationTypeLabel = (type: string) => {
     switch (type) {
       case 'procesos':
-        return `${t('validations.type')} de Procesos`;
+        return t('validations.processes');
       case 'limpieza':
-        return `${t('validations.type')} de Limpieza`;
+        return t('validations.cleaning');
       case 'metodos_analiticos':
-        return `${t('validations.type')} de Métodos Analíticos`;
+        return t('validations.analytical_methods');
+      case 'sistemas_computarizados':
+        return t('validations.computerized_systems');
       default:
-        return `${t('validations.type')} ${type}`;
+        return type;
     }
   };
 
@@ -125,20 +127,20 @@ const ValidationsList = ({
     
     switch (validationType) {
       case 'procesos':
-        return subcategory === 'fabricacion' ? 'Fabricación' : 
-               subcategory === 'empaque' ? 'Empaque' : subcategory;
+        return subcategory === 'fabricacion' ? t('validations.manufacturing') : 
+               subcategory === 'empaque' ? t('validations.packaging') : subcategory;
       case 'metodos_analiticos':
         switch (subcategory) {
-          case 'valoracion': return 'Valoración';
-          case 'disolucion': return 'Disolución';
-          case 'impurezas': return 'Impurezas';
-          case 'uniformidad_unidades_dosificacion': return 'Uniformidad de Unidades de Dosificación';
-          case 'identificacion': return 'Identificación';
-          case 'trazas': return 'Trazas';
+          case 'valoracion': return t('validations.assay');
+          case 'disolucion': return t('validations.dissolution');
+          case 'impurezas': return t('validations.impurities');
+          case 'uniformidad_unidades_dosificacion': return t('validations.uniformity');
+          case 'identificacion': return t('validations.identification');
+          case 'trazas': return t('validations.traces');
           default: return subcategory;
         }
       case 'limpieza':
-        return 'No Aplica';
+        return t('validations.not_applicable');
       default:
         return subcategory;
     }
@@ -147,9 +149,9 @@ const ValidationsList = ({
   const getProductTypeLabel = (type: string) => {
     switch (type) {
       case 'producto_terminado':
-        return 'Producto Terminado';
+        return t('products.finished_product');
       case 'materia_prima':
-        return 'Materia Prima';
+        return t('products.raw_material');
       default:
         return type;
     }
@@ -159,6 +161,7 @@ const ValidationsList = ({
   const canEdit = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
   const canDelete = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
   const canAdd = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+  const canUploadFiles = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
 
   return (
     <div className="space-y-6">
@@ -181,7 +184,7 @@ const ValidationsList = ({
             {canAdd && (
               <Button onClick={onAdd}>
                 <Plus className="mr-2 h-4 w-4" />
-                {t('validations.new')}
+                {t('validations.add_product_raw_material')}
               </Button>
             )}
           </div>
@@ -201,16 +204,16 @@ const ValidationsList = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Código de Validación</TableHead>
-                  <TableHead>Producto o Materia Prima</TableHead>
-                  <TableHead>Código de Producto o Materia Prima</TableHead>
-                  <TableHead>Tipo de Validaciones</TableHead>
-                  <TableHead>Subcategoría</TableHead>
-                  <TableHead>Equipo</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Fecha de Vencimiento</TableHead>
-                  <TableHead>Archivos</TableHead>
-                  {(canEdit || canDelete) && <TableHead>Acciones</TableHead>}
+                  <TableHead>{t('validations.validation_code')}</TableHead>
+                  <TableHead>{t('validations.product_raw_material')}</TableHead>
+                  <TableHead>{t('validations.product_raw_material_code')}</TableHead>
+                  <TableHead>{t('validations.validation_type')}</TableHead>
+                  <TableHead>{t('validations.subcategory')}</TableHead>
+                  <TableHead>{t('validations.equipment')}</TableHead>
+                  <TableHead>{t('validations.status')}</TableHead>
+                  <TableHead>{t('validations.expiry_date')}</TableHead>
+                  <TableHead>{t('validations.files')}</TableHead>
+                  {(canEdit || canDelete) && <TableHead>{t('validations.actions')}</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -239,9 +242,9 @@ const ValidationsList = ({
                       <ValidationFiles
                         validationId={validation.id}
                         files={validation.files || []}
-                        onFileUpload={canEdit ? onFileUpload : undefined}
+                        onFileUpload={canUploadFiles ? onFileUpload : undefined}
                         onFileDelete={canDelete ? onFileDelete : undefined}
-                        readOnly={!canEdit}
+                        readOnly={!canUploadFiles}
                       />
                     </TableCell>
                     {(canEdit || canDelete) && (
@@ -275,7 +278,7 @@ const ValidationsList = ({
 
             {filteredValidations.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
-                {searchTerm ? 'No se encontraron validaciones que coincidan con la búsqueda.' : 'No hay validaciones disponibles.'}
+                {searchTerm ? t('validations.no_results') : t('validations.no_validations')}
               </div>
             )}
           </div>
