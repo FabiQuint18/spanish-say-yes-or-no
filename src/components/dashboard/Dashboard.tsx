@@ -64,7 +64,7 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
 
       {/* Expiry Notifications - Solo para roles que pueden actuar */}
       {(userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista') && (
-        <ExpiryNotifications />
+        <ExpiryNotifications validations={[]} />
       )}
 
       {/* Analytics Section - Visible para todos los roles permitidos */}
@@ -78,14 +78,11 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <AnalyticsCharts readOnly={!canModifyAnalytics} />
+              <AnalyticsCharts />
             </CardContent>
           </Card>
           
-          <AnalyticsSection 
-            userRole={userRole}
-            canModify={canModifyAnalytics}
-          />
+          <AnalyticsSection />
         </div>
       )}
 

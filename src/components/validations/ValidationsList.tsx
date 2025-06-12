@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Validation, UserRole, ValidationFilters } from '@/types/validation';
+import { Validation, UserRole, ValidationFilters as ValidationFiltersType } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
 import { Search, Edit, Trash2, Plus } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -33,7 +33,7 @@ const ValidationsList = ({
 }: ValidationsListProps) => {
   const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filters, setFilters] = useState<ValidationFilters>({});
+  const [filters, setFilters] = useState<ValidationFiltersType>({});
 
   // Aplicar filtros
   const applyFilters = (validationsList: Validation[]): Validation[] => {
@@ -110,13 +110,13 @@ const ValidationsList = ({
   const getValidationTypeLabel = (type: string) => {
     switch (type) {
       case 'procesos':
-        return t('validations.processes');
+        return 'Validaciones de Procesos';
       case 'limpieza':
-        return t('validations.cleaning');
+        return 'Validaciones de Limpieza';
       case 'metodos_analiticos':
-        return t('validations.analytical_methods');
+        return 'Validaciones de Métodos Analíticos';
       case 'sistemas_computarizados':
-        return t('validations.computerized_systems');
+        return 'Validaciones de Sistemas Computarizados';
       default:
         return type;
     }
@@ -152,6 +152,8 @@ const ValidationsList = ({
         return t('products.finished_product');
       case 'materia_prima':
         return t('products.raw_material');
+      case 'material_empaque':
+        return t('products.packaging_material');
       default:
         return type;
     }
@@ -244,7 +246,7 @@ const ValidationsList = ({
                         files={validation.files || []}
                         onFileUpload={canUploadFiles ? onFileUpload : undefined}
                         onFileDelete={canDelete ? onFileDelete : undefined}
-                        readOnly={!canUploadFiles}
+                        readOnly={userRole === 'visualizador'}
                       />
                     </TableCell>
                     {(canEdit || canDelete) && (

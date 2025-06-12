@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -265,7 +266,7 @@ const Index = () => {
   const renderMainContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard userRole={userRole} activeTab={activeTab} />;
+        return <Dashboard userRole={userRole} />;
       case 'validations':
         return <ValidationsModule userRole={userRole} />;
       case 'products':
@@ -275,9 +276,9 @@ const Index = () => {
       case 'users':
       case 'security':
       case 'settings':
-        return <Dashboard userRole={userRole} activeTab={activeTab} />;
+        return <Dashboard userRole={userRole} />;
       default:
-        return <Dashboard userRole={userRole} activeTab={activeTab} />;
+        return <Dashboard userRole={userRole} />;
     }
   };
 
