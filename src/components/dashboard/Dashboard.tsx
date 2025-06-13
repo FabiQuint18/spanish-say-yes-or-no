@@ -26,6 +26,12 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
       equipment_type: 'HPLC',
       status: 'validado' as const,
       expiry_date: '2024-12-31',
+      product_id: '1',
+      issue_date: '2024-01-15',
+      created_by: 'user1',
+      updated_by: 'user1',
+      created_at: '2024-01-15T10:00:00Z',
+      updated_at: '2024-01-15T10:00:00Z',
       product: {
         id: '1',
         name: 'Producto A',
@@ -41,6 +47,12 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
       equipment_type: 'GC',
       status: 'proximo_vencer' as const,
       expiry_date: '2024-07-15',
+      product_id: '2',
+      issue_date: '2024-01-20',
+      created_by: 'user2',
+      updated_by: 'user2',
+      created_at: '2024-01-20T10:00:00Z',
+      updated_at: '2024-01-20T10:00:00Z',
       product: {
         id: '2',
         name: 'Producto B',
@@ -53,7 +65,6 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
 
   // Control de acceso por roles
   const canViewAnalytics = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'visualizador' || userRole === 'analista';
-  const canModifyAnalytics = userRole === 'administrador' || userRole === 'coordinador';
 
   return (
     <div className="p-6 space-y-6">

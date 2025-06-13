@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -12,6 +11,9 @@ import Dashboard from '@/components/dashboard/Dashboard';
 import ValidationsModule from '@/components/modules/ValidationsModule';
 import ProductsModule from '@/components/modules/ProductsModule';
 import EquipmentsModule from '@/components/modules/EquipmentsModule';
+import UsersModule from '@/components/modules/UsersModule';
+import SecurityModule from '@/components/modules/SecurityModule';
+import SettingsModule from '@/components/modules/SettingsModule';
 import Header from '@/components/layout/Header';
 import Sidebar from '@/components/layout/Sidebar';
 import LanguageSelector from '@/components/ui/language-selector';
@@ -263,22 +265,24 @@ const Index = () => {
     }
   };
 
-  const renderMainContent = () => {
+  const renderContent = () => {
     switch (activeTab) {
       case 'dashboard':
-        return <Dashboard userRole={userRole} />;
+        return <Dashboard userRole={user?.user_metadata?.role || 'visualizador'} />;
       case 'validations':
-        return <ValidationsModule userRole={userRole} />;
+        return <ValidationsModule userRole={user?.user_metadata?.role || 'visualizador'} />;
       case 'products':
-        return <ProductsModule />;
+        return <ProductsModule userRole={user?.user_metadata?.role || 'visualizador'} />;
       case 'equipments':
-        return <EquipmentsModule />;
+        return <EquipmentsModule userRole={user?.user_metadata?.role || 'visualizador'} />;
       case 'users':
+        return <UsersModule />;
       case 'security':
+        return <SecurityModule />;
       case 'settings':
-        return <Dashboard userRole={userRole} />;
+        return <SettingsModule />;
       default:
-        return <Dashboard userRole={userRole} />;
+        return <Dashboard userRole={user?.user_metadata?.role || 'visualizador'} />;
     }
   };
 
@@ -427,7 +431,7 @@ const Index = () => {
           userRole={userRole}
         />
         <main className="flex-1 overflow-auto">
-          {renderMainContent()}
+          {renderContent()}
         </main>
       </div>
     </div>

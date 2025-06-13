@@ -2,42 +2,95 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Plus, Shield, UserCheck, Eye } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Edit, Trash2, Search, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
+import { UserRole } from '@/types/validation';
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: 'active' | 'inactive';
+  created_at: string;
+}
 
 const UsersModule = () => {
   const { t } = useLanguage();
-  const { toast } = useToast();
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    fullName: '',
-    email: '',
-    role: '',
-    password: ''
-  });
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const handleAddUser = () => {
-    setShowForm(true);
+  // Mock users data
+  const mockUsers: User[] = [
+    {
+      id: '1',
+      name: 'Juan Pérez',
+      email: 'admin@company.com',
+      role: 'administrador',
+      status: 'active',
+      created_at: '2024-01-15'
+    },
+    {
+      id: '2',
+      name: 'María García',
+      email: 'coordinador@company.com',
+      role: 'coordinador',
+      status: 'active',
+      created_at: '2024-01-20'
+    },
+    {
+      id: '3',
+      name: 'Carlos López',
+      email: 'analista@company.com',
+      role: 'analista',
+      status: 'active',
+      created_at: '2024-02-01'
+    },
+    {
+      id: '4',
+      name: 'Ana Rodríguez',
+      email: 'viewer@company.com',
+      role: 'visualizador',
+      status: 'inactive',
+      created_at: '2024-02-10'
+    }
+  ];
+
+  const filteredUsers = mockUsers.filter(user =>
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const getRoleBadge = (role: UserRole) => {
+    const roleColors = {
+      administrador: 'bg-red-100 text-red-800',
+      coordinador: 'bg-blue-100 text-blue-800',
+      analista: 'bg-green-100 text-green-800',
+      visualizador: 'bg-gray-100 text-gray-800'
+    };
+    
+    const roleLabels = {
+      administrador: 'Administrador',
+      coordinador: 'Coordinador',
+      analista: 'Analista',
+      visualizador: 'Visualizador'
+    };
+
+    return (
+      <Badge className={roleColors[role]}>
+        {roleLabels[role]}
+      </Badge>
+    );
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({
-      title: "Usuario Agregado",
-      description: `El usuario ${formData.fullName} ha sido creado exitosamente`,
-    });
-    setShowForm(false);
-    setFormData({ fullName: '', email: '', role: '', password: '' });
-  };
-
-  const handleClose = () => {
-    setShowForm(false);
-    setFormData({ fullName: '', email: '', role: '', password: '' });
+  const getStatusBadge = (status: 'active' | 'inactive') => {
+    return status === 'active' ? (
+      <Badge className="bg-green-100 text-green-800">Activo</Badge>
+    ) : (
+      <Badge className="bg-red-100 text-red-800">Inactivo</Badge>
+    );
   };
 
   return (
@@ -46,139 +99,79 @@ const UsersModule = () => {
         <div>
           <h1 className="text-3xl font-bold text-foreground">{t('menu.users')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestiona Los Usuarios Del Sistema
+            Gestionar usuarios del sistema
           </p>
         </div>
-        <Button onClick={handleAddUser}>
+        <Button>
           <Plus className="mr-2 h-4 w-4" />
           Agregar Usuario
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Administradores
-            </CardTitle>
-            <Shield className="h-4 w-4 text-red-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">3</div>
-            <p className="text-xs text-muted-foreground">
-              Control Total Del Sistema
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Analistas
-            </CardTitle>
-            <UserCheck className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-            <p className="text-xs text-muted-foreground">
-              Gestión De Validaciones
-            </p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Visualizadores
-            </CardTitle>
-            <Eye className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">
-              Solo Lectura
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-
       <Card>
         <CardHeader>
-          <CardTitle>Lista De Usuarios</CardTitle>
+          <CardTitle className="flex items-center">
+            <Users className="mr-2 h-5 w-5" />
+            Lista de Usuarios
+          </CardTitle>
           <CardDescription>
-            Usuarios Registrados En El Sistema
+            Administrar los usuarios y sus permisos en el sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            Módulo De Usuarios En Desarrollo...
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar usuarios..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="max-w-sm"
+              />
+            </div>
+
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Rol</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Fecha de Creación</TableHead>
+                  <TableHead>Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filteredUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell className="font-medium">{user.name}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{getRoleBadge(user.role)}</TableCell>
+                    <TableCell>{getStatusBadge(user.status)}</TableCell>
+                    <TableCell>{user.created_at}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center space-x-2">
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="outline" size="sm">
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+
+            {filteredUsers.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                No se encontraron usuarios
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
-
-      {/* User Form Dialog */}
-      <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="bg-popover border border-border">
-          <DialogHeader>
-            <DialogTitle className="text-center">Agregar Nuevo Usuario</DialogTitle>
-          </DialogHeader>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="fullName">Nombre Completo</Label>
-              <Input
-                id="fullName"
-                value={formData.fullName}
-                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                placeholder="Juan Pérez"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="email">Correo Electrónico</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="juan.perez@empresa.com"
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="role">Rol Del Usuario</Label>
-              <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value })}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar rol" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="administrador">Administrador</SelectItem>
-                  <SelectItem value="analista">Analista</SelectItem>
-                  <SelectItem value="visualizador">Visualizador</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="password">Contraseña Temporal</Label>
-              <Input
-                id="password"
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                placeholder="Contraseña temporal"
-                required
-              />
-            </div>
-            <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" onClick={handleClose}>
-                Cancelar
-              </Button>
-              <Button type="submit">
-                Agregar Usuario
-              </Button>
-            </div>
-          </form>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
