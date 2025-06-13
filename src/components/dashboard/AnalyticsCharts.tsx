@@ -10,24 +10,27 @@ interface AnalyticsChartsProps {
   validations: Validation[];
 }
 
-const AnalyticsCharts = ({ validations }: AnalyticsChartsProps) => {
+const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
   const { t } = useLanguage();
+
+  // Ensure validations is always an array
+  const safeValidations = Array.isArray(validations) ? validations : [];
 
   // Data for validation types chart
   const validationTypeData = [
     { 
       name: t('validation.procesos'), 
-      value: validations.filter(v => v.validation_type === 'procesos').length,
+      value: safeValidations.filter(v => v.validation_type === 'procesos').length,
       fill: '#3b82f6'
     },
     { 
       name: t('validation.limpieza'), 
-      value: validations.filter(v => v.validation_type === 'limpieza').length,
+      value: safeValidations.filter(v => v.validation_type === 'limpieza').length,
       fill: '#10b981'
     },
     { 
       name: t('validation.metodos'), 
-      value: validations.filter(v => v.validation_type === 'metodos_analiticos').length,
+      value: safeValidations.filter(v => v.validation_type === 'metodos_analiticos').length,
       fill: '#f59e0b'
     },
   ];
@@ -36,44 +39,44 @@ const AnalyticsCharts = ({ validations }: AnalyticsChartsProps) => {
   const statusData = [
     { 
       name: t('status.validado'), 
-      value: validations.filter(v => v.status === 'validado').length,
+      value: safeValidations.filter(v => v.status === 'validado').length,
       fill: '#10b981'
     },
     { 
       name: t('status.proximo'), 
-      value: validations.filter(v => v.status === 'proximo_vencer').length,
+      value: safeValidations.filter(v => v.status === 'proximo_vencer').length,
       fill: '#f59e0b'
     },
     { 
       name: t('status.vencido'), 
-      value: validations.filter(v => v.status === 'vencido').length,
+      value: safeValidations.filter(v => v.status === 'vencido').length,
       fill: '#ef4444'
     },
     { 
       name: t('status.revalidacion'), 
-      value: validations.filter(v => v.status === 'en_revalidacion').length,
+      value: safeValidations.filter(v => v.status === 'en_revalidacion').length,
       fill: '#8b5cf6'
     },
     { 
       name: t('status.en_validacion'), 
-      value: validations.filter(v => v.status === 'en_validacion').length,
+      value: safeValidations.filter(v => v.status === 'en_validacion').length,
       fill: '#06b6d4'
     },
     { 
       name: t('status.por_revalidar'), 
-      value: validations.filter(v => v.status === 'por_revalidar').length,
+      value: safeValidations.filter(v => v.status === 'por_revalidar').length,
       fill: '#f97316'
     },
   ];
 
   // Data for equipment chart
   const equipmentData = [
-    { name: 'HPLC', value: validations.filter(v => v.equipment_type === 'HPLC').length },
-    { name: 'GC', value: validations.filter(v => v.equipment_type === 'GC').length },
-    { name: 'UV-VIS', value: validations.filter(v => v.equipment_type === 'UV-VIS').length },
-    { name: 'NIR', value: validations.filter(v => v.equipment_type === 'NIR').length },
-    { name: 'RAMAN', value: validations.filter(v => v.equipment_type === 'RAMAN').length },
-    { name: 'IR', value: validations.filter(v => v.equipment_type === 'IR').length },
+    { name: 'HPLC', value: safeValidations.filter(v => v.equipment_type === 'HPLC').length },
+    { name: 'GC', value: safeValidations.filter(v => v.equipment_type === 'GC').length },
+    { name: 'UV-VIS', value: safeValidations.filter(v => v.equipment_type === 'UV-VIS').length },
+    { name: 'NIR', value: safeValidations.filter(v => v.equipment_type === 'NIR').length },
+    { name: 'RAMAN', value: safeValidations.filter(v => v.equipment_type === 'RAMAN').length },
+    { name: 'IR', value: safeValidations.filter(v => v.equipment_type === 'IR').length },
   ];
 
   return (

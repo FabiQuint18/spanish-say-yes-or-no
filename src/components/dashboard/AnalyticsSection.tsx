@@ -10,12 +10,15 @@ interface AnalyticsSectionProps {
   validations: Validation[];
 }
 
-const AnalyticsSection = ({ validations }: AnalyticsSectionProps) => {
+const AnalyticsSection = ({ validations = [] }: AnalyticsSectionProps) => {
   const [analyticsType, setAnalyticsType] = useState<'validations' | 'protocols' | 'reports'>('validations');
 
-  const validationsWithProtocols = validations.filter(v => v.files && v.files.length > 0);
-  const validationsWithoutProtocols = validations.filter(v => !v.files || v.files.length === 0);
-  const reportsData = validations.filter(v => v.status === 'validado' || v.status === 'primera_revision' || v.status === 'segunda_revision');
+  // Ensure validations is always an array
+  const safeValidations = Array.isArray(validations) ? validations : [];
+
+  const validationsWithProtocols = safeValidations.filter(v => v.files && v.files.length > 0);
+  const validationsWithoutProtocols = safeValidations.filter(v => !v.files || v.files.length === 0);
+  const reportsData = safeValidations.filter(v => v.status === 'validado' || v.status === 'primera_revision' || v.status === 'segunda_revision');
 
   const getAnalyticsData = () => {
     switch (analyticsType) {
@@ -24,7 +27,7 @@ const AnalyticsSection = ({ validations }: AnalyticsSectionProps) => {
       case 'reports':
         return reportsData;
       default:
-        return validations;
+        return safeValidations;
     }
   };
 
@@ -56,7 +59,7 @@ const AnalyticsSection = ({ validations }: AnalyticsSectionProps) => {
                 className="flex items-center"
               >
                 <ClipboardCheck className="mr-2 h-4 w-4" />
-                Validaciones ({validations.length})
+                Validaciones ({safeValidations.length})
               </Button>
               <Button
                 variant={analyticsType === 'protocols' ? 'default' : 'outline'}
@@ -86,7 +89,7 @@ const AnalyticsSection = ({ validations }: AnalyticsSectionProps) => {
                 ? `Análisis de ${validationsWithProtocols.length} validaciones con protocolos documentados`
                 : analyticsType === 'reports'
                 ? `Análisis de ${reportsData.length} reportes de validación completados`
-                : `Análisis de ${validations.length} validaciones totales en el sistema`
+                : `Análisis de ${safeValidations.length} validaciones totales en el sistema`
               }
             </p>
           </div>

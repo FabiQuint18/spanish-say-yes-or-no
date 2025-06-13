@@ -16,6 +16,41 @@ interface DashboardProps {
 const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
   const { t } = useLanguage();
 
+  // Mock validations data for analytics - this should come from a real data source
+  const mockValidations = [
+    {
+      id: '1',
+      validation_code: 'VAL-001-2024',
+      validation_type: 'procesos' as const,
+      subcategory: 'fabricacion',
+      equipment_type: 'HPLC',
+      status: 'validado' as const,
+      expiry_date: '2024-12-31',
+      product: {
+        id: '1',
+        name: 'Producto A',
+        code: 'PA-001',
+        type: 'producto_terminado' as const
+      },
+      files: []
+    },
+    {
+      id: '2',
+      validation_code: 'VAL-002-2024',
+      validation_type: 'limpieza' as const,
+      equipment_type: 'GC',
+      status: 'proximo_vencer' as const,
+      expiry_date: '2024-07-15',
+      product: {
+        id: '2',
+        name: 'Producto B',
+        code: 'PB-002',
+        type: 'producto_terminado' as const
+      },
+      files: []
+    }
+  ];
+
   // Control de acceso por roles
   const canViewAnalytics = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'visualizador' || userRole === 'analista';
   const canModifyAnalytics = userRole === 'administrador' || userRole === 'coordinador';
@@ -64,7 +99,7 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
 
       {/* Expiry Notifications - Solo para roles que pueden actuar */}
       {(userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista') && (
-        <ExpiryNotifications validations={[]} />
+        <ExpiryNotifications validations={mockValidations} />
       )}
 
       {/* Analytics Section - Visible para todos los roles permitidos */}
@@ -78,11 +113,11 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <AnalyticsCharts />
+              <AnalyticsCharts validations={mockValidations} />
             </CardContent>
           </Card>
           
-          <AnalyticsSection />
+          <AnalyticsSection validations={mockValidations} />
         </div>
       )}
 
