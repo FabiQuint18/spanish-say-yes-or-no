@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
 import { ValidationType, ValidationStatus, Validation, calculateExpiryDate } from '@/types/validation';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ValidationFormProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ interface ValidationFormProps {
 
 const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: ValidationFormProps) => {
   const { toast } = useToast();
+  const { t } = useLanguage();
   const [formData, setFormData] = useState({
     validation_code: '',
     product_code: '',
@@ -62,21 +64,26 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
     switch (validationType) {
       case 'procesos':
         return [
-          { value: 'fabricacion', label: 'Fabricación' },
-          { value: 'envasado', label: 'Envasado' },
+          { value: 'fabricacion', label: t('validations.manufacturing') },
+          { value: 'empaque', label: t('validations.packaging') },
         ];
       case 'metodos_analiticos':
         return [
-          { value: 'valoracion', label: 'Valoración' },
-          { value: 'disolucion', label: 'Disolución' },
-          { value: 'impurezas', label: 'Impurezas' },
-          { value: 'uniformidad_unidades_dosificacion', label: 'Uniformidad de Unidades de Dosificación' },
-          { value: 'identificacion', label: 'Identificación' },
-          { value: 'trazas', label: 'Trazas' },
+          { value: 'valoracion', label: t('validations.assay') },
+          { value: 'disolucion', label: t('validations.dissolution') },
+          { value: 'impurezas', label: t('validations.impurities') },
+          { value: 'uniformidad_unidades_dosificacion', label: t('validations.uniformity') },
+          { value: 'identificacion', label: t('validations.identification') },
+          { value: 'trazas', label: t('validations.traces') },
         ];
       case 'limpieza':
         return [
-          { value: 'no_aplica', label: 'NA' },
+          { value: 'no_aplica', label: t('validations.not_applicable') },
+        ];
+      case 'sistemas_computarizados':
+        return [
+          { value: 'validacion_inicial', label: t('validations.initial_validation') },
+          { value: 'revalidacion_periodica', label: t('validations.periodic_revalidation') },
         ];
       default:
         return [];
@@ -85,14 +92,14 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
 
   const getStatusOptions = (): Array<{value: ValidationStatus, label: string}> => {
     return [
-      { value: 'validado', label: 'Validado' },
-      { value: 'proximo_vencer', label: 'Próximo a Vencer' },
-      { value: 'vencido', label: 'Vencido' },
-      { value: 'en_revalidacion', label: 'En Revalidación' },
-      { value: 'en_validacion', label: 'En Validación' },
-      { value: 'por_revalidar', label: 'Por Revalidar' },
-      { value: 'primera_revision', label: 'Primera Revisión' },
-      { value: 'segunda_revision', label: 'Segunda Revisión' },
+      { value: 'validado', label: t('status.validado') },
+      { value: 'proximo_vencer', label: t('status.proximo') },
+      { value: 'vencido', label: t('status.vencido') },
+      { value: 'en_revalidacion', label: t('status.revalidacion') },
+      { value: 'en_validacion', label: t('status.en_validacion') },
+      { value: 'por_revalidar', label: t('status.por_revalidar') },
+      { value: 'primera_revision', label: t('status.primera_revision') },
+      { value: 'segunda_revision', label: t('status.segunda_revision') },
     ];
   };
 
@@ -101,7 +108,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
     
     if (!formData.validation_code || !formData.validation_type || !formData.status) {
       toast({
-        title: "Error",
+        title: t('common.error'),
         description: "Por favor completa los campos requeridos",
         variant: "destructive",
       });
@@ -194,9 +201,10 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
                   <SelectValue placeholder="Seleccionar tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="procesos">Procesos</SelectItem>
-                  <SelectItem value="metodos_analiticos">Métodos Analíticos</SelectItem>
-                  <SelectItem value="limpieza">Limpieza</SelectItem>
+                  <SelectItem value="procesos">{t('validations.processes')}</SelectItem>
+                  <SelectItem value="metodos_analiticos">{t('validations.analytical_methods')}</SelectItem>
+                  <SelectItem value="limpieza">{t('validations.cleaning')}</SelectItem>
+                  <SelectItem value="sistemas_computarizados">{t('validations.computerized_systems')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -291,7 +299,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              Cancelar
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
               {editingValidation ? 'Actualizar Validación' : 'Crear Validación'}

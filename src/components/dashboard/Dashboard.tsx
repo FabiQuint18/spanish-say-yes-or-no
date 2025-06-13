@@ -7,7 +7,7 @@ import ExpiryNotifications from '@/components/notifications/ExpiryNotifications'
 import { ClipboardCheck, Package, Users, AlertTriangle, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { UserRole } from '@/types/validation';
+import { UserRole, EquipmentType } from '@/types/validation';
 
 interface DashboardProps {
   userRole?: UserRole;
@@ -23,7 +23,7 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
       validation_code: 'VAL-001-2024',
       validation_type: 'procesos' as const,
       subcategory: 'fabricacion',
-      equipment_type: 'HPLC',
+      equipment_type: 'HPLC' as EquipmentType,
       status: 'validado' as const,
       expiry_date: '2024-12-31',
       product_id: '1',
@@ -36,7 +36,9 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
         id: '1',
         name: 'Producto A',
         code: 'PA-001',
-        type: 'producto_terminado' as const
+        type: 'producto_terminado' as const,
+        created_at: '2024-01-15T10:00:00Z',
+        updated_at: '2024-01-15T10:00:00Z'
       },
       files: []
     },
@@ -44,7 +46,7 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
       id: '2',
       validation_code: 'VAL-002-2024',
       validation_type: 'limpieza' as const,
-      equipment_type: 'GC',
+      equipment_type: 'GC' as EquipmentType,
       status: 'proximo_vencer' as const,
       expiry_date: '2024-07-15',
       product_id: '2',
@@ -57,7 +59,9 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
         id: '2',
         name: 'Producto B',
         code: 'PB-002',
-        type: 'producto_terminado' as const
+        type: 'producto_terminado' as const,
+        created_at: '2024-01-20T10:00:00Z',
+        updated_at: '2024-01-20T10:00:00Z'
       },
       files: []
     }
