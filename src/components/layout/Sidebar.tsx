@@ -15,8 +15,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
 interface SidebarProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
+  activeModule: string;
+  onModuleChange: (module: string) => void;
   userRole: UserRole;
   alertCounts?: {
     expiring: number;
@@ -24,7 +24,7 @@ interface SidebarProps {
   };
 }
 
-const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps) => {
+const Sidebar = ({ activeModule, onModuleChange, userRole, alertCounts }: SidebarProps) => {
   const { t } = useLanguage();
 
   const menuItems = [
@@ -60,9 +60,9 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
     },
     {
       id: 'security',
-      label: 'Seguridad CFR 21',
+      label: t('menu.security'),
       icon: Shield,
-      roles: ['administrador'], // Solo administrador tiene acceso
+      roles: ['administrador'],
     },
     {
       id: 'settings',
@@ -76,9 +76,9 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
     item.roles.includes(userRole)
   );
 
-  const handleTabClick = (tabId: string) => {
-    console.log('Switching to tab:', tabId);
-    onTabChange(tabId);
+  const handleModuleClick = (moduleId: string) => {
+    console.log('Switching to module:', moduleId);
+    onModuleChange(moduleId);
   };
 
   return (
@@ -86,7 +86,7 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
       <nav className="p-4 space-y-2">
         {filteredItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
+          const isActive = activeModule === item.id;
           const showAlert = item.id === 'validations' && alertCounts && (alertCounts.expiring > 0 || alertCounts.expired > 0);
           
           return (
@@ -99,7 +99,7 @@ const Sidebar = ({ activeTab, onTabChange, userRole, alertCounts }: SidebarProps
                   ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm hover:bg-sidebar-primary/90' 
                   : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
               )}
-              onClick={() => handleTabClick(item.id)}
+              onClick={() => handleModuleClick(item.id)}
             >
               <Icon className="mr-3 h-4 w-4" />
               {item.label}

@@ -7,11 +7,11 @@ import LanguageSelector from '@/components/ui/language-selector';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface HeaderProps {
-  user: any;
+  currentUser: any;
   onLogout: () => void;
 }
 
-const Header = ({ user, onLogout }: HeaderProps) => {
+const Header = ({ currentUser, onLogout }: HeaderProps) => {
   const { t } = useLanguage();
 
   return (
@@ -39,13 +39,13 @@ const Header = ({ user, onLogout }: HeaderProps) => {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="flex items-center space-x-2 hover:bg-accent hover:text-accent-foreground">
                 <User className="h-4 w-4" />
-                <span>{user?.user_metadata?.full_name || user?.email}</span>
+                <span>{currentUser?.full_name || currentUser?.email}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56 bg-popover border border-border">
               <DropdownMenuItem onClick={onLogout} className="hover:bg-accent hover:text-accent-foreground cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />
-                {t('logout')}
+                {t('login.logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
