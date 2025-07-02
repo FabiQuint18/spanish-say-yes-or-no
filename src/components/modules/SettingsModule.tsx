@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { UserRole } from '@/types/validation';
 
@@ -11,22 +10,6 @@ interface SettingsModuleProps {
 
 const SettingsModule = ({ userRole = 'administrador' }: SettingsModuleProps) => {
   const { t } = useLanguage();
-
-  // Control de acceso
-  if (userRole !== 'administrador') {
-    return (
-      <div className="p-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('dashboard.access_restricted')}</CardTitle>
-            <CardDescription>
-              {t('dashboard.contact_administrator')}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
 
   return (
     <div className="p-6 space-y-6">

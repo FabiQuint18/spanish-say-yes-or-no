@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import StatsCard from './StatsCard';
 import AnalyticsCharts from './AnalyticsCharts';
 import AnalyticsSection from './AnalyticsSection';
@@ -7,8 +7,10 @@ import ExpiryNotifications from '@/components/notifications/ExpiryNotifications'
 import EmailNotificationService from '@/components/notifications/EmailNotificationService';
 import { ClipboardCheck, Package, Users, AlertTriangle, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { UserRole, EquipmentType } from '@/types/validation';
+import { UserRole, EquipmentType, ValidationType } from '@/types/validation';
 
 interface DashboardProps {
   userRole?: UserRole;
@@ -17,6 +19,7 @@ interface DashboardProps {
 
 const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardProps) => {
   const { t } = useLanguage();
+  const [selectedValidationType, setSelectedValidationType] = useState<ValidationType | 'all'>('all');
 
   // Mock validations data for analytics - this should come from a real data source
   const mockValidations = [
@@ -67,8 +70,37 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
         updated_at: '2024-01-20T10:00:00Z'
       },
       files: []
+    },
+    {
+      id: '3',
+      validation_code: 'VAL-003-2024',
+      validation_type: 'metodos_analiticos' as const,
+      subcategory: 'valoracion' as const,
+      equipment_type: 'UV-VIS' as EquipmentType,
+      status: 'en_validacion' as const,
+      expiry_date: '2025-03-15',
+      product_id: '3',
+      issue_date: '2024-03-15',
+      created_by: 'user3',
+      updated_by: 'user3',
+      created_at: '2024-03-15T10:00:00Z',
+      updated_at: '2024-03-15T10:00:00Z',
+      product: {
+        id: '3',
+        name: 'Producto C',
+        code: 'PC-003',
+        type: 'materia_prima' as const,
+        created_at: '2024-03-15T10:00:00Z',
+        updated_at: '2024-03-15T10:00:00Z'
+      },
+      files: []
     }
   ];
+
+  // Filter validations based on selected type
+  const filteredValidations = selectedValidationType === 'all' 
+    ? mockValidations 
+    : mockValidations.filter(v => v.validation_type === selectedValidationType);
 
   // Control de acceso por roles
   const canViewAnalytics = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'visualizador' || userRole === 'analista';
@@ -82,11 +114,40 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
         </p>
       </div>
 
+      {/* Validation Type Filter */}
+      {canViewAnalytics && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Filtros de Dashboard</CardTitle>
+            <CardDescription>
+              Filtrar datos por tipo de validación
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-4">
+              <Label htmlFor="validation-type-filter">Tipo de Validación:</Label>
+              <Select value={selectedValidationType} onValueChange={(value) => setSelectedValidationType(value as ValidationType | 'all')}>
+                <SelectTrigger className="w-64">
+                  <SelectValue placeholder="Seleccionar tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('common.all')}</SelectItem>
+                  <SelectItem value="procesos">{t('validation.procesos')}</SelectItem>
+                  <SelectItem value="limpieza">{t('validation.limpieza')}</SelectItem>
+                  <SelectItem value="metodos_analiticos">{t('validation.metodos')}</SelectItem>
+                  <SelectItem value="sistemas_computarizados">{t('validation.sistemas')}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
           title={t('stats.validations')}
-          value={156}
+          value={filteredValidations.length}
           icon={ClipboardCheck}
           description={t('stats.total_validations')}
           trend={{ value: 12, isPositive: true }}
@@ -100,7 +161,7 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
         />
         <StatsCard
           title={t('stats.expiring')}
-          value={8}
+          value={filteredValidations.filter(v => v.status === 'proximo_vencer').length}
           icon={AlertTriangle}
           description={t('stats.next_30_days')}
           trend={{ value: 3, isPositive: false }}
@@ -117,14 +178,14 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
 
       {/* Email Notification Service - Always running for all users */}
       <EmailNotificationService 
-        validations={mockValidations} 
+        validations={filteredValidations} 
         userEmail={currentUserEmail}
         enabled={true}
       />
 
       {/* Expiry Notifications - Solo para roles que pueden actuar */}
       {(userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista') && (
-        <ExpiryNotifications validations={mockValidations} />
+        <ExpiryNotifications validations={filteredValidations} />
       )}
 
       {/* Analytics Section - Visible para todos los roles permitidos */}
@@ -134,15 +195,16 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
             <CardHeader>
               <CardTitle>{t('analytics.title')}</CardTitle>
               <CardDescription>
-                {t('analytics.subtitle')}
+                {t('analytics.subtitle')} 
+                {selectedValidationType !== 'all' && ` - ${t(`validation.${selectedValidationType}`)}`}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <AnalyticsCharts validations={mockValidations} />
+              <AnalyticsCharts validations={filteredValidations} />
             </CardContent>
           </Card>
           
-          <AnalyticsSection validations={mockValidations} />
+          <AnalyticsSection validations={filteredValidations} />
         </div>
       )}
 

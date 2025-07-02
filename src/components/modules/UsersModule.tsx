@@ -42,11 +42,41 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     );
   }
 
+  // Password validation function
+  const validatePassword = (password: string): boolean => {
+    const minLength = password.length >= 7;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasSpecialChar = /[*+\-_@#$%^&!?]/.test(password);
+    const hasAlphaNumeric = /[a-zA-Z]/.test(password) && /[0-9]/.test(password);
+    
+    return minLength && hasUppercase && hasSpecialChar && hasAlphaNumeric;
+  };
+
   const handleNewUser = () => {
     setShowNewUserDialog(true);
   };
 
   const handleSaveUser = () => {
+    // Validate required fields
+    if (!newUser.full_name || !newUser.email || !newUser.password) {
+      toast({
+        title: "Error",
+        description: "Todos los campos son obligatorios",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password
+    if (!validatePassword(newUser.password)) {
+      toast({
+        title: "Error de Contraseña",
+        description: t('users.password_requirements'),
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Simulate user creation
     console.log('Creating new user:', newUser);
     
@@ -136,14 +166,22 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="password">Contraseña</Label>
+              <Label htmlFor="password">{t('users.password')}</Label>
               <Input
                 id="password"
                 type="password"
                 value={newUser.password}
                 onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                placeholder="Contraseña temporal"
+                placeholder="Contraseña segura"
               />
+              <p className="text-xs text-muted-foreground">
+                {t('users.password_requirements')}
+              </p>
+              {newUser.password && !validatePassword(newUser.password) && (
+                <p className="text-xs text-red-500">
+                  {t('users.password_invalid')}
+                </p>
+              )}
             </div>
             
             <div className="space-y-2">
