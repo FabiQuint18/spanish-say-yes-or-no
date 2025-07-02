@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Language } from '@/types/validation';
 
@@ -42,6 +41,7 @@ const translations = {
     'menu.validations': 'Validaciones',
     'menu.equipments': 'Equipos Analíticos',
     'menu.users': 'Usuarios',
+    'menu.security': 'Seguridad',
     'menu.settings': 'Configuración',
     
     // Stats
@@ -64,6 +64,50 @@ const translations = {
     // Analytics
     'analytics.title': 'Analíticas de Validaciones',
     'analytics.subtitle': 'Análisis estadístico de las validaciones del sistema',
+    
+    // Security Module
+    'security.title': 'Seguridad',
+    'security.subtitle': 'Configuración de seguridad y auditoría del sistema',
+    'security.settings': 'Configuración de Seguridad',
+    'security.settings_desc': 'Configurar políticas de seguridad del sistema',
+    'security.permissions': 'Permisos del Sistema',
+    'security.permissions_desc': 'Gestionar permisos y roles de usuario',
+    'security.audit_log': 'Registro de Auditoría',
+    'security.audit_log_desc': 'Historial de actividades de seguridad del sistema',
+    'security.two_factor': 'Autenticación de Dos Factores',
+    'security.two_factor_desc': 'Requerir 2FA para todos los usuarios',
+    'security.password_expiry': 'Expiración de Contraseña (días)',
+    'security.session_timeout': 'Tiempo de Sesión (minutos)',
+    'security.login_attempts': 'Intentos de Login Máximos',
+    'security.audit_logging': 'Registro de Auditoría',
+    'security.audit_logging_desc': 'Registrar todas las acciones del sistema',
+    'security.encryption': 'Encriptación de Datos',
+    'security.encryption_desc': 'Encriptar datos sensibles',
+    'security.access_restricted': 'Acceso Restringido',
+    'security.no_permissions': 'No tienes permisos para acceder a la configuración de seguridad',
+    
+    // Products Module
+    'products.title': 'Productos',
+    'products.subtitle': 'Gestión de productos del sistema',
+    'products.manage_system_products': 'Gestión de productos del sistema',
+    'products.add_product': 'Agregar Producto',
+    'products.add_new_product': 'Agregar Nuevo Producto',
+    'products.product_code': 'Código de Producto',
+    'products.product_name': 'Nombre del Producto',
+    'products.product_type': 'Tipo de Producto',
+    'products.description': 'Descripción',
+    'products.product_description': 'Descripción del producto',
+    'products.select_type': 'Seleccionar tipo',
+    'products.finished_products': 'Productos Terminados',
+    'products.raw_materials': 'Materias Primas',
+    'products.packaging_materials': 'Materiales de Empaque',
+    'products.increase_last_month': '+12% desde el mes pasado',
+    'products.product_list': 'Lista de Productos',
+    'products.registered_products': 'Productos registrados en el sistema',
+    'products.module_in_development': 'Módulo de productos en desarrollo',
+    'products.created': 'Producto creado',
+    'products.product': 'Producto',
+    'products.added_successfully': 'agregado exitosamente',
     
     // Validations
     'validations.search_filters': 'Filtros de Búsqueda',
@@ -178,6 +222,7 @@ const translations = {
     'menu.validations': 'Validations',
     'menu.equipments': 'Analytical Equipment',
     'menu.users': 'Users',
+    'menu.security': 'Security',
     'menu.settings': 'Settings',
     
     // Stats
@@ -200,6 +245,50 @@ const translations = {
     // Analytics
     'analytics.title': 'Validation Analytics',
     'analytics.subtitle': 'Statistical analysis of system validations',
+    
+    // Security Module
+    'security.title': 'Security',
+    'security.subtitle': 'System security and audit configuration',
+    'security.settings': 'Security Settings',
+    'security.settings_desc': 'Configure system security policies',
+    'security.permissions': 'System Permissions',
+    'security.permissions_desc': 'Manage user permissions and roles',
+    'security.audit_log': 'Audit Log',
+    'security.audit_log_desc': 'System security activity history',
+    'security.two_factor': 'Two-Factor Authentication',
+    'security.two_factor_desc': 'Require 2FA for all users',
+    'security.password_expiry': 'Password Expiry (days)',
+    'security.session_timeout': 'Session Timeout (minutes)',
+    'security.login_attempts': 'Maximum Login Attempts',
+    'security.audit_logging': 'Audit Logging',
+    'security.audit_logging_desc': 'Log all system actions',
+    'security.encryption': 'Data Encryption',
+    'security.encryption_desc': 'Encrypt sensitive data',
+    'security.access_restricted': 'Access Restricted',
+    'security.no_permissions': 'You do not have permissions to access security configuration',
+    
+    // Products Module
+    'products.title': 'Products',
+    'products.subtitle': 'System product management',
+    'products.manage_system_products': 'Manage system products',
+    'products.add_product': 'Add Product',
+    'products.add_new_product': 'Add New Product',
+    'products.product_code': 'Product Code',
+    'products.product_name': 'Product Name',
+    'products.product_type': 'Product Type',
+    'products.description': 'Description',
+    'products.product_description': 'Product description',
+    'products.select_type': 'Select type',
+    'products.finished_products': 'Finished Products',
+    'products.raw_materials': 'Raw Materials',
+    'products.packaging_materials': 'Packaging Materials',
+    'products.increase_last_month': '+12% from last month',
+    'products.product_list': 'Product List',
+    'products.registered_products': 'Products registered in the system',
+    'products.module_in_development': 'Product module in development',
+    'products.created': 'Product created',
+    'products.product': 'Product',
+    'products.added_successfully': 'added successfully',
     
     // Validations
     'validations.search_filters': 'Search Filters',
@@ -314,6 +403,7 @@ const translations = {
     'menu.validations': 'Validações',
     'menu.equipments': 'Equipamentos Analíticos',
     'menu.users': 'Usuários',
+    'menu.security': 'Segurança',
     'menu.settings': 'Configurações',
     
     // Stats
@@ -336,6 +426,50 @@ const translations = {
     // Analytics
     'analytics.title': 'Análises de Validações',
     'analytics.subtitle': 'Análise estatística das validações do sistema',
+    
+    // Security Module
+    'security.title': 'Segurança',
+    'security.subtitle': 'Configuração de segurança e auditoria do sistema',
+    'security.settings': 'Configurações de Segurança',
+    'security.settings_desc': 'Configurar políticas de segurança do sistema',
+    'security.permissions': 'Permissões do Sistema',
+    'security.permissions_desc': 'Gerenciar permissões e funções de usuário',
+    'security.audit_log': 'Log de Auditoria',
+    'security.audit_log_desc': 'Histórico de atividades de segurança do sistema',
+    'security.two_factor': 'Autenticação de Dois Fatores',
+    'security.two_factor_desc': 'Exigir 2FA para todos os usuários',
+    'security.password_expiry': 'Expiração de Senha (dias)',
+    'security.session_timeout': 'Tempo Limite de Sessão (minutos)',
+    'security.login_attempts': 'Tentativas Máximas de Login',
+    'security.audit_logging': 'Log de Auditoria',
+    'security.audit_logging_desc': 'Registrar todas as ações do sistema',
+    'security.encryption': 'Criptografia de Dados',
+    'security.encryption_desc': 'Criptografar dados sensíveis',
+    'security.access_restricted': 'Acesso Restrito',
+    'security.no_permissions': 'Você não tem permissões para acessar as configurações de segurança',
+    
+    // Products Module
+    'products.title': 'Produtos',
+    'products.subtitle': 'Gestão de produtos do sistema',
+    'products.manage_system_products': 'Gerenciar produtos do sistema',
+    'products.add_product': 'Adicionar Produto',
+    'products.add_new_product': 'Adicionar Novo Produto',
+    'products.product_code': 'Código do Produto',
+    'products.product_name': 'Nome do Produto',
+    'products.product_type': 'Tipo de Produto',
+    'products.description': 'Descrição',
+    'products.product_description': 'Descrição do produto',
+    'products.select_type': 'Selecionar tipo',
+    'products.finished_products': 'Produtos Acabados',
+    'products.raw_materials': 'Matérias Primas',
+    'products.packaging_materials': 'Materiais de Embalagem',
+    'products.increase_last_month': '+12% do mês passado',
+    'products.product_list': 'Lista de Produtos',
+    'products.registered_products': 'Produtos registrados no sistema',
+    'products.module_in_development': 'Módulo de produtos em desenvolvimento',
+    'products.created': 'Produto criado',
+    'products.product': 'Produto',
+    'products.added_successfully': 'adicionado com sucesso',
     
     // Validations
     'validations.search_filters': 'Filtros de Busca',

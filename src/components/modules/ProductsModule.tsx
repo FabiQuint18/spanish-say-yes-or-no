@@ -41,21 +41,21 @@ const ProductsModule = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 sm:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('menu.products')}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{t('products.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('products.manage_system_products')}
+            {t('products.subtitle')}
           </p>
         </div>
-        <Button onClick={handleAddProduct}>
+        <Button onClick={handleAddProduct} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           {t('products.add_product')}
         </Button>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
@@ -86,7 +86,7 @@ const ProductsModule = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
               {t('products.packaging_materials')}
@@ -118,7 +118,7 @@ const ProductsModule = () => {
 
       {/* Product Form Dialog */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
-        <DialogContent className="bg-popover border border-border">
+        <DialogContent className="bg-popover border border-border max-w-md mx-auto">
           <DialogHeader>
             <DialogTitle className="text-center">{t('products.add_new_product')}</DialogTitle>
           </DialogHeader>
@@ -165,11 +165,11 @@ const ProductsModule = () => {
                 placeholder={t('products.product_description')}
               />
             </div>
-            <div className="flex gap-2 justify-end">
-              <Button type="button" variant="outline" onClick={handleClose}>
+            <div className="flex flex-col sm:flex-row gap-2 justify-end">
+              <Button type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
                 {t('common.cancel')}
               </Button>
-              <Button type="submit">
+              <Button type="submit" className="w-full sm:w-auto">
                 {t('products.add_product')}
               </Button>
             </div>

@@ -76,27 +76,27 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     }
   ];
 
-  // Mock permissions
+  // Mock permissions with translations
   const mockPermissions: Permission[] = [
     {
       id: '1',
       name: 'validations.create',
       description: 'Crear nuevas validaciones',
-      module: 'Validaciones',
+      module: t('menu.validations'),
       enabled: true
     },
     {
       id: '2',
       name: 'validations.edit',
       description: 'Editar validaciones existentes',
-      module: 'Validaciones',
+      module: t('menu.validations'),
       enabled: true
     },
     {
       id: '3',
       name: 'users.manage',
       description: 'Gestionar usuarios del sistema',
-      module: 'Usuarios',
+      module: t('menu.users'),
       enabled: false
     },
     {
@@ -144,17 +144,17 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     return (
       <div className="p-6 space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Seguridad</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('security.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Configuración de seguridad del sistema
+            {t('security.subtitle')}
           </p>
         </div>
         
         <Card>
           <CardHeader>
-            <CardTitle>Acceso Restringido</CardTitle>
+            <CardTitle>{t('security.access_restricted')}</CardTitle>
             <CardDescription>
-              No tienes permisos para acceder a la configuración de seguridad
+              {t('security.no_permissions')}
             </CardDescription>
           </CardHeader>
         </Card>
@@ -166,9 +166,9 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Seguridad</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('security.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Configuración de seguridad y auditoría del sistema
+            {t('security.subtitle')}
           </p>
         </div>
       </div>
@@ -179,17 +179,17 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Configuración de Seguridad
+              {t('security.settings')}
             </CardTitle>
             <CardDescription>
-              Configurar políticas de seguridad del sistema
+              {t('security.settings_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label>Autenticación de Dos Factores</Label>
-                <p className="text-sm text-muted-foreground">Requerir 2FA para todos los usuarios</p>
+                <Label>{t('security.two_factor')}</Label>
+                <p className="text-sm text-muted-foreground">{t('security.two_factor_desc')}</p>
               </div>
               <Switch
                 checked={securitySettings.twoFactorAuth}
@@ -198,7 +198,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="passwordExpiry">Expiración de Contraseña (días)</Label>
+              <Label htmlFor="passwordExpiry">{t('security.password_expiry')}</Label>
               <Input
                 id="passwordExpiry"
                 type="number"
@@ -208,7 +208,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sessionTimeout">Tiempo de Sesión (minutos)</Label>
+              <Label htmlFor="sessionTimeout">{t('security.session_timeout')}</Label>
               <Input
                 id="sessionTimeout"
                 type="number"
@@ -218,7 +218,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="loginAttempts">Intentos de Login Máximos</Label>
+              <Label htmlFor="loginAttempts">{t('security.login_attempts')}</Label>
               <Input
                 id="loginAttempts"
                 type="number"
@@ -229,8 +229,8 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
 
             <div className="flex items-center justify-between">
               <div>
-                <Label>Registro de Auditoría</Label>
-                <p className="text-sm text-muted-foreground">Registrar todas las acciones del sistema</p>
+                <Label>{t('security.audit_logging')}</Label>
+                <p className="text-sm text-muted-foreground">{t('security.audit_logging_desc')}</p>
               </div>
               <Switch
                 checked={securitySettings.auditLogging}
@@ -240,8 +240,8 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
 
             <div className="flex items-center justify-between">
               <div>
-                <Label>Encriptación de Datos</Label>
-                <p className="text-sm text-muted-foreground">Encriptar datos sensibles</p>
+                <Label>{t('security.encryption')}</Label>
+                <p className="text-sm text-muted-foreground">{t('security.encryption_desc')}</p>
               </div>
               <Switch
                 checked={securitySettings.encryptionEnabled}
@@ -255,10 +255,10 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Key className="h-5 w-5" />
-              Permisos del Sistema
+              {t('security.permissions')}
             </CardTitle>
             <CardDescription>
-              Gestionar permisos y roles de usuario
+              {t('security.permissions_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -286,39 +286,41 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <AlertTriangle className="h-5 w-5" />
-            Registro de Auditoría
+            {t('security.audit_log')}
           </CardTitle>
           <CardDescription>
-            Historial de actividades de seguridad del sistema
+            {t('security.audit_log_desc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Fecha y Hora</TableHead>
-                <TableHead>Usuario</TableHead>
-                <TableHead>Acción</TableHead>
-                <TableHead>Recurso</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Dirección IP</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockSecurityLogs.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell className="font-medium">
-                    {formatDate(log.timestamp)}
-                  </TableCell>
-                  <TableCell>{log.user}</TableCell>
-                  <TableCell>{log.action}</TableCell>
-                  <TableCell>{log.resource}</TableCell>
-                  <TableCell>{getStatusBadge(log.status)}</TableCell>
-                  <TableCell className="font-mono text-sm">{log.ip_address}</TableCell>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Fecha y Hora</TableHead>
+                  <TableHead>Usuario</TableHead>
+                  <TableHead>Acción</TableHead>
+                  <TableHead>Recurso</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Dirección IP</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {mockSecurityLogs.map((log) => (
+                  <TableRow key={log.id}>
+                    <TableCell className="font-medium">
+                      {formatDate(log.timestamp)}
+                    </TableCell>
+                    <TableCell>{log.user}</TableCell>
+                    <TableCell>{log.action}</TableCell>
+                    <TableCell>{log.resource}</TableCell>
+                    <TableCell>{getStatusBadge(log.status)}</TableCell>
+                    <TableCell className="font-mono text-sm">{log.ip_address}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
