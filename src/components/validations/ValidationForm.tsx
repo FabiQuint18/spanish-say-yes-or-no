@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
-import { ValidationType, ValidationStatus, Validation, calculateExpiryDate } from '@/types/validation';
+import { ValidationType, ValidationStatus, Validation, calculateExpiryDate, ProductType } from '@/types/validation';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ValidationFormProps {
@@ -24,6 +24,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
     validation_code: '',
     product_code: '',
     product_name: '',
+    material_type: '',
     validation_type: '',
     subcategory: '',
     equipment_type: '',
@@ -38,6 +39,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
         validation_code: editingValidation.validation_code,
         product_code: editingValidation.product?.code || '',
         product_name: editingValidation.product?.name || '',
+        material_type: editingValidation.product?.type || '',
         validation_type: editingValidation.validation_type,
         subcategory: editingValidation.subcategory || '',
         equipment_type: editingValidation.equipment_type,
@@ -50,6 +52,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
         validation_code: '',
         product_code: '',
         product_name: '',
+        material_type: '',
         validation_type: '',
         subcategory: '',
         equipment_type: '',
@@ -59,6 +62,15 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
       });
     }
   }, [editingValidation, isOpen]);
+
+  const getMaterialTypeOptions = () => {
+    return [
+      { value: 'materia_prima', label: t('material_types.raw_material') },
+      { value: 'material_empaque', label: t('material_types.packaging_material') },
+      { value: 'producto_terminado', label: t('material_types.finished_product') },
+      { value: 'granel', label: t('material_types.bulk') },
+    ];
+  };
 
   const getSubcategoryOptions = (validationType: string) => {
     switch (validationType) {
@@ -189,6 +201,25 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
                 onChange={(e) => updateField('product_name', e.target.value)}
                 placeholder="Nombre del producto"
               />
+            </div>
+
+            <div>
+              <Label htmlFor="material_type">Tipo de Material</Label>
+              <Select
+                value={formData.material_type}
+                onValueChange={(value) => updateField('material_type', value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo de material" />
+                </SelectTrigger>
+                <SelectContent>
+                  {getMaterialTypeOptions().map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>

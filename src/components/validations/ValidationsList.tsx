@@ -10,7 +10,6 @@ import { Validation, UserRole, ValidationFilters as ValidationFiltersType } from
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
 import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import ValidationFiles from './ValidationFiles';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 
 interface ValidationsListProps {
@@ -147,14 +146,16 @@ const ValidationsList = ({
     }
   };
 
-  const getProductTypeLabel = (type: string) => {
+  const getMaterialTypeLabel = (type: string) => {
     switch (type) {
       case 'producto_terminado':
-        return t('products.finished_product');
+        return t('material_types.finished_product');
       case 'materia_prima':
-        return t('products.raw_material');
+        return t('material_types.raw_material');
       case 'material_empaque':
-        return t('products.packaging_material');
+        return t('material_types.packaging_material');
+      case 'granel':
+        return t('material_types.bulk');
       default:
         return type;
     }
@@ -180,7 +181,7 @@ const ValidationsList = ({
                 <ChevronDown className="h-4 w-4 ml-1" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-64">
+            <DropdownMenuContent align="end" className="w-64 bg-popover border border-border z-50">
               {files.map((file) => (
                 <div key={file.id} className="p-2 border-b last:border-b-0">
                   <div className="flex items-center justify-between">
@@ -319,7 +320,7 @@ const ValidationsList = ({
                         <div>
                           <div className="font-medium">{validation.product?.name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {getProductTypeLabel(validation.product?.type || '')}
+                            {getMaterialTypeLabel(validation.product?.type || '')}
                           </div>
                         </div>
                       </TableCell>

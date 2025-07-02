@@ -1,4 +1,5 @@
-export type ProductType = 'producto_terminado' | 'materia_prima' | 'material_empaque';
+
+export type ProductType = 'producto_terminado' | 'materia_prima' | 'material_empaque' | 'granel';
 
 export type EquipmentType = 'HPLC' | 'GC' | 'UV-VIS' | 'NIR' | 'RAMAN' | 'IR' | 'AA' | 'Karl Fischer';
 

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   const [showForm, setShowForm] = useState(false);
   const [editingValidation, setEditingValidation] = useState<Validation | null>(null);
 
-  // Mock data actualizado con "empaque" en lugar de "envasado"
+  // Mock data actualizado con el nuevo tipo 'granel'
   const mockValidations: Validation[] = [
     {
       id: '1',
@@ -130,7 +131,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
     },
     {
       id: '5',
-      product_id: '1',
+      product_id: '5',
       validation_code: 'VAL-005-2024',
       equipment_type: 'HPLC',
       validation_type: 'metodos_analiticos',
@@ -143,18 +144,18 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
       created_at: '2024-02-15T00:00:00Z',
       updated_at: '2024-02-15T00:00:00Z',
       product: {
-        id: '1',
-        code: 'PT-001',
-        name: 'Paracetamol 500mg',
-        type: 'producto_terminado',
-        created_at: '2024-01-15T00:00:00Z',
-        updated_at: '2024-01-15T00:00:00Z',
+        id: '5',
+        code: 'GR-001',
+        name: 'Tabletas Granel Lote A',
+        type: 'granel',
+        created_at: '2024-02-15T00:00:00Z',
+        updated_at: '2024-02-15T00:00:00Z',
       },
       files: []
     },
     {
       id: '6',
-      product_id: '2',
+      product_id: '6',
       validation_code: 'VAL-006-2024',
       equipment_type: 'GC',
       validation_type: 'procesos',
@@ -167,12 +168,12 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
       created_at: '2024-07-01T00:00:00Z',
       updated_at: '2024-07-01T00:00:00Z',
       product: {
-        id: '2',
-        code: 'MP-001',
-        name: 'Principio Activo A',
-        type: 'materia_prima',
-        created_at: '2024-06-15T00:00:00Z',
-        updated_at: '2024-06-15T00:00:00Z',
+        id: '6',
+        code: 'ME-001',
+        name: 'Blister PVC/PVDC',
+        type: 'material_empaque',
+        created_at: '2024-07-01T00:00:00Z',
+        updated_at: '2024-07-01T00:00:00Z',
       },
       files: []
     },
@@ -216,6 +217,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
                   ...v.product,
                   code: formData.product_code,
                   name: formData.product_name,
+                  type: formData.material_type,
                 } : undefined
               }
             : v
@@ -241,7 +243,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
           id: Date.now().toString(),
           code: formData.product_code,
           name: formData.product_name,
-          type: 'producto_terminado',
+          type: formData.material_type,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
@@ -298,16 +300,16 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   const canAdd = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
 
   return (
-    <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="p-4 md:p-6 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('menu.validations')}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('menu.validations')}</h1>
           <p className="text-muted-foreground mt-1">
             {t('validations.subtitle')}
           </p>
         </div>
         {canAdd && (
-          <Button onClick={handleAdd}>
+          <Button onClick={handleAdd} className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
             {t('validations.new')}
           </Button>
