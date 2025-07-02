@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Validation, UserRole, ValidationFilters as ValidationFiltersType } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
-import { Search, Edit, Trash2, Plus } from 'lucide-react';
+import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ValidationFiles from './ValidationFiles';
 import ValidationFilters from '@/components/filters/ValidationFilters';
@@ -110,13 +111,13 @@ const ValidationsList = ({
   const getValidationTypeLabel = (type: string) => {
     switch (type) {
       case 'procesos':
-        return 'Validaciones de Procesos';
+        return 'Procesos';
       case 'limpieza':
-        return 'Validaciones de Limpieza';
+        return 'Limpieza';
       case 'metodos_analiticos':
-        return 'Validaciones de Métodos Analíticos';
+        return 'Métodos Analíticos';
       case 'sistemas_computarizados':
-        return 'Validaciones de Sistemas Computarizados';
+        return 'Sistemas Computarizados';
       default:
         return type;
     }
@@ -159,11 +160,100 @@ const ValidationsList = ({
     }
   };
 
+  const FilesDropdown = ({ validation }: { validation: Validation }) => {
+    const files = validation.files || [];
+    const canUploadFiles = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+    const canDelete = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+
+    if (files.length === 0 && !canUploadFiles) {
+      return <span className="text-sm text-muted-foreground">Sin archivos</span>;
+    }
+
+    return (
+      <div className="flex items-center space-x-2">
+        {files.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <FileText className="h-4 w-4 mr-1" />
+                {files.length}
+                <ChevronDown className="h-4 w-4 ml-1" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              {files.map((file) => (
+                <div key={file.id} className="p-2 border-b last:border-b-0">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{file.file_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {(file.file_size / 1024 / 1024).toFixed(1)} MB
+                      </p>
+                    </div>
+                    <div className="flex space-x-1 ml-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => window.open(file.file_url, '_blank')}
+                        title="Ver"
+                      >
+                        <Eye className="h-3 w-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => window.print()}
+                        title="Imprimir"
+                      >
+                        <Printer className="h-3 w-3" />
+                      </Button>
+                      {canDelete && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onFileDelete(file.id)}
+                          title="Eliminar"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        
+        {canUploadFiles && (
+          <>
+            <input
+              type="file"
+              accept=".pdf"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) onFileUpload(validation.id, file);
+              }}
+              className="hidden"
+              id={`file-upload-${validation.id}`}
+            />
+            <label htmlFor={`file-upload-${validation.id}`}>
+              <Button variant="outline" size="sm" asChild>
+                <span>
+                  <Upload className="h-4 w-4" />
+                </span>
+              </Button>
+            </label>
+          </>
+        )}
+      </div>
+    );
+  };
+
   // Control de acceso por roles
   const canEdit = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
   const canDelete = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
   const canAdd = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
-  const canUploadFiles = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
 
   return (
     <div className="space-y-6">
@@ -176,7 +266,7 @@ const ValidationsList = ({
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <CardTitle>{t('validations.list')}</CardTitle>
               <CardDescription>
@@ -184,9 +274,9 @@ const ValidationsList = ({
               </CardDescription>
             </div>
             {canAdd && (
-              <Button onClick={onAdd}>
+              <Button onClick={onAdd} className="w-full sm:w-auto">
                 <Plus className="mr-2 h-4 w-4" />
-                {t('validations.add_product_raw_material')}
+                {t('validations.new')}
               </Button>
             )}
           </div>
@@ -203,80 +293,76 @@ const ValidationsList = ({
               />
             </div>
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('validations.validation_code')}</TableHead>
-                  <TableHead>{t('validations.product_raw_material')}</TableHead>
-                  <TableHead>{t('validations.product_raw_material_code')}</TableHead>
-                  <TableHead>{t('validations.validation_type')}</TableHead>
-                  <TableHead>{t('validations.subcategory')}</TableHead>
-                  <TableHead>{t('validations.equipment')}</TableHead>
-                  <TableHead>{t('validations.status')}</TableHead>
-                  <TableHead>{t('validations.expiry_date')}</TableHead>
-                  <TableHead>{t('validations.files')}</TableHead>
-                  {(canEdit || canDelete) && <TableHead>{t('validations.actions')}</TableHead>}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredValidations.map((validation) => (
-                  <TableRow key={validation.id}>
-                    <TableCell className="font-medium">
-                      {validation.validation_code}
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{validation.product?.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {getProductTypeLabel(validation.product?.type || '')}
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {validation.product?.code}
-                    </TableCell>
-                    <TableCell>{getValidationTypeLabel(validation.validation_type)}</TableCell>
-                    <TableCell>{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
-                    <TableCell>{validation.equipment_type}</TableCell>
-                    <TableCell>{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
-                    <TableCell>{formatDate(validation.expiry_date)}</TableCell>
-                    <TableCell>
-                      <ValidationFiles
-                        validationId={validation.id}
-                        files={validation.files || []}
-                        onFileUpload={canUploadFiles ? onFileUpload : undefined}
-                        onFileDelete={canDelete ? onFileDelete : undefined}
-                        readOnly={userRole === 'visualizador'}
-                      />
-                    </TableCell>
-                    {(canEdit || canDelete) && (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[120px]">{t('validations.validation_code')}</TableHead>
+                    <TableHead className="min-w-[150px]">{t('validations.product_raw_material')}</TableHead>
+                    <TableHead className="min-w-[100px]">{t('validations.product_raw_material_code')}</TableHead>
+                    <TableHead className="min-w-[150px]">{t('validations.validation_type')}</TableHead>
+                    <TableHead className="min-w-[120px]">{t('validations.subcategory')}</TableHead>
+                    <TableHead className="min-w-[100px]">{t('validations.equipment')}</TableHead>
+                    <TableHead className="min-w-[120px]">{t('validations.status')}</TableHead>
+                    <TableHead className="min-w-[120px]">{t('validations.expiry_date')}</TableHead>
+                    <TableHead className="min-w-[120px]">{t('validations.files')}</TableHead>
+                    {(canEdit || canDelete) && <TableHead className="min-w-[100px]">{t('validations.actions')}</TableHead>}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredValidations.map((validation) => (
+                    <TableRow key={validation.id}>
+                      <TableCell className="font-medium">
+                        {validation.validation_code}
+                      </TableCell>
                       <TableCell>
-                        <div className="flex items-center space-x-2">
-                          {canEdit && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => onEdit(validation)}
-                            >
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                          )}
-                          {canDelete && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => onDelete(validation.id)}
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          )}
+                        <div>
+                          <div className="font-medium">{validation.product?.name}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {getProductTypeLabel(validation.product?.type || '')}
+                          </div>
                         </div>
                       </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                      <TableCell className="font-medium">
+                        {validation.product?.code}
+                      </TableCell>
+                      <TableCell>{getValidationTypeLabel(validation.validation_type)}</TableCell>
+                      <TableCell>{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
+                      <TableCell>{validation.equipment_type}</TableCell>
+                      <TableCell>{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
+                      <TableCell>{formatDate(validation.expiry_date)}</TableCell>
+                      <TableCell>
+                        <FilesDropdown validation={validation} />
+                      </TableCell>
+                      {(canEdit || canDelete) && (
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            {canEdit && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onEdit(validation)}
+                              >
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            )}
+                            {canDelete && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => onDelete(validation.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      )}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
 
             {filteredValidations.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">

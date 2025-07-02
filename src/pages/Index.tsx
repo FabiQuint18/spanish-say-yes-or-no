@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -159,7 +160,7 @@ const Index = () => {
       case 'dashboard':
         return <Dashboard userRole={userRole} />;
       case 'products':
-        return <ProductsModule />;
+        return <ProductsModule userRole={userRole} />;
       case 'validations':
         return <ValidationsModule userRole={userRole} />;
       case 'equipments':

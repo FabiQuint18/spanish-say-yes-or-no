@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { Shield, Key, AlertTriangle, Edit, Trash2, Plus, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { UserRole } from '@/types/validation';
+import { useToast } from '@/hooks/use-toast';
 
 interface SecurityModuleProps {
   userRole?: UserRole;
@@ -35,7 +36,15 @@ interface Permission {
 
 const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => {
   const { t } = useLanguage();
+  const { toast } = useToast();
   const [showPasswords, setShowPasswords] = useState(false);
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: '',
+    email: '',
+    role: 'analista' as UserRole,
+    password: ''
+  });
   const [securitySettings, setSecuritySettings] = useState({
     twoFactorAuth: false,
     passwordExpiry: 90,
@@ -80,30 +89,30 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
   const mockPermissions: Permission[] = [
     {
       id: '1',
-      name: 'validations.create',
-      description: 'Crear nuevas validaciones',
+      name: t('permissions.create_validations'),
+      description: t('permissions.create_validations_desc'),
       module: t('menu.validations'),
       enabled: true
     },
     {
       id: '2',
-      name: 'validations.edit',
-      description: 'Editar validaciones existentes',
+      name: t('permissions.edit_validations'),
+      description: t('permissions.edit_validations_desc'),
       module: t('menu.validations'),
       enabled: true
     },
     {
       id: '3',
-      name: 'users.manage',
-      description: 'Gestionar usuarios del sistema',
+      name: t('permissions.manage_users'),
+      description: t('permissions.manage_users_desc'),
       module: t('menu.users'),
       enabled: false
     },
     {
       id: '4',
-      name: 'reports.export',
-      description: 'Exportar reportes del sistema',
-      module: 'Reportes',
+      name: t('permissions.export_reports'),
+      description: t('permissions.export_reports_desc'),
+      module: t('menu.reports'),
       enabled: true
     }
   ];
@@ -111,11 +120,11 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'success':
-        return <Badge className="bg-green-100 text-green-800">Éxito</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('status.success')}</Badge>;
       case 'failed':
-        return <Badge className="bg-red-100 text-red-800">Falló</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{t('status.failed')}</Badge>;
       case 'warning':
-        return <Badge className="bg-yellow-100 text-yellow-800">Advertencia</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.warning')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -126,8 +135,11 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
   };
 
   const togglePermission = (permissionId: string) => {
-    // Mock function - would update permission in real implementation
     console.log(`Toggling permission: ${permissionId}`);
+    toast({
+      title: t('security.permission_updated'),
+      description: t('security.permission_updated_desc'),
+    });
   };
 
   const updateSecuritySetting = (setting: string, value: any) => {
@@ -135,6 +147,29 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
       ...prev,
       [setting]: value
     }));
+    toast({
+      title: t('security.setting_updated'),
+      description: t('security.setting_updated_desc'),
+    });
+  };
+
+  const handleAddUser = () => {
+    setShowUserForm(true);
+  };
+
+  const handleSaveUser = () => {
+    console.log('Creating new user:', newUser);
+    toast({
+      title: t('security.user_created'),
+      description: `${t('security.user')} ${newUser.name} ${t('security.created_successfully')}`,
+    });
+    setShowUserForm(false);
+    setNewUser({ name: '', email: '', role: 'analista', password: '' });
+  };
+
+  const handleCancelUser = () => {
+    setShowUserForm(false);
+    setNewUser({ name: '', email: '', role: 'analista', password: '' });
   };
 
   // Control de acceso por roles
@@ -171,7 +206,71 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             {t('security.subtitle')}
           </p>
         </div>
+        <Button onClick={handleAddUser}>
+          <Plus className="mr-2 h-4 w-4" />
+          {t('security.new_user')}
+        </Button>
       </div>
+
+      {/* New User Form */}
+      {showUserForm && (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('security.add_new_user')}</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="userName">{t('security.full_name')}</Label>
+                <Input
+                  id="userName"
+                  value={newUser.name}
+                  onChange={(e) => setNewUser({...newUser, name: e.target.value})}
+                  placeholder={t('security.enter_name')}
+                />
+              </div>
+              <div>
+                <Label htmlFor="userEmail">{t('security.email')}</Label>
+                <Input
+                  id="userEmail"
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  placeholder={t('security.enter_email')}
+                />
+              </div>
+              <div>
+                <Label htmlFor="userRole">{t('security.role')}</Label>
+                <select
+                  id="userRole"
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({...newUser, role: e.target.value as UserRole})}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="administrador">{t('roles.administrator')}</option>
+                  <option value="coordinador">{t('roles.coordinator')}</option>
+                  <option value="analista">{t('roles.analyst')}</option>
+                  <option value="visualizador">{t('roles.viewer')}</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="userPassword">{t('security.password')}</Label>
+                <Input
+                  id="userPassword"
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  placeholder={t('security.enter_password')}
+                />
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <Button onClick={handleSaveUser}>{t('common.save')}</Button>
+              <Button variant="outline" onClick={handleCancelUser}>{t('common.cancel')}</Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Security Settings */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -297,12 +396,12 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Fecha y Hora</TableHead>
-                  <TableHead>Usuario</TableHead>
-                  <TableHead>Acción</TableHead>
-                  <TableHead>Recurso</TableHead>
-                  <TableHead>Estado</TableHead>
-                  <TableHead>Dirección IP</TableHead>
+                  <TableHead>{t('security.date_time')}</TableHead>
+                  <TableHead>{t('security.user')}</TableHead>
+                  <TableHead>{t('security.action')}</TableHead>
+                  <TableHead>{t('security.resource')}</TableHead>
+                  <TableHead>{t('security.status')}</TableHead>
+                  <TableHead>{t('security.ip_address')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
