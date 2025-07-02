@@ -157,7 +157,7 @@ const Index = () => {
     
     switch (activeModule) {
       case 'dashboard':
-        return <Dashboard userRole={userRole} />;
+        return <Dashboard userRole={userRole} currentUserEmail={currentUser?.email} />;
       case 'products':
         return <ProductsModule userRole={userRole} />;
       case 'validations':
@@ -171,7 +171,7 @@ const Index = () => {
       case 'settings':
         return <SettingsModule userRole={userRole} />;
       default:
-        return <Dashboard userRole={userRole} />;
+        return <Dashboard userRole={userRole} currentUserEmail={currentUser?.email} />;
     }
   };
 

@@ -4,6 +4,7 @@ import StatsCard from './StatsCard';
 import AnalyticsCharts from './AnalyticsCharts';
 import AnalyticsSection from './AnalyticsSection';
 import ExpiryNotifications from '@/components/notifications/ExpiryNotifications';
+import EmailNotificationService from '@/components/notifications/EmailNotificationService';
 import { ClipboardCheck, Package, Users, AlertTriangle, TrendingUp } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,9 +12,10 @@ import { UserRole, EquipmentType } from '@/types/validation';
 
 interface DashboardProps {
   userRole?: UserRole;
+  currentUserEmail?: string;
 }
 
-const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
+const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardProps) => {
   const { t } = useLanguage();
 
   // Mock validations data for analytics - this should come from a real data source
@@ -112,6 +114,13 @@ const Dashboard = ({ userRole = 'visualizador' }: DashboardProps) => {
           suffix="%"
         />
       </div>
+
+      {/* Email Notification Service - Always running for all users */}
+      <EmailNotificationService 
+        validations={mockValidations} 
+        userEmail={currentUserEmail}
+        enabled={true}
+      />
 
       {/* Expiry Notifications - Solo para roles que pueden actuar */}
       {(userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista') && (

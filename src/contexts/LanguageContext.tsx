@@ -37,6 +37,9 @@ const translations = {
     'login.logout': 'Cerrar Sesión',
     'login.logoutSuccess': 'Sesión cerrada exitosamente',
     
+    // Dashboard
+    'dashboard.subtitle': 'Resumen general del sistema de validaciones',
+    
     // Common
     'common.cancel': 'Cancelar',
     'common.save': 'Guardar',
@@ -61,6 +64,13 @@ const translations = {
     'stats.expiring': 'Por Vencer',
     'stats.expired': 'Vencidas',
     'stats.in_validation': 'En Validación',
+    'stats.validations': 'Validaciones',
+    'stats.products': 'Productos',
+    'stats.efficiency': 'Eficiencia',
+    'stats.total_validations': 'validaciones registradas',
+    'stats.registered_products': 'productos registrados',
+    'stats.next_30_days': 'próximos 30 días',
+    'stats.validation_efficiency': 'eficiencia de validación',
     
     // Status
     'status.validado': 'Validado',
@@ -76,15 +86,18 @@ const translations = {
     'validations.list': 'Lista de Validaciones',
     'validations.manage': 'Gestionar validaciones del sistema',
     'validations.new': 'Nueva Validación',
-    'validations.search': 'Buscar validaciones...',
+    'validations.search': 'Buscar validaciones',
     'validations.validation_code': 'Código',
     'validations.product_raw_material': 'Tipo de Material',
     'validations.product_raw_material_code': 'Código',
     'validations.validation_type': 'Tipo de Validación',
     'validations.subcategory': 'Subcategoría',
     'validations.equipment': 'Equipo',
+    'validations.equipment_type': 'Tipo de Equipo',
     'validations.status': 'Estado',
     'validations.expiry_date': 'Fecha de Vencimiento',
+    'validations.expiry_from': 'Fecha de Vencimiento Desde',
+    'validations.search_filters': 'Filtros de Búsqueda',
     'validations.files': 'Archivos',
     'validations.actions': 'Acciones',
     'validations.no_results': 'No se encontraron resultados',
@@ -117,7 +130,7 @@ const translations = {
     'products.list': 'Lista de Productos',
     'products.manage': 'Gestionar productos del catálogo',
     'products.new': 'Nuevo Producto',
-    'products.search': 'Buscar productos...',
+    'products.search': 'Buscar productos',
     'products.code': 'Código',
     'products.name': 'Nombre',
     'products.type': 'Tipo',
@@ -142,7 +155,7 @@ const translations = {
     'users.list': 'Lista de Usuarios',
     'users.manage': 'Gestionar usuarios del sistema',
     'users.new': 'Nuevo Usuario',
-    'users.search': 'Buscar usuarios...',
+    'users.search': 'Buscar usuarios',
     'users.name': 'Nombre',
     'users.email': 'Email',
     'users.role': 'Rol',
@@ -173,7 +186,22 @@ const translations = {
     
     // Settings
     'settings.title': 'Configuraciones',
-    'settings.subtitle': 'Configuración general del sistema'
+    'settings.subtitle': 'Configuración general del sistema',
+    
+    // Analytics
+    'analytics.title': 'Análisis de Validaciones',
+    'analytics.subtitle': 'Tendencias y estadísticas del sistema',
+    
+    // Access Control
+    'dashboard.access_restricted': 'Acceso Restringido',
+    'dashboard.contact_administrator': 'Para acceder a este módulo, contacta al administrador del sistema',
+    
+    // Notifications
+    'notifications.expiry_reminder_6months': 'Recordatorio de Vencimiento - 6 Meses',
+    'notifications.expiry_reminder_3months': 'Recordatorio de Vencimiento - 3 Meses',
+    'notifications.expiry_reminder_1month': 'Alerta Crítica de Vencimiento - 1 Mes',
+    'notifications.expiry_expired': 'Validaciones Vencidas',
+    'notifications.email_sent': 'Correo de recordatorio enviado',
   },
   en: {
     // System
@@ -201,6 +229,9 @@ const translations = {
     'login.logout': 'Logout',
     'login.logoutSuccess': 'Successfully logged out',
     
+    // Dashboard
+    'dashboard.subtitle': 'General overview of the validation system',
+    
     // Common
     'common.cancel': 'Cancel',
     'common.save': 'Save',
@@ -225,6 +256,13 @@ const translations = {
     'stats.expiring': 'Expiring',
     'stats.expired': 'Expired',
     'stats.in_validation': 'In Validation',
+    'stats.validations': 'Validations',
+    'stats.products': 'Products',
+    'stats.efficiency': 'Efficiency',
+    'stats.total_validations': 'registered validations',
+    'stats.registered_products': 'registered products',
+    'stats.next_30_days': 'next 30 days',
+    'stats.validation_efficiency': 'validation efficiency',
     
     // Status
     'status.validado': 'Validated',
@@ -240,15 +278,18 @@ const translations = {
     'validations.list': 'Validations List',
     'validations.manage': 'Manage system validations',
     'validations.new': 'New Validation',
-    'validations.search': 'Search validations...',
+    'validations.search': 'Search validations',
     'validations.validation_code': 'Code',
     'validations.product_raw_material': 'Material Type',
     'validations.product_raw_material_code': 'Code',
     'validations.validation_type': 'Validation Type',
     'validations.subcategory': 'Subcategory',
     'validations.equipment': 'Equipment',
+    'validations.equipment_type': 'Equipment Type',
     'validations.status': 'Status',
     'validations.expiry_date': 'Expiry Date',
+    'validations.expiry_from': 'Expiry Date From',
+    'validations.search_filters': 'Search Filters',
     'validations.files': 'Files',
     'validations.actions': 'Actions',
     'validations.no_results': 'No results found',
@@ -281,7 +322,7 @@ const translations = {
     'products.list': 'Product List',
     'products.manage': 'Manage catalog products',
     'products.new': 'New Product',
-    'products.search': 'Search products...',
+    'products.search': 'Search products',
     'products.code': 'Code',
     'products.name': 'Name',
     'products.type': 'Type',
@@ -306,7 +347,7 @@ const translations = {
     'users.list': 'User List',
     'users.manage': 'Manage system users',
     'users.new': 'New User',
-    'users.search': 'Search users...',
+    'users.search': 'Search users',
     'users.name': 'Name',
     'users.email': 'Email',
     'users.role': 'Role',
@@ -337,7 +378,22 @@ const translations = {
     
     // Settings
     'settings.title': 'Settings',
-    'settings.subtitle': 'General system configuration'
+    'settings.subtitle': 'General system configuration',
+    
+    // Analytics
+    'analytics.title': 'Validation Analytics',
+    'analytics.subtitle': 'System trends and statistics',
+    
+    // Access Control
+    'dashboard.access_restricted': 'Access Restricted',
+    'dashboard.contact_administrator': 'To access this module, contact the system administrator',
+    
+    // Notifications
+    'notifications.expiry_reminder_6months': 'Expiry Reminder - 6 Months',
+    'notifications.expiry_reminder_3months': 'Expiry Reminder - 3 Months',
+    'notifications.expiry_reminder_1month': 'Critical Expiry Alert - 1 Month',
+    'notifications.expiry_expired': 'Expired Validations',
+    'notifications.email_sent': 'Reminder email sent',
   },
   pt: {
     // System
@@ -365,6 +421,9 @@ const translations = {
     'login.logout': 'Sair',
     'login.logoutSuccess': 'Logout realizado com sucesso',
     
+    // Dashboard
+    'dashboard.subtitle': 'Visão geral do sistema de validações',
+    
     // Common
     'common.cancel': 'Cancelar',
     'common.save': 'Salvar',
@@ -389,6 +448,13 @@ const translations = {
     'stats.expiring': 'A Vencer',
     'stats.expired': 'Vencidos',
     'stats.in_validation': 'Em Validação',
+    'stats.validations': 'Validações',
+    'stats.products': 'Produtos',
+    'stats.efficiency': 'Eficiência',
+    'stats.total_validations': 'validações registradas',
+    'stats.registered_products': 'produtos registrados',
+    'stats.next_30_days': 'próximos 30 dias',
+    'stats.validation_efficiency': 'eficiência de validação',
     
     // Status
     'status.validado': 'Validado',
@@ -404,15 +470,18 @@ const translations = {
     'validations.list': 'Lista de Validações',
     'validations.manage': 'Gerenciar validações do sistema',
     'validations.new': 'Nova Validação',
-    'validations.search': 'Pesquisar validações...',
+    'validations.search': 'Pesquisar validações',
     'validations.validation_code': 'Código',
     'validations.product_raw_material': 'Tipo de Material',
     'validations.product_raw_material_code': 'Código',
     'validations.validation_type': 'Tipo de Validação',
     'validations.subcategory': 'Subcategoria',
     'validations.equipment': 'Equipamento',
+    'validations.equipment_type': 'Tipo de Equipamento',
     'validations.status': 'Status',
     'validations.expiry_date': 'Data de Vencimento',
+    'validations.expiry_from': 'Data de Vencimento De',
+    'validations.search_filters': 'Filtros de Pesquisa',
     'validations.files': 'Arquivos',
     'validations.actions': 'Ações',
     'validations.no_results': 'Nenhum resultado encontrado',
@@ -445,7 +514,7 @@ const translations = {
     'products.list': 'Lista de Produtos',
     'products.manage': 'Gerenciar produtos do catálogo',
     'products.new': 'Novo Produto',
-    'products.search': 'Pesquisar produtos...',
+    'products.search': 'Pesquisar produtos',
     'products.code': 'Código',
     'products.name': 'Nome',
     'products.type': 'Tipo',
@@ -470,7 +539,7 @@ const translations = {
     'users.list': 'Lista de Usuários',
     'users.manage': 'Gerenciar usuários do sistema',
     'users.new': 'Novo Usuário',
-    'users.search': 'Pesquisar usuários...',
+    'users.search': 'Pesquisar usuários',
     'users.name': 'Nome',
     'users.email': 'Email',
     'users.role': 'Função',
@@ -501,7 +570,22 @@ const translations = {
     
     // Settings
     'settings.title': 'Configurações',
-    'settings.subtitle': 'Configuração geral do sistema'
+    'settings.subtitle': 'Configuração geral do sistema',
+    
+    // Analytics
+    'analytics.title': 'Análise de Validações',
+    'analytics.subtitle': 'Tendências e estatísticas do sistema',
+    
+    // Access Control
+    'dashboard.access_restricted': 'Acesso Restrito',
+    'dashboard.contact_administrator': 'Para acessar este módulo, entre em contato com o administrador do sistema',
+    
+    // Notifications
+    'notifications.expiry_reminder_6months': 'Lembrete de Vencimento - 6 Meses',
+    'notifications.expiry_reminder_3months': 'Lembrete de Vencimento - 3 Meses',
+    'notifications.expiry_reminder_1month': 'Alerta Crítico de Vencimento - 1 Mês',
+    'notifications.expiry_expired': 'Validações Vencidas',
+    'notifications.email_sent': 'Email de lembrete enviado',
   }
 };
 
