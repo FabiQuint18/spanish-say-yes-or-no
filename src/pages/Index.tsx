@@ -49,13 +49,14 @@ const Index = () => {
     password: ''
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
 
   // Mock users for demonstration
   const mockUsers: User[] = [
     {
       id: '1',
       email: 'admin@company.com',
-      full_name: 'Administrador Sistema',
+      full_name: 'Administrador Sistema', 
       role: 'administrador',
       last_login: '2024-01-15T10:30:00Z'
     },
@@ -92,9 +93,13 @@ const Index = () => {
 
   useEffect(() => {
     const savedUser = localStorage.getItem('currentUser');
+    const savedLogo = localStorage.getItem('companyLogo');
     if (savedUser) {
       setCurrentUser(JSON.parse(savedUser));
       setIsLoggedIn(true);
+    }
+    if (savedLogo) {
+      setCompanyLogo(savedLogo);
     }
   }, []);
 
@@ -119,19 +124,19 @@ const Index = () => {
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         
         toast({
-          title: t('login.success'),
-          description: t('login.welcome'),
+          title: t('login_success'),
+          description: t('login_welcome'),
         });
       } else {
         toast({
-          title: t('login.error'),
+          title: t('login_error'),
           description: 'Credenciales inválidas',
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: t('login.error'),
+        title: t('login_error'),
         description: 'Error al conectar con el servidor',
         variant: "destructive",
       });
@@ -148,9 +153,22 @@ const Index = () => {
     setLoginData({ email: '', password: '' });
     
     toast({
-      title: t('login.logout'),
-      description: t('login.logoutSuccess'),
+      title: t('login_logout'),
+      description: t('login_logoutSuccess'),
     });
+  };
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const logoUrl = e.target?.result as string;
+        setCompanyLogo(logoUrl);
+        localStorage.setItem('companyLogo', logoUrl);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const renderModule = () => {
@@ -168,9 +186,9 @@ const Index = () => {
       case 'users':
         return <UsersModule userRole={userRole} />;
       case 'security':
-        return <SecurityModule userRole={userRole} />;
+        return <SecurityModule />;
       case 'settings':
-        return <SettingsModule userRole={userRole} />;
+        return <SettingsModule />;
       default:
         return <Dashboard userRole={userRole} currentUserEmail={currentUser?.email} />;
     }
@@ -181,15 +199,24 @@ const Index = () => {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl text-center">{t('login.title')}</CardTitle>
+            <div className="flex items-center justify-center mb-4">
+              {companyLogo ? (
+                <img src={companyLogo} alt="Company Logo" className="h-16 w-16 object-contain" />
+              ) : (
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
+                  <ClipboardCheck className="text-white h-8 w-8" />
+                </div>
+              )}
+            </div>
+            <CardTitle className="text-2xl text-center">{t('login_title')}</CardTitle>
             <CardDescription className="text-center">
-              {t('system.subtitle')}
+              {t('system_subtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">{t('login.email')}</Label>
+                <Label htmlFor="email">{t('login_email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -200,7 +227,7 @@ const Index = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">{t('login.password')}</Label>
+                <Label htmlFor="password">{t('login_password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -211,9 +238,21 @@ const Index = () => {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('login.loading') : t('login.button')}
+                {isLoading ? t('login_loading') : t('login_button')}
               </Button>
             </form>
+            
+            {/* Company Logo Upload */}
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <Label htmlFor="logo-upload" className="text-sm font-medium">Logo de la Empresa:</Label>
+              <input
+                id="logo-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleLogoUpload}
+                className="mt-1 text-sm"
+              />
+            </div>
             
             {/* Demo credentials info */}
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
@@ -257,6 +296,7 @@ const Index = () => {
         <Header 
           currentUser={currentUser}
           onLogout={handleLogout}
+          companyLogo={companyLogo}
         />
         
         <main className="flex-1 overflow-auto">

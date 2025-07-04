@@ -7,43 +7,19 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Key, AlertTriangle, Edit, Trash2, Plus, Eye, EyeOff } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Shield, Key, AlertTriangle, Download, FileText, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { UserRole } from '@/types/validation';
 import { useToast } from '@/hooks/use-toast';
 
-interface SecurityModuleProps {
-  userRole?: UserRole;
-}
-
-interface SecurityLog {
-  id: string;
-  timestamp: string;
-  user: string;
-  action: string;
-  resource: string;
-  status: 'success' | 'failed' | 'warning';
-  ip_address: string;
-}
-
-interface Permission {
-  id: string;
-  name: string;
-  description: string;
-  module: string;
-  enabled: boolean;
-}
-
-const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => {
+const SecurityModule = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  const [showPasswords, setShowPasswords] = useState(false);
-  const [showUserForm, setShowUserForm] = useState(false);
-  const [newUser, setNewUser] = useState({
-    name: '',
-    email: '',
-    role: 'analista' as UserRole,
-    password: ''
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: '',
+    newPassword: '',
+    confirmPassword: ''
   });
   const [securitySettings, setSecuritySettings] = useState({
     twoFactorAuth: false,
@@ -55,7 +31,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
   });
 
   // Mock security logs
-  const mockSecurityLogs: SecurityLog[] = [
+  const mockSecurityLogs = [
     {
       id: '1',
       timestamp: '2024-01-15T10:30:00Z',
@@ -85,46 +61,14 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     }
   ];
 
-  // Mock permissions with translations
-  const mockPermissions: Permission[] = [
-    {
-      id: '1',
-      name: t('permissions.create_validations'),
-      description: t('permissions.create_validations_desc'),
-      module: t('menu.validations'),
-      enabled: true
-    },
-    {
-      id: '2',
-      name: t('permissions.edit_validations'),
-      description: t('permissions.edit_validations_desc'),
-      module: t('menu.validations'),
-      enabled: true
-    },
-    {
-      id: '3',
-      name: t('permissions.manage_users'),
-      description: t('permissions.manage_users_desc'),
-      module: t('menu.users'),
-      enabled: false
-    },
-    {
-      id: '4',
-      name: t('permissions.export_reports'),
-      description: t('permissions.export_reports_desc'),
-      module: t('menu.reports'),
-      enabled: true
-    }
-  ];
-
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'success':
-        return <Badge className="bg-green-100 text-green-800">{t('status.success')}</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('status_success')}</Badge>;
       case 'failed':
-        return <Badge className="bg-red-100 text-red-800">{t('status.failed')}</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{t('status_failed')}</Badge>;
       case 'warning':
-        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.warning')}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('status_warning')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -134,143 +78,118 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     return new Date(dateString).toLocaleString('es-ES');
   };
 
-  const togglePermission = (permissionId: string) => {
-    console.log(`Toggling permission: ${permissionId}`);
-    toast({
-      title: t('security.permission_updated'),
-      description: t('security.permission_updated_desc'),
-    });
-  };
-
   const updateSecuritySetting = (setting: string, value: any) => {
     setSecuritySettings(prev => ({
       ...prev,
       [setting]: value
     }));
     toast({
-      title: t('security.setting_updated'),
-      description: t('security.setting_updated_desc'),
+      title: t('security_setting_updated'),
+      description: t('security_setting_updated_desc'),
     });
   };
 
-  const handleAddUser = () => {
-    setShowUserForm(true);
+  const handlePasswordReset = () => {
+    setShowPasswordDialog(true);
   };
 
-  const handleSaveUser = () => {
-    console.log('Creating new user:', newUser);
+  const handlePasswordChange = () => {
+    if (!passwordData.currentPassword || !passwordData.newPassword || !passwordData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Todos los campos son obligatorios",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Las contraseñas no coinciden",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password requirements
+    const minLength = passwordData.newPassword.length >= 7;
+    const hasUppercase = /[A-Z]/.test(passwordData.newPassword);
+    const hasSpecialChar = /[*+\-_@#$%^&!?]/.test(passwordData.newPassword);
+    const hasAlphaNumeric = /[a-zA-Z]/.test(passwordData.newPassword) && /[0-9]/.test(passwordData.newPassword);
+    
+    if (!minLength || !hasUppercase || !hasSpecialChar || !hasAlphaNumeric) {
+      toast({
+        title: "Error de Contraseña",
+        description: t('users_password_requirements'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Changing password:', passwordData);
+    
     toast({
-      title: t('security.user_created'),
-      description: `${t('security.user')} ${newUser.name} ${t('security.created_successfully')}`,
+      title: "Contraseña Cambiada",
+      description: "La contraseña ha sido actualizada exitosamente",
     });
-    setShowUserForm(false);
-    setNewUser({ name: '', email: '', role: 'analista', password: '' });
+
+    setPasswordData({
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: ''
+    });
+    setShowPasswordDialog(false);
   };
 
-  const handleCancelUser = () => {
-    setShowUserForm(false);
-    setNewUser({ name: '', email: '', role: 'analista', password: '' });
+  const downloadAuditTrail = () => {
+    const csvContent = mockSecurityLogs.map(log => 
+      `${formatDate(log.timestamp)},${log.user},${log.action},${log.resource},${log.status},${log.ip_address}`
+    ).join('\n');
+    
+    const csvHeader = 'Fecha,Usuario,Acción,Recurso,Estado,IP\n';
+    const csvData = csvHeader + csvContent;
+    
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = `audit-trail-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    
+    toast({
+      title: t('security_download_audit'),
+      description: "Registro de auditoría descargado exitosamente",
+    });
   };
 
-  // Control de acceso por roles
-  const canManageSecurity = userRole === 'administrador';
-
-  if (!canManageSecurity) {
-    return (
-      <div className="p-6 space-y-6">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('security.title')}</h1>
-          <p className="text-muted-foreground mt-1">
-            {t('security.subtitle')}
-          </p>
-        </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('security.access_restricted')}</CardTitle>
-            <CardDescription>
-              {t('security.no_permissions')}
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    );
-  }
+  const viewAuditPDF = () => {
+    toast({
+      title: t('security_view_audit_pdf'),
+      description: "Generando reporte PDF del registro de auditoría...",
+    });
+    // Aquí se implementaría la generación de PDF
+  };
 
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('security.title')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('security_title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('security.subtitle')}
+            {t('security_subtitle')}
           </p>
         </div>
-        <Button onClick={handleAddUser}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('security.new_user')}
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handlePasswordReset}>
+            <Lock className="mr-2 h-4 w-4" />
+            {t('security_password_change')}
+          </Button>
+        </div>
       </div>
-
-      {/* New User Form */}
-      {showUserForm && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('security.add_new_user')}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="userName">{t('security.full_name')}</Label>
-                <Input
-                  id="userName"
-                  value={newUser.name}
-                  onChange={(e) => setNewUser({...newUser, name: e.target.value})}
-                  placeholder={t('security.enter_name')}
-                />
-              </div>
-              <div>
-                <Label htmlFor="userEmail">{t('security.email')}</Label>
-                <Input
-                  id="userEmail"
-                  type="email"
-                  value={newUser.email}
-                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                  placeholder={t('security.enter_email')}
-                />
-              </div>
-              <div>
-                <Label htmlFor="userRole">{t('security.role')}</Label>
-                <select
-                  id="userRole"
-                  value={newUser.role}
-                  onChange={(e) => setNewUser({...newUser, role: e.target.value as UserRole})}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="administrador">{t('roles.administrator')}</option>
-                  <option value="coordinador">{t('roles.coordinator')}</option>
-                  <option value="analista">{t('roles.analyst')}</option>
-                  <option value="visualizador">{t('roles.viewer')}</option>
-                </select>
-              </div>
-              <div>
-                <Label htmlFor="userPassword">{t('security.password')}</Label>
-                <Input
-                  id="userPassword"
-                  type="password"
-                  value={newUser.password}
-                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                  placeholder={t('security.enter_password')}
-                />
-              </div>
-            </div>
-            <div className="flex space-x-2">
-              <Button onClick={handleSaveUser}>{t('common.save')}</Button>
-              <Button variant="outline" onClick={handleCancelUser}>{t('common.cancel')}</Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Security Settings */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -278,17 +197,17 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              {t('security.settings')}
+              {t('security_settings')}
             </CardTitle>
             <CardDescription>
-              {t('security.settings_desc')}
+              {t('security_settings_desc')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label>{t('security.two_factor')}</Label>
-                <p className="text-sm text-muted-foreground">{t('security.two_factor_desc')}</p>
+                <Label>{t('security_two_factor')}</Label>
+                <p className="text-sm text-muted-foreground">{t('security_two_factor_desc')}</p>
               </div>
               <Switch
                 checked={securitySettings.twoFactorAuth}
@@ -297,7 +216,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="passwordExpiry">{t('security.password_expiry')}</Label>
+              <Label htmlFor="passwordExpiry">{t('security_password_expiry')}</Label>
               <Input
                 id="passwordExpiry"
                 type="number"
@@ -307,7 +226,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sessionTimeout">{t('security.session_timeout')}</Label>
+              <Label htmlFor="sessionTimeout">{t('security_session_timeout')}</Label>
               <Input
                 id="sessionTimeout"
                 type="number"
@@ -317,7 +236,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="loginAttempts">{t('security.login_attempts')}</Label>
+              <Label htmlFor="loginAttempts">{t('security_login_attempts')}</Label>
               <Input
                 id="loginAttempts"
                 type="number"
@@ -328,8 +247,8 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
 
             <div className="flex items-center justify-between">
               <div>
-                <Label>{t('security.audit_logging')}</Label>
-                <p className="text-sm text-muted-foreground">{t('security.audit_logging_desc')}</p>
+                <Label>{t('security_audit_logging')}</Label>
+                <p className="text-sm text-muted-foreground">{t('security_audit_logging_desc')}</p>
               </div>
               <Switch
                 checked={securitySettings.auditLogging}
@@ -339,8 +258,8 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
 
             <div className="flex items-center justify-between">
               <div>
-                <Label>{t('security.encryption')}</Label>
-                <p className="text-sm text-muted-foreground">{t('security.encryption_desc')}</p>
+                <Label>{t('security_encryption')}</Label>
+                <p className="text-sm text-muted-foreground">{t('security_encryption_desc')}</p>
               </div>
               <Switch
                 checked={securitySettings.encryptionEnabled}
@@ -354,27 +273,31 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Key className="h-5 w-5" />
-              {t('security.permissions')}
+              Gestión de Contraseñas
             </CardTitle>
             <CardDescription>
-              {t('security.permissions_desc')}
+              Herramientas para gestión de contraseñas y seguridad
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {mockPermissions.map((permission) => (
-                <div key={permission.id} className="flex items-center justify-between p-3 border rounded-lg">
-                  <div>
-                    <div className="font-medium">{permission.name}</div>
-                    <div className="text-sm text-muted-foreground">{permission.description}</div>
-                    <Badge variant="outline" className="mt-1 text-xs">{permission.module}</Badge>
-                  </div>
-                  <Switch
-                    checked={permission.enabled}
-                    onCheckedChange={() => togglePermission(permission.id)}
-                  />
-                </div>
-              ))}
+          <CardContent className="space-y-4">
+            <Button onClick={handlePasswordReset} className="w-full">
+              <Lock className="mr-2 h-4 w-4" />
+              {t('security_password_change')}
+            </Button>
+            
+            <Button variant="outline" className="w-full">
+              <Key className="mr-2 h-4 w-4" />
+              {t('security_password_reset')}
+            </Button>
+            
+            <div className="pt-4 border-t">
+              <h4 className="font-medium mb-2">Requisitos de Contraseña:</h4>
+              <ul className="text-sm text-muted-foreground space-y-1">
+                <li>• Mínimo 7 caracteres</li>
+                <li>• Al menos 1 letra mayúscula</li>
+                <li>• Al menos 1 símbolo especial (*,+,-,_,@,#,$,%,^,&,!,?)</li>
+                <li>• Debe contener números y letras</li>
+              </ul>
             </div>
           </CardContent>
         </Card>
@@ -383,25 +306,39 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
       {/* Security Logs */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5" />
-            {t('security.audit_log')}
-          </CardTitle>
-          <CardDescription>
-            {t('security.audit_log_desc')}
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5" />
+                {t('security_audit_log')}
+              </CardTitle>
+              <CardDescription>
+                {t('security_audit_log_desc')}
+              </CardDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={downloadAuditTrail}>
+                <Download className="mr-2 h-4 w-4" />
+                {t('security_download_audit')}
+              </Button>
+              <Button variant="outline" onClick={viewAuditPDF}>
+                <FileText className="mr-2 h-4 w-4" />
+                {t('security_view_audit_pdf')}
+              </Button>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('security.date_time')}</TableHead>
-                  <TableHead>{t('security.user')}</TableHead>
-                  <TableHead>{t('security.action')}</TableHead>
-                  <TableHead>{t('security.resource')}</TableHead>
-                  <TableHead>{t('security.status')}</TableHead>
-                  <TableHead>{t('security.ip_address')}</TableHead>
+                  <TableHead>{t('security_date_time')}</TableHead>
+                  <TableHead>{t('security_user')}</TableHead>
+                  <TableHead>{t('security_action')}</TableHead>
+                  <TableHead>{t('security_resource')}</TableHead>
+                  <TableHead>{t('security_status')}</TableHead>
+                  <TableHead>{t('security_ip_address')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -422,6 +359,64 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           </div>
         </CardContent>
       </Card>
+
+      {/* Password Change Dialog */}
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('security_password_change')}</DialogTitle>
+            <DialogDescription>
+              Cambiar contraseña de usuario actual
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="currentPassword">Contraseña Actual</Label>
+              <Input
+                id="currentPassword"
+                type="password"
+                value={passwordData.currentPassword}
+                onChange={(e) => setPasswordData({...passwordData, currentPassword: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="newPassword">Nueva Contraseña</Label>
+              <Input
+                id="newPassword"
+                type="password"
+                value={passwordData.newPassword}
+                onChange={(e) => setPasswordData({...passwordData, newPassword: e.target.value})}
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Nueva Contraseña</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={passwordData.confirmPassword}
+                onChange={(e) => setPasswordData({...passwordData, confirmPassword: e.target.value})}
+              />
+            </div>
+
+            <div className="p-3 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">
+                {t('users_password_requirements')}
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex justify-end space-x-2 pt-4">
+            <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
+              {t('common_cancel')}
+            </Button>
+            <Button onClick={handlePasswordChange}>
+              Cambiar Contraseña
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
