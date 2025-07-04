@@ -1,19 +1,32 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { FlaskConical, Plus } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { FlaskConical, Plus, Edit, Trash2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+
+interface Equipment {
+  id: string;
+  name: string;
+  type: string;
+  model: string;
+  serial: string;
+  location: string;
+  created_at: string;
+}
 
 const EquipmentsModule = () => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
+  const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -22,16 +35,61 @@ const EquipmentsModule = () => {
     location: ''
   });
 
+  // Load equipments from localStorage on component mount
+  useEffect(() => {
+    const savedEquipments = localStorage.getItem('systemEquipments');
+    if (savedEquipments) {
+      setEquipments(JSON.parse(savedEquipments));
+    }
+  }, []);
+
   const handleAddEquipment = () => {
     setShowForm(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.name || !formData.type || !formData.model || !formData.serial) {
+      toast({
+        title: "Error",
+        description: "Todos los campos obligatorios deben ser completados",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if serial already exists
+    if (equipments.some(equipment => equipment.serial === formData.serial)) {
+      toast({
+        title: "Error",
+        description: "Ya existe un equipo con este número de serie",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create new equipment
+    const newEquipment: Equipment = {
+      id: Date.now().toString(),
+      name: formData.name,
+      type: formData.type,
+      model: formData.model,
+      serial: formData.serial,
+      location: formData.location,
+      created_at: new Date().toISOString()
+    };
+
+    const updatedEquipments = [...equipments, newEquipment];
+    setEquipments(updatedEquipments);
+    localStorage.setItem('systemEquipments', JSON.stringify(updatedEquipments));
+
     toast({
       title: "Equipo Agregado",
       description: `El equipo ${formData.name} ha sido registrado exitosamente`,
     });
+    
     setShowForm(false);
     setFormData({ name: '', type: '', model: '', serial: '', location: '' });
   };
@@ -41,18 +99,39 @@ const EquipmentsModule = () => {
     setFormData({ name: '', type: '', model: '', serial: '', location: '' });
   };
 
+  const handleDeleteEquipment = (equipmentId: string) => {
+    const updatedEquipments = equipments.filter(equipment => equipment.id !== equipmentId);
+    setEquipments(updatedEquipments);
+    localStorage.setItem('systemEquipments', JSON.stringify(updatedEquipments));
+    
+    toast({
+      title: "Equipo Eliminado",
+      description: "Equipo eliminado exitosamente",
+    });
+  };
+
+  const getEquipmentStats = () => {
+    const hplc = equipments.filter(e => e.type === 'HPLC').length;
+    const gc = equipments.filter(e => e.type === 'GC').length;
+    const uvvis = equipments.filter(e => e.type === 'UV-VIS').length;
+    
+    return { hplc, gc, uvvis };
+  };
+
+  const stats = getEquipmentStats();
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('menu.equipments')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('equipments_title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Gestiona Los Equipos Analíticos
+            {t('equipments_subtitle')}
           </p>
         </div>
         <Button onClick={handleAddEquipment}>
           <Plus className="mr-2 h-4 w-4" />
-          Agregar Equipo
+          {t('equipments_add')}
         </Button>
       </div>
 
@@ -65,7 +144,7 @@ const EquipmentsModule = () => {
             <FlaskConical className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">4</div>
+            <div className="text-2xl font-bold">{stats.hplc}</div>
             <p className="text-xs text-muted-foreground">
               Equipos Registrados
             </p>
@@ -80,7 +159,7 @@ const EquipmentsModule = () => {
             <FlaskConical className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">2</div>
+            <div className="text-2xl font-bold">{stats.gc}</div>
             <p className="text-xs text-muted-foreground">
               Equipos Registrados
             </p>
@@ -95,7 +174,7 @@ const EquipmentsModule = () => {
             <FlaskConical className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">6</div>
+            <div className="text-2xl font-bold">{stats.uvvis}</div>
             <p className="text-xs text-muted-foreground">
               Equipos Registrados
             </p>
@@ -105,15 +184,61 @@ const EquipmentsModule = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Equipos Analíticos</CardTitle>
+          <CardTitle>{t('equipments_list')}</CardTitle>
           <CardDescription>
-            Lista De Equipos Registrados En El Sistema
+            Lista de equipos registrados en el sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            Módulo De Equipos En Desarrollo...
-          </div>
+          {equipments.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Nombre</TableHead>
+                    <TableHead>Tipo</TableHead>
+                    <TableHead>Modelo</TableHead>
+                    <TableHead>Número de Serie</TableHead>
+                    <TableHead>Ubicación</TableHead>
+                    <TableHead>Fecha Registro</TableHead>
+                    <TableHead>Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {equipments.map((equipment) => (
+                    <TableRow key={equipment.id}>
+                      <TableCell className="font-medium">{equipment.name}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{equipment.type}</Badge>
+                      </TableCell>
+                      <TableCell>{equipment.model}</TableCell>
+                      <TableCell>{equipment.serial}</TableCell>
+                      <TableCell>{equipment.location}</TableCell>
+                      <TableCell>{new Date(equipment.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleDeleteEquipment(equipment.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No hay equipos registrados
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -183,10 +308,10 @@ const EquipmentsModule = () => {
             </div>
             <div className="flex gap-2 justify-end">
               <Button type="button" variant="outline" onClick={handleClose}>
-                Cancelar
+                {t('common_cancel')}
               </Button>
               <Button type="submit">
-                Agregar Equipo
+                {t('equipments_add')}
               </Button>
             </div>
           </form>

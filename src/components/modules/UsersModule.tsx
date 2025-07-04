@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,14 +8,22 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Switch } from '@/components/ui/switch';
-import { Users, Plus, Edit, Trash2, Shield, Key } from 'lucide-react';
+import { Users, Plus, Edit, Trash2, Shield } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { UserRole } from '@/types/validation';
 import { useToast } from '@/hooks/use-toast';
 
 interface UsersModuleProps {
   userRole?: UserRole;
+}
+
+interface User {
+  id: string;
+  full_name: string;
+  email: string;
+  role: UserRole;
+  created_at: string;
+  last_login?: string;
 }
 
 interface Permission {
@@ -34,11 +42,44 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [showNewUserDialog, setShowNewUserDialog] = useState(false);
+  const [users, setUsers] = useState<User[]>([]);
   const [newUser, setNewUser] = useState({
     full_name: '',
     email: '',
     role: 'visualizador' as UserRole,
+    password: '',
+    confirmPassword: ''
   });
+
+  // Load users from localStorage on component mount
+  useEffect(() => {
+    const savedUsers = localStorage.getItem('systemUsers');
+    if (savedUsers) {
+      setUsers(JSON.parse(savedUsers));
+    } else {
+      // Initialize with default users
+      const defaultUsers: User[] = [
+        {
+          id: '1',
+          full_name: 'Administrador Sistema',
+          email: 'admin@company.com',
+          role: 'administrador',
+          created_at: '2024-01-01T00:00:00Z',
+          last_login: '2024-01-15T10:30:00Z'
+        },
+        {
+          id: '2',
+          full_name: 'Coordinador QA',
+          email: 'coordinador@company.com',
+          role: 'coordinador',
+          created_at: '2024-01-01T00:00:00Z',
+          last_login: '2024-01-15T09:15:00Z'
+        }
+      ];
+      setUsers(defaultUsers);
+      localStorage.setItem('systemUsers', JSON.stringify(defaultUsers));
+    }
+  }, []);
 
   // Control de acceso
   if (userRole !== 'administrador') {
@@ -95,13 +136,22 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     ],
   };
 
+  const validatePassword = (password: string): boolean => {
+    // At least 7 characters, 1 uppercase, 1 special character
+    const minLength = password.length >= 7;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasSpecialChar = /[*+\-!@#$%^&(){}[\]:;<>,.?~_|]/.test(password);
+    
+    return minLength && hasUppercase && hasSpecialChar;
+  };
+
   const handleNewUser = () => {
     setShowNewUserDialog(true);
   };
 
   const handleSaveUser = () => {
     // Validate required fields
-    if (!newUser.full_name || !newUser.email) {
+    if (!newUser.full_name || !newUser.email || !newUser.password || !newUser.confirmPassword) {
       toast({
         title: "Error",
         description: "Todos los campos son obligatorios",
@@ -110,12 +160,52 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
       return;
     }
 
-    // Simulate user creation
-    console.log('Creating new user:', newUser);
+    // Validate password
+    if (!validatePassword(newUser.password)) {
+      toast({
+        title: "Error",
+        description: t('users_password_weak'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate password confirmation
+    if (newUser.password !== newUser.confirmPassword) {
+      toast({
+        title: "Error",
+        description: t('users_password_mismatch'),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if email already exists
+    if (users.some(user => user.email === newUser.email)) {
+      toast({
+        title: "Error",
+        description: "Ya existe un usuario con este correo electrónico",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Create new user
+    const user: User = {
+      id: Date.now().toString(),
+      full_name: newUser.full_name,
+      email: newUser.email,
+      role: newUser.role,
+      created_at: new Date().toISOString()
+    };
+
+    const updatedUsers = [...users, user];
+    setUsers(updatedUsers);
+    localStorage.setItem('systemUsers', JSON.stringify(updatedUsers));
     
     toast({
-      title: "Usuario Creado",
-      description: `Usuario ${newUser.full_name} creado exitosamente. Se ha enviado un correo para establecer la contraseña.`,
+      title: t('users_created_successfully'),
+      description: `Usuario ${newUser.full_name} creado exitosamente`,
     });
 
     // Reset form and close dialog
@@ -123,6 +213,8 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
       full_name: '',
       email: '',
       role: 'visualizador' as UserRole,
+      password: '',
+      confirmPassword: ''
     });
     setShowNewUserDialog(false);
   };
@@ -133,6 +225,19 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
       full_name: '',
       email: '',
       role: 'visualizador' as UserRole,
+      password: '',
+      confirmPassword: ''
+    });
+  };
+
+  const handleDeleteUser = (userId: string) => {
+    const updatedUsers = users.filter(user => user.id !== userId);
+    setUsers(updatedUsers);
+    localStorage.setItem('systemUsers', JSON.stringify(updatedUsers));
+    
+    toast({
+      title: "Usuario Eliminado",
+      description: "Usuario eliminado exitosamente",
     });
   };
 
@@ -148,7 +253,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('menu_users')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('users_title')}</h1>
           <p className="text-muted-foreground mt-1">
             {t('users_subtitle')}
           </p>
@@ -168,9 +273,58 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            Módulo de gestión de usuarios en desarrollo
-          </div>
+          {users.length > 0 ? (
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('users_name')}</TableHead>
+                    <TableHead>{t('users_email')}</TableHead>
+                    <TableHead>{t('users_role')}</TableHead>
+                    <TableHead>Fecha Creación</TableHead>
+                    <TableHead>Último Acceso</TableHead>
+                    <TableHead>Acciones</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {users.map((user) => (
+                    <TableRow key={user.id}>
+                      <TableCell className="font-medium">{user.full_name}</TableCell>
+                      <TableCell>{user.email}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">
+                          {t(`roles_${user.role}`)}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Nunca'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleDeleteUser(user.id)}
+                            disabled={user.email === 'admin@company.com'}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              No hay usuarios registrados
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -237,7 +391,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
           <DialogHeader>
             <DialogTitle>{t('users_new')}</DialogTitle>
             <DialogDescription>
-              Crear un nuevo usuario en el sistema. Se enviará un correo para establecer la contraseña.
+              Crear un nuevo usuario en el sistema con contraseña local
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -277,9 +431,31 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
               </Select>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="password">{t('users_password')}</Label>
+              <Input
+                id="password"
+                type="password"
+                value={newUser.password}
+                onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                placeholder="Contraseña"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">{t('users_confirm_password')}</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={newUser.confirmPassword}
+                onChange={(e) => setNewUser({...newUser, confirmPassword: e.target.value})}
+                placeholder="Confirmar contraseña"
+              />
+            </div>
+
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                {t('users_create_password')}
+                {t('users_password_requirements')}
               </p>
             </div>
           </div>

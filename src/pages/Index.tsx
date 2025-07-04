@@ -4,18 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   ClipboardCheck, 
-  Package, 
-  Users, 
-  Settings, 
-  Shield,
-  Monitor,
-  LogOut,
-  Languages,
-  Search,
-  Bell
+  Languages
 } from 'lucide-react';
 import Sidebar from '@/components/layout/Sidebar';
 import Header from '@/components/layout/Header';
@@ -178,13 +169,13 @@ const Index = () => {
       case 'dashboard':
         return <Dashboard userRole={userRole} currentUserEmail={currentUser?.email} />;
       case 'products':
-        return <ProductsModule userRole={userRole} />;
+        return <ProductsModule />;
       case 'validations':
-        return <ValidationsModule userRole={userRole} />;
+        return <ValidationsModule />;
       case 'equipments':
-        return <EquipmentsModule userRole={userRole} />;
+        return <EquipmentsModule />;
       case 'users':
-        return <UsersModule userRole={userRole} />;
+        return <UsersModule />;
       case 'security':
         return <SecurityModule />;
       case 'settings':
