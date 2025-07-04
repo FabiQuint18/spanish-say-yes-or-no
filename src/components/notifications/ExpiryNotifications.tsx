@@ -12,7 +12,8 @@ const ExpiryNotifications = ({ validations, userEmail }: ExpiryNotificationsProp
   const { toast } = useToast();
 
   useEffect(() => {
-    const { sixMonths, threeMonths, oneMonth } = checkExpiringValidations(validations);
+    const notifications = checkExpiringValidations(validations);
+    const { sixMonths, threeMonths, oneMonth } = notifications;
 
     // Simular envío de correos electrónicos
     if (sixMonths.length > 0) {

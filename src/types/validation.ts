@@ -11,7 +11,8 @@ export type ValidationStatus =
   | 'validado'
   | 'proximo_vencer'
   | 'vencido'
-  | 'por_revalidar';
+  | 'por_revalidar'
+  | 'en_revalidacion';
 
 export type ValidationType = 
   | 'metodos_analiticos'
@@ -99,14 +100,32 @@ export interface Validation {
   files?: ValidationFile[];
 }
 
-export const checkExpiringValidations = (validations: Validation[]) => {
+export interface ExpirationNotifications {
+  sixMonths: Validation[];
+  threeMonths: Validation[];
+  oneMonth: Validation[];
+}
+
+export const checkExpiringValidations = (validations: Validation[]): ExpirationNotifications => {
   const today = new Date();
-  const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+  const oneMonth = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+  const threeMonths = new Date(today.getTime() + (90 * 24 * 60 * 60 * 1000));
+  const sixMonths = new Date(today.getTime() + (180 * 24 * 60 * 60 * 1000));
   
-  return validations.filter(validation => {
-    const expiryDate = new Date(validation.expiry_date);
-    return expiryDate <= thirtyDaysFromNow && expiryDate >= today;
-  });
+  return {
+    oneMonth: validations.filter(validation => {
+      const expiryDate = new Date(validation.expiry_date);
+      return expiryDate <= oneMonth && expiryDate >= today;
+    }),
+    threeMonths: validations.filter(validation => {
+      const expiryDate = new Date(validation.expiry_date);
+      return expiryDate <= threeMonths && expiryDate >= today;
+    }),
+    sixMonths: validations.filter(validation => {
+      const expiryDate = new Date(validation.expiry_date);
+      return expiryDate <= sixMonths && expiryDate >= today;
+    })
+  };
 };
 
 export const calculateExpiryDate = (issueDate: string, validationType: ValidationType): string => {

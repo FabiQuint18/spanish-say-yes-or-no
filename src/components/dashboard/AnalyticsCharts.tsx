@@ -19,17 +19,17 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
   // Data for validation types chart
   const validationTypeData = [
     { 
-      name: t('validation.procesos'), 
+      name: t('validations_processes'), 
       value: safeValidations.filter(v => v.validation_type === 'procesos').length,
       fill: '#3b82f6'
     },
     { 
-      name: t('validation.limpieza'), 
+      name: t('validations_cleaning'), 
       value: safeValidations.filter(v => v.validation_type === 'limpieza').length,
       fill: '#10b981'
     },
     { 
-      name: t('validation.metodos'), 
+      name: t('validations_analytical_methods'), 
       value: safeValidations.filter(v => v.validation_type === 'metodos_analiticos').length,
       fill: '#f59e0b'
     },
@@ -38,32 +38,32 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
   // Data for status chart
   const statusData = [
     { 
-      name: t('status.validado'), 
+      name: t('status_validated'), 
       value: safeValidations.filter(v => v.status === 'validado').length,
       fill: '#10b981'
     },
     { 
-      name: t('status.proximo'), 
+      name: t('status_expiring_soon'), 
       value: safeValidations.filter(v => v.status === 'proximo_vencer').length,
       fill: '#f59e0b'
     },
     { 
-      name: t('status.vencido'), 
+      name: t('status_expired'), 
       value: safeValidations.filter(v => v.status === 'vencido').length,
       fill: '#ef4444'
     },
     { 
-      name: t('status.revalidacion'), 
+      name: t('status_under_revalidation'), 
       value: safeValidations.filter(v => v.status === 'en_revalidacion').length,
       fill: '#8b5cf6'
     },
     { 
-      name: t('status.en_validacion'), 
+      name: t('status_under_validation'), 
       value: safeValidations.filter(v => v.status === 'en_validacion').length,
       fill: '#06b6d4'
     },
     { 
-      name: t('status.por_revalidar'), 
+      name: t('status_pending_revalidation'), 
       value: safeValidations.filter(v => v.status === 'por_revalidar').length,
       fill: '#f97316'
     },
@@ -89,9 +89,9 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
         <CardContent className="flex justify-center">
           <ChartContainer
             config={{
-              procesos: { label: t('validation.procesos'), color: '#3b82f6' },
-              limpieza: { label: t('validation.limpieza'), color: '#10b981' },
-              metodos: { label: t('validation.metodos'), color: '#f59e0b' },
+              procesos: { label: t('validations_processes'), color: '#3b82f6' },
+              limpieza: { label: t('validations_cleaning'), color: '#10b981' },
+              metodos: { label: t('validations_analytical_methods'), color: '#f59e0b' },
             }}
             className="h-[200px] w-full"
           >
@@ -125,10 +125,10 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
         <CardContent className="flex justify-center">
           <ChartContainer
             config={{
-              validado: { label: t('status.validado'), color: '#10b981' },
-              proximo: { label: t('status.proximo'), color: '#f59e0b' },
-              vencido: { label: t('status.vencido'), color: '#ef4444' },
-              revalidacion: { label: t('status.revalidacion'), color: '#8b5cf6' },
+              validado: { label: t('status_validated'), color: '#10b981' },
+              proximo: { label: t('status_expiring_soon'), color: '#f59e0b' },
+              vencido: { label: t('status_expired'), color: '#ef4444' },
+              revalidacion: { label: t('status_under_revalidation'), color: '#8b5cf6' },
             }}
             className="h-[200px] w-full"
           >

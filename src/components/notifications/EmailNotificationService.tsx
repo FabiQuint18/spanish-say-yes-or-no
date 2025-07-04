@@ -21,7 +21,8 @@ const EmailNotificationService = ({
   useEffect(() => {
     if (!enabled || !userEmail) return;
 
-    const { sixMonths, threeMonths, oneMonth } = checkExpiringValidations(validations);
+    const notifications = checkExpiringValidations(validations);
+    const { sixMonths, threeMonths, oneMonth } = notifications;
     const expired = validations.filter(v => v.status === 'vencido');
 
     // Simulate email sending for 6 months reminder
@@ -32,8 +33,8 @@ const EmailNotificationService = ({
       // Simulate email API call
       setTimeout(() => {
         toast({
-          title: t('notifications.expiry_reminder_6months'),
-          description: `${sixMonths.length} validaciones vencerán en los próximos 6 meses. ${t('notifications.email_sent')} a ${userEmail}`,
+          title: "Recordatorio de Vencimiento - 6 Meses",
+          description: `${sixMonths.length} validaciones vencerán en los próximos 6 meses. Correo enviado a ${userEmail}`,
           variant: "default",
         });
       }, 1000);
@@ -46,8 +47,8 @@ const EmailNotificationService = ({
       
       setTimeout(() => {
         toast({
-          title: t('notifications.expiry_reminder_3months'),
-          description: `${threeMonths.length} validaciones vencerán en los próximos 3 meses. ${t('notifications.email_sent')} a ${userEmail}`,
+          title: "Recordatorio de Vencimiento - 3 Meses",
+          description: `${threeMonths.length} validaciones vencerán en los próximos 3 meses. Correo enviado a ${userEmail}`,
           variant: "default",
         });
       }, 2000);
@@ -60,8 +61,8 @@ const EmailNotificationService = ({
       
       setTimeout(() => {
         toast({
-          title: t('notifications.expiry_reminder_1month'),
-          description: `${oneMonth.length} validaciones vencerán en el próximo mes. ${t('notifications.email_sent')} a ${userEmail}`,
+          title: "Alerta de Vencimiento Crítico - 1 Mes",
+          description: `${oneMonth.length} validaciones vencerán en el próximo mes. Correo enviado a ${userEmail}`,
           variant: "destructive",
         });
       }, 3000);
@@ -74,8 +75,8 @@ const EmailNotificationService = ({
       
       setTimeout(() => {
         toast({
-          title: t('notifications.expiry_expired'),
-          description: `${expired.length} validaciones están vencidas. ${t('notifications.email_sent')} a ${userEmail}`,
+          title: "Validaciones Vencidas",
+          description: `${expired.length} validaciones están vencidas. Correo enviado a ${userEmail}`,
           variant: "destructive",
         });
       }, 4000);
