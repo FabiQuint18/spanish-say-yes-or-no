@@ -34,6 +34,7 @@ const translations = {
     common_close: 'Cerrar',
     common_confirm: 'Confirmar',
     common_loading: 'Cargando...',
+    common_all: 'Todos',
     
     // System
     system_title: 'Sistema de Gestión de Validaciones',
@@ -54,27 +55,87 @@ const translations = {
     // Dashboard
     dashboard_title: 'Panel de Control',
     dashboard_subtitle: 'Resumen general del sistema',
+    dashboard_access_restricted: 'Acceso Restringido',
+    dashboard_contact_administrator: 'Contacte al administrador para obtener permisos',
+    
+    // Stats
+    stats_validations: 'Validaciones',
+    stats_products: 'Productos',
+    stats_expiring: 'Por Vencer',
+    stats_expired: 'Vencidas',
+    stats_efficiency: 'Eficiencia',
+    stats_total_validations: 'Validaciones totales',
+    stats_registered_products: 'Productos registrados',
+    stats_next_30_days: 'Próximos 30 días',
+    stats_validation_efficiency: 'Eficiencia de validación',
+    stats_validated: 'Validadas',
+    stats_in_validation: 'En Validación',
+    
+    // Analytics
+    analytics_title: 'Analíticas',
+    analytics_subtitle: 'Análisis detallado del sistema',
     
     // Validations
     validations_title: 'Validaciones',
     validations_subtitle: 'Gestión de validaciones de métodos y procesos',
     validations_new: 'Nueva Validación',
     validations_list: 'Lista de Validaciones',
+    validations_manage: 'Gestionar validaciones del sistema',
     validations_code: 'Código de Validación',
+    validations_validation_code: 'Código de Validación',
     validations_product: 'Producto',
+    validations_product_raw_material: 'Producto/Materia Prima',
+    validations_product_raw_material_code: 'Código Producto/MP',
+    validations_product_code: 'Código de Producto',
     validations_type: 'Tipo',
+    validations_validation_type: 'Tipo de Validación',
+    validations_subcategory: 'Subcategoría',
     validations_equipment: 'Equipo',
+    validations_equipment_type: 'Tipo de Equipo',
     validations_status: 'Estado',
     validations_issue_date: 'Fecha Emisión',
     validations_expiry_date: 'Fecha Vencimiento',
+    validations_expiry_from: 'Vencimiento Desde',
+    validations_expiry_to: 'Vencimiento Hasta',
+    validations_search: 'Buscar validaciones...',
     validations_search_by_code: 'Buscar por código',
+    validations_search_by_product: 'Buscar por producto',
+    validations_search_filters: 'Filtros de Búsqueda',
+    validations_clear_filters: 'Limpiar Filtros',
+    validations_select_type: 'Seleccionar tipo',
+    validations_select_subcategory: 'Seleccionar subcategoría',
+    validations_select_equipment: 'Seleccionar equipo',
+    validations_select_status: 'Seleccionar estado',
     validations_filter_by_type: 'Filtrar por tipo',
     validations_filter_by_status: 'Filtrar por estado',
-    validations_completed: 'Completadas',
+    validations_completed: 'Validaciones completadas',
     validations_next30days: 'Próximas a vencer (30 días)',
     validations_immediate: 'Acción inmediata requerida',
     validations_protocols: 'Protocolos',
     validations_withDocumentation: 'Con documentación',
+    validations_files: 'Archivos',
+    validations_actions: 'Acciones',
+    validations_no_results: 'No se encontraron resultados',
+    validations_no_validations: 'No hay validaciones registradas',
+    
+    // Validation Types
+    validations_processes: 'Procesos',
+    validations_cleaning: 'Limpieza',
+    validations_analytical_methods: 'Métodos Analíticos',
+    validations_computerized_systems: 'Sistemas Computarizados',
+    
+    // Subcategories
+    validations_manufacturing: 'Fabricación',
+    validations_packaging: 'Empaque',
+    validations_assay: 'Valoración',
+    validations_dissolution: 'Disolución',
+    validations_impurities: 'Impurezas',
+    validations_uniformity: 'Uniformidad de Unidades de Dosificación',
+    validations_identification: 'Identificación',
+    validations_traces: 'Trazas',
+    validations_not_applicable: 'No Aplica',
+    validations_initial_validation: 'Validación Inicial',
+    validations_periodic_revalidation: 'Revalidación Periódica',
     
     // Equipment
     equipments_title: 'Equipos',
@@ -87,6 +148,12 @@ const translations = {
     products_subtitle: 'Gestión de productos y materias primas',
     products_add: 'Agregar Producto',
     products_list: 'Lista de Productos',
+    
+    // Material Types
+    material_types_finished_product: 'Producto Terminado',
+    material_types_raw_material: 'Materia Prima',
+    material_types_packaging_material: 'Material de Empaque',
+    material_types_bulk: 'Granel',
     
     // Users
     users_title: 'Usuarios',
@@ -107,31 +174,6 @@ const translations = {
     // Security
     security_title: 'Seguridad',
     security_subtitle: 'Configuración de seguridad del sistema',
-    security_settings: 'Configuración de Seguridad',
-    security_settings_desc: 'Ajustes de seguridad y políticas del sistema',
-    security_two_factor: 'Autenticación de Dos Factores',
-    security_two_factor_desc: 'Habilitar 2FA para mayor seguridad',
-    security_password_expiry: 'Expiración de Contraseña (días)',
-    security_session_timeout: 'Tiempo de Sesión (minutos)',
-    security_login_attempts: 'Intentos de Login Máximos',
-    security_audit_logging: 'Registro de Auditoría',
-    security_audit_logging_desc: 'Registrar todas las acciones del sistema',
-    security_encryption: 'Cifrado de Datos',
-    security_encryption_desc: 'Cifrar datos sensibles',
-    security_audit_log: 'Registro de Auditoría',
-    security_audit_log_desc: 'Historial de acciones del sistema',
-    security_date_time: 'Fecha y Hora',
-    security_user: 'Usuario',
-    security_action: 'Acción',
-    security_resource: 'Recurso',
-    security_status: 'Estado',
-    security_ip_address: 'Dirección IP',
-    security_download_audit: 'Descargar Auditoría',
-    security_view_audit_pdf: 'Ver Auditoría PDF',
-    security_password_change: 'Cambiar Contraseña',
-    security_password_reset: 'Restablecer Contraseña',
-    security_setting_updated: 'Configuración actualizada',
-    security_setting_updated_desc: 'La configuración de seguridad ha sido actualizada',
     
     // Settings
     settings_title: 'Configuración',
@@ -144,45 +186,15 @@ const translations = {
     roles_analista: 'Analista',
     roles_visualizador: 'Visualizador',
     
-    // Validation Types
-    validation_type_metodos_analiticos: 'Métodos Analíticos',
-    validation_type_procesos: 'Procesos',
-    validation_type_limpieza: 'Limpieza',
-    validation_type_sistemas_computarizados: 'Sistemas Computarizados',
-    
-    // Validation Statuses
-    validation_status_borrador: 'Borrador',
-    validation_status_primera_revision: 'Primera Revisión',
-    validation_status_segunda_revision: 'Segunda Revisión',
-    validation_status_en_validacion: 'En Validación',
-    validation_status_validado: 'Validado',
-    validation_status_proximo_vencer: 'Próximo a Vencer',
-    validation_status_vencido: 'Vencido',
-    validation_status_por_revalidar: 'Por Revalidar',
-    
-    // Product Types
-    product_type_producto_terminado: 'Producto Terminado',
-    product_type_materia_prima: 'Materia Prima',
-    product_type_material_empaque: 'Material de Empaque',
-    product_type_granel: 'Granel',
-    
-    // Equipment Types
-    equipment_type_hplc: 'HPLC',
-    equipment_type_gc: 'GC',
-    equipment_type_uvvis: 'UV-VIS',
-    equipment_type_nir: 'NIR',
-    equipment_type_raman: 'RAMAN',
-    equipment_type_ir: 'IR',
-    equipment_type_aa: 'AA',
-    equipment_type_karl_fischer: 'Karl Fischer',
-    
-    // Stats
-    stats_validated: 'Validadas',
-    stats_expiring: 'Por Vencer',
-    stats_expired: 'Vencidas',
-    stats_in_validation: 'En Validación',
-    
     // Status
+    status_validado: 'Validado',
+    status_en_validacion: 'En Validación',
+    status_por_revalidar: 'Por Revalidar',
+    status_vencido: 'Vencido',
+    status_proximo: 'Próximo a Vencer',
+    status_revalidacion: 'En Revalidación',
+    status_primera_revision: 'Primera Revisión',
+    status_segunda_revision: 'Segunda Revisión',
     status_success: 'Exitoso',
     status_failed: 'Fallido',
     status_warning: 'Advertencia',
@@ -210,6 +222,7 @@ const translations = {
     common_close: 'Close',
     common_confirm: 'Confirm',
     common_loading: 'Loading...',
+    common_all: 'All',
     
     // System
     system_title: 'Validation Management System',
@@ -230,27 +243,87 @@ const translations = {
     // Dashboard
     dashboard_title: 'Dashboard',
     dashboard_subtitle: 'System overview',
+    dashboard_access_restricted: 'Access Restricted',
+    dashboard_contact_administrator: 'Contact administrator for permissions',
+    
+    // Stats
+    stats_validations: 'Validations',
+    stats_products: 'Products',
+    stats_expiring: 'Expiring',
+    stats_expired: 'Expired',
+    stats_efficiency: 'Efficiency',
+    stats_total_validations: 'Total validations',
+    stats_registered_products: 'Registered products',
+    stats_next_30_days: 'Next 30 days',
+    stats_validation_efficiency: 'Validation efficiency',
+    stats_validated: 'Validated',
+    stats_in_validation: 'In Validation',
+    
+    // Analytics
+    analytics_title: 'Analytics',
+    analytics_subtitle: 'Detailed system analysis',
     
     // Validations
     validations_title: 'Validations',
     validations_subtitle: 'Method and process validation management',
     validations_new: 'New Validation',
     validations_list: 'Validation List',
+    validations_manage: 'Manage system validations',
     validations_code: 'Validation Code',
+    validations_validation_code: 'Validation Code',
     validations_product: 'Product',
+    validations_product_raw_material: 'Product/Raw Material',
+    validations_product_raw_material_code: 'Product/RM Code',
+    validations_product_code: 'Product Code',
     validations_type: 'Type',
+    validations_validation_type: 'Validation Type',
+    validations_subcategory: 'Subcategory',
     validations_equipment: 'Equipment',
+    validations_equipment_type: 'Equipment Type',
     validations_status: 'Status',
     validations_issue_date: 'Issue Date',
     validations_expiry_date: 'Expiry Date',
+    validations_expiry_from: 'Expiry From',
+    validations_expiry_to: 'Expiry To',
+    validations_search: 'Search validations...',
     validations_search_by_code: 'Search by code',
+    validations_search_by_product: 'Search by product',
+    validations_search_filters: 'Search Filters',
+    validations_clear_filters: 'Clear Filters',
+    validations_select_type: 'Select type',
+    validations_select_subcategory: 'Select subcategory',
+    validations_select_equipment: 'Select equipment',
+    validations_select_status: 'Select status',
     validations_filter_by_type: 'Filter by type',
     validations_filter_by_status: 'Filter by status',
-    validations_completed: 'Completed',
+    validations_completed: 'Completed validations',
     validations_next30days: 'Expiring soon (30 days)',
     validations_immediate: 'Immediate action required',
     validations_protocols: 'Protocols',
     validations_withDocumentation: 'With documentation',
+    validations_files: 'Files',
+    validations_actions: 'Actions',
+    validations_no_results: 'No results found',
+    validations_no_validations: 'No validations registered',
+    
+    // Validation Types
+    validations_processes: 'Processes',
+    validations_cleaning: 'Cleaning',
+    validations_analytical_methods: 'Analytical Methods',
+    validations_computerized_systems: 'Computerized Systems',
+    
+    // Subcategories
+    validations_manufacturing: 'Manufacturing',
+    validations_packaging: 'Packaging',
+    validations_assay: 'Assay',
+    validations_dissolution: 'Dissolution',
+    validations_impurities: 'Impurities',
+    validations_uniformity: 'Uniformity of Dosage Units',
+    validations_identification: 'Identification',
+    validations_traces: 'Traces',
+    validations_not_applicable: 'Not Applicable',
+    validations_initial_validation: 'Initial Validation',
+    validations_periodic_revalidation: 'Periodic Revalidation',
     
     // Equipment
     equipments_title: 'Equipment',
@@ -263,6 +336,12 @@ const translations = {
     products_subtitle: 'Product and raw material management',
     products_add: 'Add Product',
     products_list: 'Product List',
+    
+    // Material Types
+    material_types_finished_product: 'Finished Product',
+    material_types_raw_material: 'Raw Material',
+    material_types_packaging_material: 'Packaging Material',
+    material_types_bulk: 'Bulk',
     
     // Users
     users_title: 'Users',
@@ -283,31 +362,6 @@ const translations = {
     // Security
     security_title: 'Security',
     security_subtitle: 'System security configuration',
-    security_settings: 'Security Settings',
-    security_settings_desc: 'Security settings and system policies',
-    security_two_factor: 'Two-Factor Authentication',
-    security_two_factor_desc: 'Enable 2FA for enhanced security',
-    security_password_expiry: 'Password Expiry (days)',
-    security_session_timeout: 'Session Timeout (minutes)',
-    security_login_attempts: 'Maximum Login Attempts',
-    security_audit_logging: 'Audit Logging',
-    security_audit_logging_desc: 'Log all system actions',
-    security_encryption: 'Data Encryption',
-    security_encryption_desc: 'Encrypt sensitive data',
-    security_audit_log: 'Audit Log',
-    security_audit_log_desc: 'System action history',
-    security_date_time: 'Date & Time',
-    security_user: 'User',
-    security_action: 'Action',
-    security_resource: 'Resource',
-    security_status: 'Status',
-    security_ip_address: 'IP Address',
-    security_download_audit: 'Download Audit',
-    security_view_audit_pdf: 'View Audit PDF',
-    security_password_change: 'Change Password',
-    security_password_reset: 'Reset Password',
-    security_setting_updated: 'Setting updated',
-    security_setting_updated_desc: 'Security setting has been updated',
     
     // Settings
     settings_title: 'Settings',
@@ -320,45 +374,15 @@ const translations = {
     roles_analista: 'Analyst',
     roles_visualizador: 'Viewer',
     
-    // Validation Types
-    validation_type_metodos_analiticos: 'Analytical Methods',
-    validation_type_procesos: 'Processes',
-    validation_type_limpieza: 'Cleaning',
-    validation_type_sistemas_computarizados: 'Computer Systems',
-    
-    // Validation Statuses
-    validation_status_borrador: 'Draft',
-    validation_status_primera_revision: 'First Review',
-    validation_status_segunda_revision: 'Second Review',
-    validation_status_en_validacion: 'In Validation',
-    validation_status_validado: 'Validated',
-    validation_status_proximo_vencer: 'Expiring Soon',
-    validation_status_vencido: 'Expired',
-    validation_status_por_revalidar: 'For Revalidation',
-    
-    // Product Types
-    product_type_producto_terminado: 'Finished Product',
-    product_type_materia_prima: 'Raw Material',
-    product_type_material_empaque: 'Packaging Material',
-    product_type_granel: 'Bulk',
-    
-    // Equipment Types
-    equipment_type_hplc: 'HPLC',
-    equipment_type_gc: 'GC',
-    equipment_type_uvvis: 'UV-VIS',
-    equipment_type_nir: 'NIR',
-    equipment_type_raman: 'RAMAN',
-    equipment_type_ir: 'IR',
-    equipment_type_aa: 'AA',
-    equipment_type_karl_fischer: 'Karl Fischer',
-    
-    // Stats
-    stats_validated: 'Validated',
-    stats_expiring: 'Expiring',
-    stats_expired: 'Expired',
-    stats_in_validation: 'In Validation',
-    
     // Status
+    status_validado: 'Validated',
+    status_en_validacion: 'In Validation',
+    status_por_revalidar: 'For Revalidation',
+    status_vencido: 'Expired',
+    status_proximo: 'Expiring Soon',
+    status_revalidacion: 'In Revalidation',
+    status_primera_revision: 'First Review',
+    status_segunda_revision: 'Second Review',
     status_success: 'Success',
     status_failed: 'Failed',
     status_warning: 'Warning',
@@ -386,6 +410,7 @@ const translations = {
     common_close: 'Fechar',
     common_confirm: 'Confirmar',
     common_loading: 'Carregando...',
+    common_all: 'Todos',
     
     // System
     system_title: 'Sistema de Gestão de Validações',
@@ -406,27 +431,87 @@ const translations = {
     // Dashboard
     dashboard_title: 'Painel de Controle',
     dashboard_subtitle: 'Visão geral do sistema',
+    dashboard_access_restricted: 'Acesso Restrito',
+    dashboard_contact_administrator: 'Contate o administrador para obter permissões',
+    
+    // Stats
+    stats_validations: 'Validações',
+    stats_products: 'Produtos',
+    stats_expiring: 'Vencendo',
+    stats_expired: 'Vencidas',
+    stats_efficiency: 'Eficiência',
+    stats_total_validations: 'Validações totais',
+    stats_registered_products: 'Produtos registrados',
+    stats_next_30_days: 'Próximos 30 dias',
+    stats_validation_efficiency: 'Eficiência de validação',
+    stats_validated: 'Validadas',
+    stats_in_validation: 'Em Validação',
+    
+    // Analytics
+    analytics_title: 'Analíticas',
+    analytics_subtitle: 'Análise detalhada do sistema',
     
     // Validations
     validations_title: 'Validações',
     validations_subtitle: 'Gestão de validações de métodos e processos',
     validations_new: 'Nova Validação',
     validations_list: 'Lista de Validações',
+    validations_manage: 'Gerenciar validações do sistema',
     validations_code: 'Código de Validação',
+    validations_validation_code: 'Código de Validação',
     validations_product: 'Produto',
+    validations_product_raw_material: 'Produto/Matéria-Prima',
+    validations_product_raw_material_code: 'Código Produto/MP',
+    validations_product_code: 'Código do Produto',
     validations_type: 'Tipo',
+    validations_validation_type: 'Tipo de Validação',
+    validations_subcategory: 'Subcategoria',
     validations_equipment: 'Equipamento',
+    validations_equipment_type: 'Tipo de Equipamento',
     validations_status: 'Status',
     validations_issue_date: 'Data de Emissão',
     validations_expiry_date: 'Data de Vencimento',
+    validations_expiry_from: 'Vencimento De',
+    validations_expiry_to: 'Vencimento Até',
+    validations_search: 'Pesquisar validações...',
     validations_search_by_code: 'Pesquisar por código',
+    validations_search_by_product: 'Pesquisar por produto',
+    validations_search_filters: 'Filtros de Pesquisa',
+    validations_clear_filters: 'Limpar Filtros',
+    validations_select_type: 'Selecionar tipo',
+    validations_select_subcategory: 'Selecionar subcategoria',
+    validations_select_equipment: 'Selecionar equipamento',
+    validations_select_status: 'Selecionar status',
     validations_filter_by_type: 'Filtrar por tipo',
     validations_filter_by_status: 'Filtrar por status',
-    validations_completed: 'Completadas',
+    validations_completed: 'Validações concluídas',
     validations_next30days: 'Vencendo em breve (30 dias)',
     validations_immediate: 'Ação imediata necessária',
     validations_protocols: 'Protocolos',
     validations_withDocumentation: 'Com documentação',
+    validations_files: 'Arquivos',
+    validations_actions: 'Ações',
+    validations_no_results: 'Nenhum resultado encontrado',
+    validations_no_validations: 'Nenhuma validação registrada',
+    
+    // Validation Types
+    validations_processes: 'Processos',
+    validations_cleaning: 'Limpeza',
+    validations_analytical_methods: 'Métodos Analíticos',
+    validations_computerized_systems: 'Sistemas Computadorizados',
+    
+    // Subcategories
+    validations_manufacturing: 'Fabricação',
+    validations_packaging: 'Embalagem',
+    validations_assay: 'Valoração',
+    validations_dissolution: 'Dissolução',
+    validations_impurities: 'Impurezas',
+    validations_uniformity: 'Uniformidade de Unidades de Dosagem',
+    validations_identification: 'Identificação',
+    validations_traces: 'Traços',
+    validations_not_applicable: 'Não Aplicável',
+    validations_initial_validation: 'Validação Inicial',
+    validations_periodic_revalidation: 'Revalidação Periódica',
     
     // Equipment
     equipments_title: 'Equipamentos',
@@ -439,6 +524,12 @@ const translations = {
     products_subtitle: 'Gestão de produtos e matérias-primas',
     products_add: 'Adicionar Produto',
     products_list: 'Lista de Produtos',
+    
+    // Material Types
+    material_types_finished_product: 'Produto Acabado',
+    material_types_raw_material: 'Matéria-Prima',
+    material_types_packaging_material: 'Material de Embalagem',
+    material_types_bulk: 'Granel',
     
     // Users
     users_title: 'Usuários',
@@ -459,31 +550,6 @@ const translations = {
     // Security
     security_title: 'Segurança',
     security_subtitle: 'Configuração de segurança do sistema',
-    security_settings: 'Configurações de Segurança',
-    security_settings_desc: 'Configurações de segurança e políticas do sistema',
-    security_two_factor: 'Autenticação de Dois Fatores',
-    security_two_factor_desc: 'Habilizar 2FA para maior segurança',
-    security_password_expiry: 'Expiração da Senha (dias)',
-    security_session_timeout: 'Tempo de Sessão (minutos)',
-    security_login_attempts: 'Tentativas Máximas de Login',
-    security_audit_logging: 'Registro de Auditoria',
-    security_audit_logging_desc: 'Registrar todas as ações do sistema',
-    security_encryption: 'Criptografia de Dados',
-    security_encryption_desc: 'Criptografar dados sensíveis',
-    security_audit_log: 'Registro de Auditoria',
-    security_audit_log_desc: 'Histórico de ações do sistema',
-    security_date_time: 'Data e Hora',
-    security_user: 'Usuário',
-    security_action: 'Ação',
-    security_resource: 'Recurso',
-    security_status: 'Status',
-    security_ip_address: 'Endereço IP',
-    security_download_audit: 'Baixar Auditoria',
-    security_view_audit_pdf: 'Ver Auditoria PDF',
-    security_password_change: 'Alterar Senha',
-    security_password_reset: 'Redefinir Senha',
-    security_setting_updated: 'Configuração atualizada',
-    security_setting_updated_desc: 'A configuração de segurança foi atualizada',
     
     // Settings
     settings_title: 'Configurações',
@@ -496,45 +562,15 @@ const translations = {
     roles_analista: 'Analista',
     roles_visualizador: 'Visualizador',
     
-    // Validation Types
-    validation_type_metodos_analiticos: 'Métodos Analíticos',
-    validation_type_procesos: 'Processos',
-    validation_type_limpieza: 'Limpeza',
-    validation_type_sistemas_computarizados: 'Sistemas Computadorizados',
-    
-    // Validation Statuses
-    validation_status_borrador: 'Rascunho',
-    validation_status_primera_revision: 'Primeira Revisão',
-    validation_status_segunda_revision: 'Segunda Revisão',
-    validation_status_en_validacion: 'Em Validação',
-    validation_status_validado: 'Validado',
-    validation_status_proximo_vencer: 'Vencendo em Breve',
-    validation_status_vencido: 'Vencido',
-    validation_status_por_revalidar: 'Para Revalidação',
-    
-    // Product Types
-    product_type_producto_terminado: 'Produto Acabado',
-    product_type_materia_prima: 'Matéria-Prima',
-    product_type_material_empaque: 'Material de Embalagem',
-    product_type_granel: 'Granel',
-    
-    // Equipment Types
-    equipment_type_hplc: 'HPLC',
-    equipment_type_gc: 'GC',
-    equipment_type_uvvis: 'UV-VIS',
-    equipment_type_nir: 'NIR',
-    equipment_type_raman: 'RAMAN',
-    equipment_type_ir: 'IR',
-    equipment_type_aa: 'AA',
-    equipment_type_karl_fischer: 'Karl Fischer',
-    
-    // Stats
-    stats_validated: 'Validadas',
-    stats_expiring: 'Vencendo',
-    stats_expired: 'Vencidas',
-    stats_in_validation: 'Em Validação',
-    
     // Status
+    status_validado: 'Validado',
+    status_en_validacion: 'Em Validação',
+    status_por_revalidar: 'Para Revalidação',
+    status_vencido: 'Vencido',
+    status_proximo: 'Vencendo em Breve',
+    status_revalidacion: 'Em Revalidação',
+    status_primera_revision: 'Primeira Revisão',
+    status_segunda_revision: 'Segunda Revisão',
     status_success: 'Sucesso',
     status_failed: 'Falhou',
     status_warning: 'Aviso',

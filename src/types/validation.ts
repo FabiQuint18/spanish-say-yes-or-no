@@ -35,6 +35,22 @@ export type EquipmentType =
   | 'AA'
   | 'Karl Fischer';
 
+export type ProcessSubcategory = 'fabricacion' | 'empaque';
+export type AnalyticalSubcategory = 'valoracion' | 'disolucion' | 'impurezas' | 'uniformidad_unidades_dosificacion' | 'identificacion' | 'trazas';
+export type CleaningSubcategory = 'no_aplica';
+export type ComputerizedSubcategory = 'validacion_inicial' | 'revalidacion_periodica';
+
+export interface ValidationFilters {
+  validationType?: ValidationType;
+  subcategory?: string;
+  validationCode?: string;
+  productCode?: string;
+  equipmentType?: EquipmentType;
+  status?: ValidationStatus;
+  expiryDateFrom?: string;
+  expiryDateTo?: string;
+}
+
 export interface Product {
   id: string;
   code: string;
@@ -82,3 +98,37 @@ export interface Validation {
   product?: Product;
   files?: ValidationFile[];
 }
+
+export const checkExpiringValidations = (validations: Validation[]) => {
+  const today = new Date();
+  const thirtyDaysFromNow = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000));
+  
+  return validations.filter(validation => {
+    const expiryDate = new Date(validation.expiry_date);
+    return expiryDate <= thirtyDaysFromNow && expiryDate >= today;
+  });
+};
+
+export const calculateExpiryDate = (issueDate: string, validationType: ValidationType): string => {
+  const issue = new Date(issueDate);
+  let years = 2; // default
+  
+  switch (validationType) {
+    case 'metodos_analiticos':
+      years = 3;
+      break;
+    case 'procesos':
+      years = 2;
+      break;
+    case 'limpieza':
+      years = 1;
+      break;
+    case 'sistemas_computarizados':
+      years = 3;
+      break;
+  }
+  
+  const expiry = new Date(issue);
+  expiry.setFullYear(expiry.getFullYear() + years);
+  return expiry.toISOString().split('T')[0];
+};

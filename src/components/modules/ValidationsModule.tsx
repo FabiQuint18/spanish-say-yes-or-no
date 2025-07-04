@@ -22,26 +22,26 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   const [showForm, setShowForm] = useState(false);
   const [editingValidation, setEditingValidation] = useState<Validation | null>(null);
 
-  // Load data from localStorage
+  // Cargar datos del localStorage
   useEffect(() => {
-    // Load products
+    // Cargar productos
     const savedProducts = localStorage.getItem('systemProducts');
     if (savedProducts) {
       setProducts(JSON.parse(savedProducts));
     }
 
-    // Load equipments
+    // Cargar equipos
     const savedEquipments = localStorage.getItem('systemEquipments');
     if (savedEquipments) {
       setEquipments(JSON.parse(savedEquipments));
     }
 
-    // Load validations
+    // Cargar validaciones
     const savedValidations = localStorage.getItem('systemValidations');
     if (savedValidations) {
       setValidations(JSON.parse(savedValidations));
     } else {
-      // Initialize with mock data
+      // Inicializar con datos de ejemplo si no existen
       const mockValidations: Validation[] = [
         {
           id: '1',
@@ -82,6 +82,11 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
     const updatedValidations = validations.filter(v => v.id !== id);
     setValidations(updatedValidations);
     localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
+    
+    toast({
+      title: "Validación eliminada",
+      description: "La validación ha sido eliminada exitosamente",
+    });
   };
 
   const handleAdd = () => {
@@ -91,7 +96,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
 
   const handleFormSubmit = (formData: any) => {
     if (editingValidation) {
-      // Update existing validation
+      // Actualizar validación existente
       const updatedValidations = validations.map(v => 
         v.id === editingValidation.id 
           ? {
@@ -115,8 +120,13 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
       );
       setValidations(updatedValidations);
       localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
+      
+      toast({
+        title: "Validación actualizada",
+        description: "La validación ha sido actualizada exitosamente",
+      });
     } else {
-      // Create new validation
+      // Crear nueva validación
       const newValidation: Validation = {
         id: Date.now().toString(),
         product_id: Date.now().toString(),
@@ -145,7 +155,15 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
       const updatedValidations = [newValidation, ...validations];
       setValidations(updatedValidations);
       localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
+      
+      toast({
+        title: "Validación creada",
+        description: "La validación ha sido creada exitosamente",
+      });
     }
+    
+    setShowForm(false);
+    setEditingValidation(null);
   };
 
   const handleCloseForm = () => {
@@ -172,6 +190,11 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
     );
     setValidations(updatedValidations);
     localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
+    
+    toast({
+      title: "Archivo subido",
+      description: "El archivo ha sido subido exitosamente",
+    });
   };
 
   const handleFileDelete = (fileId: string) => {
@@ -181,6 +204,11 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
     }));
     setValidations(updatedValidations);
     localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
+    
+    toast({
+      title: "Archivo eliminado",
+      description: "El archivo ha sido eliminado exitosamente",
+    });
   };
 
   const stats = {
@@ -282,8 +310,6 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
         userRole={userRole}
-        products={products}
-        equipments={equipments}
       />
 
       {/* Validation Form Modal */}
@@ -293,8 +319,6 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
           onClose={handleCloseForm}
           onSubmit={handleFormSubmit}
           editingValidation={editingValidation}
-          products={products}
-          equipments={equipments}
         />
       )}
     </div>
