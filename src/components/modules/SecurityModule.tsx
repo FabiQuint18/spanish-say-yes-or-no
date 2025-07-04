@@ -11,8 +11,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Shield, Key, AlertTriangle, Download, FileText, Lock } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { UserRole } from '@/types/validation';
 
-const SecurityModule = () => {
+interface SecurityModuleProps {
+  userRole?: UserRole;
+}
+
+const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -29,6 +34,25 @@ const SecurityModule = () => {
     auditLogging: true,
     encryptionEnabled: true
   });
+
+  // Control de acceso - solo super admin puede hacer cambios
+  const canManageSecurity = userRole === 'super_administrador';
+  const canViewSecurity = userRole === 'super_administrador' || userRole === 'administrador';
+
+  if (!canViewSecurity) {
+    return (
+      <div className="p-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>Acceso Restringido</CardTitle>
+            <CardDescription>
+              No tienes permisos para ver este módulo
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
 
   // Mock security logs
   const mockSecurityLogs = [
@@ -79,6 +103,15 @@ const SecurityModule = () => {
   };
 
   const updateSecuritySetting = (setting: string, value: any) => {
+    if (!canManageSecurity) {
+      toast({
+        title: "Acceso Denegado",
+        description: "Solo el Super Administrador puede modificar configuraciones de seguridad",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setSecuritySettings(prev => ({
       ...prev,
       [setting]: value
@@ -201,6 +234,11 @@ const SecurityModule = () => {
             </CardTitle>
             <CardDescription>
               {t('security_settings_desc')}
+              {!canManageSecurity && (
+                <span className="block text-orange-600 mt-1">
+                  Solo lectura - Contacte al Super Administrador para cambios
+                </span>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -212,6 +250,7 @@ const SecurityModule = () => {
               <Switch
                 checked={securitySettings.twoFactorAuth}
                 onCheckedChange={(checked) => updateSecuritySetting('twoFactorAuth', checked)}
+                disabled={!canManageSecurity}
               />
             </div>
 
@@ -222,6 +261,7 @@ const SecurityModule = () => {
                 type="number"
                 value={securitySettings.passwordExpiry}
                 onChange={(e) => updateSecuritySetting('passwordExpiry', parseInt(e.target.value))}
+                disabled={!canManageSecurity}
               />
             </div>
 
@@ -232,6 +272,7 @@ const SecurityModule = () => {
                 type="number"
                 value={securitySettings.sessionTimeout}
                 onChange={(e) => updateSecuritySetting('sessionTimeout', parseInt(e.target.value))}
+                disabled={!canManageSecurity}
               />
             </div>
 
@@ -242,6 +283,7 @@ const SecurityModule = () => {
                 type="number"
                 value={securitySettings.loginAttempts}
                 onChange={(e) => updateSecuritySetting('loginAttempts', parseInt(e.target.value))}
+                disabled={!canManageSecurity}
               />
             </div>
 
@@ -253,6 +295,7 @@ const SecurityModule = () => {
               <Switch
                 checked={securitySettings.auditLogging}
                 onCheckedChange={(checked) => updateSecuritySetting('auditLogging', checked)}
+                disabled={!canManageSecurity}
               />
             </div>
 
@@ -264,6 +307,7 @@ const SecurityModule = () => {
               <Switch
                 checked={securitySettings.encryptionEnabled}
                 onCheckedChange={(checked) => updateSecuritySetting('encryptionEnabled', checked)}
+                disabled={!canManageSecurity}
               />
             </div>
           </CardContent>
@@ -285,10 +329,12 @@ const SecurityModule = () => {
               {t('security_password_change')}
             </Button>
             
-            <Button variant="outline" className="w-full">
-              <Key className="mr-2 h-4 w-4" />
-              {t('security_password_reset')}
-            </Button>
+            {canManageSecurity && (
+              <Button variant="outline" className="w-full">
+                <Key className="mr-2 h-4 w-4" />
+                {t('security_password_reset')}
+              </Button>
+            )}
             
             <div className="pt-4 border-t">
               <h4 className="font-medium mb-2">Requisitos de Contraseña:</h4>

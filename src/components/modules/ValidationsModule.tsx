@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { ClipboardCheck, Plus, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Validation, UserRole } from '@/types/validation';
+import { Validation, UserRole, Product, Equipment } from '@/types/validation';
 import ValidationsList from '@/components/validations/ValidationsList';
 import ValidationForm from '@/components/validations/ValidationForm';
 import { useToast } from '@/hooks/use-toast';
@@ -17,170 +17,60 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   const { t } = useLanguage();
   const { toast } = useToast();
   const [validations, setValidations] = useState<Validation[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [editingValidation, setEditingValidation] = useState<Validation | null>(null);
 
-  // Mock data actualizado con el nuevo tipo 'granel'
-  const mockValidations: Validation[] = [
-    {
-      id: '1',
-      product_id: '1',
-      validation_code: 'VAL-001-2024',
-      equipment_type: 'HPLC',
-      validation_type: 'metodos_analiticos',
-      subcategory: 'valoracion',
-      issue_date: '2024-01-15',
-      expiry_date: '2026-01-15',
-      status: 'validado',
-      created_by: 'user1',
-      updated_by: 'user1',
-      created_at: '2024-01-15T00:00:00Z',
-      updated_at: '2024-01-15T00:00:00Z',
-      product: {
-        id: '1',
-        code: 'PT-001',
-        name: 'Paracetamol 500mg',
-        type: 'producto_terminado',
-        created_at: '2024-01-15T00:00:00Z',
-        updated_at: '2024-01-15T00:00:00Z',
-      },
-      files: [
-        {
-          id: 'file-1',
-          validation_id: '1',
-          file_name: 'Protocolo_Paracetamol_500mg_Valoracion.pdf',
-          file_url: '/mock-files/protocolo-paracetamol.pdf',
-          file_size: 2048576,
-          file_type: 'application/pdf',
-          uploaded_at: '2024-01-15T10:30:00Z',
-          uploaded_by: 'user1',
-        }
-      ]
-    },
-    {
-      id: '2',
-      product_id: '2',
-      validation_code: 'VAL-002-2024',
-      equipment_type: 'GC',
-      validation_type: 'procesos',
-      subcategory: 'fabricacion',
-      issue_date: '2024-06-15',
-      expiry_date: '2025-02-15',
-      status: 'en_validacion',
-      created_by: 'user1',
-      updated_by: 'user1',
-      created_at: '2024-06-15T00:00:00Z',
-      updated_at: '2024-06-15T00:00:00Z',
-      product: {
-        id: '2',
-        code: 'MP-001',
-        name: 'Principio Activo A',
-        type: 'materia_prima',
-        created_at: '2024-06-15T00:00:00Z',
-        updated_at: '2024-06-15T00:00:00Z',
-      },
-      files: []
-    },
-    {
-      id: '3',
-      product_id: '3',
-      validation_code: 'VAL-003-2023',
-      equipment_type: 'UV-VIS',
-      validation_type: 'limpieza',
-      subcategory: 'no_aplica',
-      issue_date: '2023-01-10',
-      expiry_date: '2024-12-10',
-      status: 'por_revalidar',
-      created_by: 'user1',
-      updated_by: 'user1',
-      created_at: '2023-01-10T00:00:00Z',
-      updated_at: '2023-01-10T00:00:00Z',
-      product: {
-        id: '3',
-        code: 'PT-002',
-        name: 'Ibuprofeno 400mg',
-        type: 'producto_terminado',
-        created_at: '2023-01-10T00:00:00Z',
-        updated_at: '2023-01-10T00:00:00Z',
-      },
-      files: []
-    },
-    {
-      id: '4',
-      product_id: '4',
-      validation_code: 'VAL-004-2024',
-      equipment_type: 'NIR',
-      validation_type: 'metodos_analiticos',
-      subcategory: 'disolucion',
-      issue_date: '2024-03-01',
-      expiry_date: '2025-03-01',
-      status: 'primera_revision',
-      created_by: 'user1',
-      updated_by: 'user1',
-      created_at: '2024-03-01T00:00:00Z',
-      updated_at: '2024-03-01T00:00:00Z',
-      product: {
-        id: '4',
-        code: 'PT-003',
-        name: 'Aspirina 100mg',
-        type: 'producto_terminado',
-        created_at: '2024-03-01T00:00:00Z',
-        updated_at: '2024-03-01T00:00:00Z',
-      },
-      files: []
-    },
-    {
-      id: '5',
-      product_id: '5',
-      validation_code: 'VAL-005-2024',
-      equipment_type: 'HPLC',
-      validation_type: 'metodos_analiticos',
-      subcategory: 'impurezas',
-      issue_date: '2024-02-15',
-      expiry_date: '2029-02-15',
-      status: 'validado',
-      created_by: 'user1',
-      updated_by: 'user1',
-      created_at: '2024-02-15T00:00:00Z',
-      updated_at: '2024-02-15T00:00:00Z',
-      product: {
-        id: '5',
-        code: 'GR-001',
-        name: 'Tabletas Granel Lote A',
-        type: 'granel',
-        created_at: '2024-02-15T00:00:00Z',
-        updated_at: '2024-02-15T00:00:00Z',
-      },
-      files: []
-    },
-    {
-      id: '6',
-      product_id: '6',
-      validation_code: 'VAL-006-2024',
-      equipment_type: 'GC',
-      validation_type: 'procesos',
-      subcategory: 'empaque',
-      issue_date: '2024-07-01',
-      expiry_date: '2025-07-01',
-      status: 'en_validacion',
-      created_by: 'user1',
-      updated_by: 'user1',
-      created_at: '2024-07-01T00:00:00Z',
-      updated_at: '2024-07-01T00:00:00Z',
-      product: {
-        id: '6',
-        code: 'ME-001',
-        name: 'Blister PVC/PVDC',
-        type: 'material_empaque',
-        created_at: '2024-07-01T00:00:00Z',
-        updated_at: '2024-07-01T00:00:00Z',
-      },
-      files: []
-    },
-  ];
-
+  // Load data from localStorage
   useEffect(() => {
-    setValidations(mockValidations);
+    // Load products
+    const savedProducts = localStorage.getItem('systemProducts');
+    if (savedProducts) {
+      setProducts(JSON.parse(savedProducts));
+    }
+
+    // Load equipments
+    const savedEquipments = localStorage.getItem('systemEquipments');
+    if (savedEquipments) {
+      setEquipments(JSON.parse(savedEquipments));
+    }
+
+    // Load validations
+    const savedValidations = localStorage.getItem('systemValidations');
+    if (savedValidations) {
+      setValidations(JSON.parse(savedValidations));
+    } else {
+      // Initialize with mock data
+      const mockValidations: Validation[] = [
+        {
+          id: '1',
+          product_id: '1',
+          validation_code: 'VAL-001-2024',
+          equipment_type: 'HPLC',
+          validation_type: 'metodos_analiticos',
+          subcategory: 'valoracion',
+          issue_date: '2024-01-15',
+          expiry_date: '2026-01-15',
+          status: 'validado',
+          created_by: 'user1',
+          updated_by: 'user1',
+          created_at: '2024-01-15T00:00:00Z',
+          updated_at: '2024-01-15T00:00:00Z',
+          product: {
+            id: '1',
+            code: 'PT-001',
+            name: 'Paracetamol 500mg',
+            type: 'producto_terminado',
+            created_at: '2024-01-15T00:00:00Z',
+            updated_at: '2024-01-15T00:00:00Z',
+          },
+          files: []
+        }
+      ];
+      setValidations(mockValidations);
+      localStorage.setItem('systemValidations', JSON.stringify(mockValidations));
+    }
   }, []);
 
   const handleEdit = (validation: Validation) => {
@@ -189,7 +79,9 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   };
 
   const handleDelete = (id: string) => {
-    setValidations(prev => prev.filter(v => v.id !== id));
+    const updatedValidations = validations.filter(v => v.id !== id);
+    setValidations(updatedValidations);
+    localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
   };
 
   const handleAdd = () => {
@@ -200,29 +92,29 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   const handleFormSubmit = (formData: any) => {
     if (editingValidation) {
       // Update existing validation
-      setValidations(prev => 
-        prev.map(v => 
-          v.id === editingValidation.id 
-            ? {
-                ...v,
-                validation_code: formData.validation_code,
-                equipment_type: formData.equipment_type,
-                validation_type: formData.validation_type,
-                subcategory: formData.subcategory,
-                issue_date: formData.issue_date,
-                expiry_date: formData.expiry_date,
-                status: formData.status,
-                updated_at: new Date().toISOString(),
-                product: v.product ? {
-                  ...v.product,
-                  code: formData.product_code,
-                  name: formData.product_name,
-                  type: formData.material_type,
-                } : undefined
-              }
-            : v
-        )
+      const updatedValidations = validations.map(v => 
+        v.id === editingValidation.id 
+          ? {
+              ...v,
+              validation_code: formData.validation_code,
+              equipment_type: formData.equipment_type,
+              validation_type: formData.validation_type,
+              subcategory: formData.subcategory,
+              issue_date: formData.issue_date,
+              expiry_date: formData.expiry_date,
+              status: formData.status,
+              updated_at: new Date().toISOString(),
+              product: v.product ? {
+                ...v.product,
+                code: formData.product_code,
+                name: formData.product_name,
+                type: formData.material_type,
+              } : undefined
+            }
+          : v
       );
+      setValidations(updatedValidations);
+      localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
     } else {
       // Create new validation
       const newValidation: Validation = {
@@ -250,7 +142,9 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         files: []
       };
 
-      setValidations(prev => [newValidation, ...prev]);
+      const updatedValidations = [newValidation, ...validations];
+      setValidations(updatedValidations);
+      localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
     }
   };
 
@@ -271,22 +165,22 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
       uploaded_by: 'current_user',
     };
 
-    setValidations(prev => 
-      prev.map(v => 
-        v.id === validationId 
-          ? { ...v, files: [...(v.files || []), mockFile] }
-          : v
-      )
+    const updatedValidations = validations.map(v => 
+      v.id === validationId 
+        ? { ...v, files: [...(v.files || []), mockFile] }
+        : v
     );
+    setValidations(updatedValidations);
+    localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
   };
 
   const handleFileDelete = (fileId: string) => {
-    setValidations(prev => 
-      prev.map(v => ({
-        ...v,
-        files: v.files?.filter(f => f.id !== fileId) || []
-      }))
-    );
+    const updatedValidations = validations.map(v => ({
+      ...v,
+      files: v.files?.filter(f => f.id !== fileId) || []
+    }));
+    setValidations(updatedValidations);
+    localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
   };
 
   const stats = {
@@ -297,21 +191,21 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   };
 
   // Control de acceso por roles
-  const canAdd = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
+  const canAdd = userRole === 'super_administrador' || userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
 
   return (
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('menu.validations')}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('validations_title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('validations.subtitle')}
+            {t('validations_subtitle')}
           </p>
         </div>
         {canAdd && (
           <Button onClick={handleAdd} className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
-            {t('validations.new')}
+            {t('validations_new')}
           </Button>
         )}
       </div>
@@ -321,14 +215,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('stats.validated')}
+              {t('stats_validated')}
             </CardTitle>
             <ClipboardCheck className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.validated}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations.completed')}
+              {t('validations_completed')}
             </p>
           </CardContent>
         </Card>
@@ -336,14 +230,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('stats.expiring')}
+              {t('stats_expiring')}
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.expiring}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations.next30days')}
+              {t('validations_next30days')}
             </p>
           </CardContent>
         </Card>
@@ -351,14 +245,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('stats.expired')}
+              {t('stats_expired')}
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.expired}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations.immediate')}
+              {t('validations_immediate')}
             </p>
           </CardContent>
         </Card>
@@ -366,14 +260,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('validations.protocols')}
+              {t('validations_protocols')}
             </CardTitle>
             <ClipboardCheck className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{validations.filter(v => v.files && v.files.length > 0).length}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations.withDocumentation')}
+              {t('validations_withDocumentation')}
             </p>
           </CardContent>
         </Card>
@@ -388,6 +282,8 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
         userRole={userRole}
+        products={products}
+        equipments={equipments}
       />
 
       {/* Validation Form Modal */}
@@ -397,6 +293,8 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
           onClose={handleCloseForm}
           onSubmit={handleFormSubmit}
           editingValidation={editingValidation}
+          products={products}
+          equipments={equipments}
         />
       )}
     </div>

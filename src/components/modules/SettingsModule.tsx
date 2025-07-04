@@ -1,63 +1,63 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
-import { Settings, Save, Upload, Download, Database, Clock, HardDrive } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { Download, Upload, Settings, Database, Building, Image } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 
-const SettingsModule = () => {
+interface SettingsModuleProps {
+  onLogoChange?: (logo: string) => void;
+}
+
+const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
   const { t } = useLanguage();
   const { toast } = useToast();
-  
-  const [settings, setSettings] = useState({
-    companyName: 'Farmacéutica XYZ',
-    companyAddress: 'Calle Principal 123, Ciudad',
-    companyPhone: '+1234567890',
-    companyEmail: 'info@farmaceutica.com',
-    systemTitle: 'Sistema de Validaciones',
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [companyInfo, setCompanyInfo] = useState({
+    name: 'Empresa Farmacéutica',
+    address: 'Dirección de la empresa',
+    phone: '+1234567890',
+    email: 'contacto@empresa.com',
+    website: 'www.empresa.com'
+  });
+  const [systemSettings, setSystemSettings] = useState({
     autoBackup: true,
     backupFrequency: 'daily',
-    backupLocation: '/backups/',
-    backupRetention: '30',
     emailNotifications: true,
-    reportFormat: 'PDF',
-    dateFormat: 'DD/MM/YYYY',
-    timezone: 'America/Mexico_City'
+    auditTrail: true,
+    dataRetention: 365
   });
+  const [currentLogo, setCurrentLogo] = useState<string | null>(null);
 
-  const [companyLogo, setCompanyLogo] = useState<string | null>(null);
-  const [lastBackup, setLastBackup] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Load settings from localStorage
-    const savedSettings = localStorage.getItem('systemSettings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
-    
-    // Load company logo
+  // Load current logo from localStorage
+  React.useEffect(() => {
     const savedLogo = localStorage.getItem('companyLogo');
     if (savedLogo) {
-      setCompanyLogo(savedLogo);
-    }
-
-    // Load last backup date
-    const savedLastBackup = localStorage.getItem('lastBackupDate');
-    if (savedLastBackup) {
-      setLastBackup(savedLastBackup);
+      setCurrentLogo(savedLogo);
     }
   }, []);
 
-  const handleSettingChange = (key: string, value: any) => {
-    setSettings(prev => ({
+  const handleCompanyInfoChange = (field: string, value: string) => {
+    setCompanyInfo(prev => ({
       ...prev,
-      [key]: value
+      [field]: value
     }));
+  };
+
+  const handleSystemSettingChange = (setting: string, value: any) => {
+    setSystemSettings(prev => ({
+      ...prev,
+      [setting]: value
+    }));
+  };
+
+  const handleLogoClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,8 +66,9 @@ const SettingsModule = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const logoUrl = e.target?.result as string;
-        setCompanyLogo(logoUrl);
+        setCurrentLogo(logoUrl);
         localStorage.setItem('companyLogo', logoUrl);
+        onLogoChange?.(logoUrl);
         
         toast({
           title: "Logo Actualizado",
@@ -78,50 +79,49 @@ const SettingsModule = () => {
     }
   };
 
-  const handleSaveSettings = () => {
-    localStorage.setItem('systemSettings', JSON.stringify(settings));
+  const handleSaveCompanyInfo = () => {
+    localStorage.setItem('companyInfo', JSON.stringify(companyInfo));
     toast({
-      title: t('settings_save'),
-      description: "Los ajustes del sistema han sido guardados exitosamente",
+      title: "Información Guardada",
+      description: "La información de la empresa ha sido guardada exitosamente",
     });
   };
 
-  const handleCreateBackup = () => {
-    // Simulate backup creation
+  const handleSaveSystemSettings = () => {
+    localStorage.setItem('systemSettings', JSON.stringify(systemSettings));
+    toast({
+      title: "Configuración Guardada",
+      description: "La configuración del sistema ha sido guardada exitosamente",
+    });
+  };
+
+  const handleExportBackup = () => {
     const backupData = {
-      settings,
-      users: JSON.parse(localStorage.getItem('systemUsers') || '[]'),
+      companyInfo,
+      systemSettings,
       products: JSON.parse(localStorage.getItem('systemProducts') || '[]'),
       equipments: JSON.parse(localStorage.getItem('systemEquipments') || '[]'),
-      timestamp: new Date().toISOString()
+      users: JSON.parse(localStorage.getItem('systemUsers') || '[]'),
+      validations: JSON.parse(localStorage.getItem('systemValidations') || '[]'),
+      exportDate: new Date().toISOString()
     };
 
     const dataStr = JSON.stringify(backupData, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = `backup-${new Date().toISOString().split('T')[0]}.json`;
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `backup-${new Date().toISOString().split('T')[0]}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
 
-    // Update last backup date
-    const currentDate = new Date().toISOString();
-    setLastBackup(currentDate);
-    localStorage.setItem('lastBackupDate', currentDate);
-    
     toast({
-      title: t('settings_backup_created'),
-      description: t('settings_backup_downloaded'),
+      title: "Backup Exportado",
+      description: "El backup ha sido descargado exitosamente",
     });
   };
 
-  const handleDownloadBackup = () => {
-    handleCreateBackup(); // Same as create backup for now
-  };
-
-  const handleRestoreBackup = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImportBackup = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -129,73 +129,36 @@ const SettingsModule = () => {
         try {
           const backupData = JSON.parse(e.target?.result as string);
           
-          // Restore all data
-          if (backupData.settings) {
-            setSettings(backupData.settings);
-            localStorage.setItem('systemSettings', JSON.stringify(backupData.settings));
+          // Restore data to localStorage
+          if (backupData.companyInfo) {
+            localStorage.setItem('companyInfo', JSON.stringify(backupData.companyInfo));
+            setCompanyInfo(backupData.companyInfo);
           }
-          
-          if (backupData.users) {
-            localStorage.setItem('systemUsers', JSON.stringify(backupData.users));
+          if (backupData.systemSettings) {
+            localStorage.setItem('systemSettings', JSON.stringify(backupData.systemSettings));
+            setSystemSettings(backupData.systemSettings);
           }
-          
           if (backupData.products) {
             localStorage.setItem('systemProducts', JSON.stringify(backupData.products));
           }
-          
           if (backupData.equipments) {
             localStorage.setItem('systemEquipments', JSON.stringify(backupData.equipments));
           }
-          
+          if (backupData.users) {
+            localStorage.setItem('systemUsers', JSON.stringify(backupData.users));
+          }
+          if (backupData.validations) {
+            localStorage.setItem('systemValidations', JSON.stringify(backupData.validations));
+          }
+
           toast({
-            title: "Respaldo Restaurado",
-            description: "El respaldo ha sido restaurado exitosamente. Recarga la página para ver los cambios.",
+            title: "Backup Restaurado",
+            description: "El backup ha sido restaurado exitosamente",
           });
         } catch (error) {
           toast({
             title: "Error",
-            description: "Error al restaurar el respaldo. Archivo inválido.",
-            variant: "destructive",
-          });
-        }
-      };
-      reader.readAsText(file);
-    }
-  };
-
-  const handleExportSettings = () => {
-    const dataStr = JSON.stringify(settings, null, 2);
-    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-    
-    const exportFileDefaultName = 'system-settings.json';
-    
-    const linkElement = document.createElement('a');
-    linkElement.setAttribute('href', dataUri);
-    linkElement.setAttribute('download', exportFileDefaultName);
-    linkElement.click();
-    
-    toast({
-      title: "Configuración Exportada",
-      description: "La configuración ha sido exportada exitosamente",
-    });
-  };
-
-  const handleImportSettings = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const importedSettings = JSON.parse(e.target?.result as string);
-          setSettings(importedSettings);
-          toast({
-            title: "Configuración Importada",
-            description: "La configuración ha sido importada exitosamente",
-          });
-        } catch (error) {
-          toast({
-            title: "Error",
-            description: "Error al importar la configuración",
+            description: "Error al procesar el archivo de backup",
             variant: "destructive",
           });
         }
@@ -206,42 +169,72 @@ const SettingsModule = () => {
 
   return (
     <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-foreground">{t('settings_title')}</h1>
-        <p className="text-muted-foreground mt-1">
-          {t('settings_subtitle')}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-foreground">{t('settings_title')}</h1>
+          <p className="text-muted-foreground mt-1">
+            {t('settings_subtitle')}
+          </p>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Información de la Empresa */}
+        {/* Company Information */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Settings className="h-5 w-5" />
-              {t('settings_company_info')}
+              <Building className="h-5 w-5" />
+              Información de la Empresa
             </CardTitle>
             <CardDescription>
-              Configurar datos de la empresa
+              Configuración de la información corporativa
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Logo Section */}
+            <div className="space-y-2">
+              <Label>Logo de la Empresa</Label>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                  {currentLogo ? (
+                    <img src={currentLogo} alt="Company Logo" className="w-full h-full object-contain rounded-lg" />
+                  ) : (
+                    <Image className="h-6 w-6 text-gray-400" />
+                  )}
+                </div>
+                <Button variant="outline" onClick={handleLogoClick}>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Cambiar Logo
+                </Button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleLogoUpload}
+                  className="hidden"
+                />
+              </div>
+            </div>
+
+            <Separator />
+
             <div className="space-y-2">
               <Label htmlFor="companyName">Nombre de la Empresa</Label>
               <Input
                 id="companyName"
-                value={settings.companyName}
-                onChange={(e) => handleSettingChange('companyName', e.target.value)}
+                value={companyInfo.name}
+                onChange={(e) => handleCompanyInfoChange('name', e.target.value)}
+                placeholder="Nombre de la empresa"
               />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="companyAddress">Dirección</Label>
-              <Textarea
+              <Input
                 id="companyAddress"
-                value={settings.companyAddress}
-                onChange={(e) => handleSettingChange('companyAddress', e.target.value)}
-                rows={3}
+                value={companyInfo.address}
+                onChange={(e) => handleCompanyInfoChange('address', e.target.value)}
+                placeholder="Dirección completa"
               />
             </div>
 
@@ -249,8 +242,9 @@ const SettingsModule = () => {
               <Label htmlFor="companyPhone">Teléfono</Label>
               <Input
                 id="companyPhone"
-                value={settings.companyPhone}
-                onChange={(e) => handleSettingChange('companyPhone', e.target.value)}
+                value={companyInfo.phone}
+                onChange={(e) => handleCompanyInfoChange('phone', e.target.value)}
+                placeholder="Número de teléfono"
               />
             </div>
 
@@ -259,241 +253,154 @@ const SettingsModule = () => {
               <Input
                 id="companyEmail"
                 type="email"
-                value={settings.companyEmail}
-                onChange={(e) => handleSettingChange('companyEmail', e.target.value)}
+                value={companyInfo.email}
+                onChange={(e) => handleCompanyInfoChange('email', e.target.value)}
+                placeholder="Email corporativo"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="logo-upload">Logo de la Empresa</Label>
-              <input
-                id="logo-upload"
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              <Label htmlFor="companyWebsite">Sitio Web</Label>
+              <Input
+                id="companyWebsite"
+                value={companyInfo.website}
+                onChange={(e) => handleCompanyInfoChange('website', e.target.value)}
+                placeholder="www.empresa.com"
               />
-              {companyLogo && (
-                <div className="mt-2">
-                  <img src={companyLogo} alt="Company Logo" className="h-16 w-16 object-contain border rounded" />
-                </div>
-              )}
             </div>
+
+            <Button onClick={handleSaveCompanyInfo} className="w-full">
+              Guardar Información
+            </Button>
           </CardContent>
         </Card>
 
-        {/* Configuración del Sistema */}
+        {/* System Settings */}
         <Card>
           <CardHeader>
-            <CardTitle>{t('settings_system_config')}</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Settings className="h-5 w-5" />
+              Configuración del Sistema
+            </CardTitle>
             <CardDescription>
-              Ajustes generales del sistema
+              Configuración general del comportamiento del sistema
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="systemTitle">Título del Sistema</Label>
-              <Input
-                id="systemTitle"
-                value={settings.systemTitle}
-                onChange={(e) => handleSettingChange('systemTitle', e.target.value)}
+            <div className="flex items-center justify-between">
+              <div>
+                <Label>Backup Automático</Label>
+                <p className="text-sm text-muted-foreground">Realizar backups automáticos del sistema</p>
+              </div>
+              <Switch
+                checked={systemSettings.autoBackup}
+                onCheckedChange={(checked) => handleSystemSettingChange('autoBackup', checked)}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="dateFormat">Formato de Fecha</Label>
+              <Label htmlFor="backupFrequency">Frecuencia de Backup</Label>
               <select
-                id="dateFormat"
-                value={settings.dateFormat}
-                onChange={(e) => handleSettingChange('dateFormat', e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                id="backupFrequency"
+                value={systemSettings.backupFrequency}
+                onChange={(e) => handleSystemSettingChange('backupFrequency', e.target.value)}
+                className="w-full border rounded px-3 py-2"
               >
-                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-                <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="timezone">Zona Horaria</Label>
-              <select
-                id="timezone"
-                value={settings.timezone}
-                onChange={(e) => handleSettingChange('timezone', e.target.value)}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-              >
-                <option value="America/Mexico_City">América/Ciudad de México</option>
-                <option value="America/New_York">América/Nueva York</option>
-                <option value="Europe/Madrid">Europa/Madrid</option>
-                <option value="America/Sao_Paulo">América/São Paulo</option>
+                <option value="daily">Diario</option>
+                <option value="weekly">Semanal</option>
+                <option value="monthly">Mensual</option>
               </select>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
                 <Label>Notificaciones por Email</Label>
-                <p className="text-sm text-muted-foreground">Enviar notificaciones automáticas</p>
+                <p className="text-sm text-muted-foreground">Recibir notificaciones importantes por email</p>
               </div>
               <Switch
-                checked={settings.emailNotifications}
-                onCheckedChange={(checked) => handleSettingChange('emailNotifications', checked)}
+                checked={systemSettings.emailNotifications}
+                onCheckedChange={(checked) => handleSystemSettingChange('emailNotifications', checked)}
               />
             </div>
+
+            <div className="flex items-center justify-between">
+              <div>
+                <Label>Registro de Auditoría</Label>
+                <p className="text-sm text-muted-foreground">Mantener registro de todas las acciones</p>
+              </div>
+              <Switch
+                checked={systemSettings.auditTrail}
+                onCheckedChange={(checked) => handleSystemSettingChange('auditTrail', checked)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="dataRetention">Retención de Datos (días)</Label>
+              <Input
+                id="dataRetention"
+                type="number"
+                value={systemSettings.dataRetention}
+                onChange={(e) => handleSystemSettingChange('dataRetention', parseInt(e.target.value))}
+                placeholder="365"
+              />
+            </div>
+
+            <Button onClick={handleSaveSystemSettings} className="w-full">
+              Guardar Configuración
+            </Button>
           </CardContent>
         </Card>
       </div>
 
-      {/* Configuración de Respaldo */}
+      {/* Backup Management */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Database className="h-5 w-5" />
-            {t('settings_backup_config')}
+            Gestión de Backup
           </CardTitle>
           <CardDescription>
-            Configuración y gestión de respaldos del sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <Label>{t('settings_backup_enabled')}</Label>
-                  <p className="text-sm text-muted-foreground">Realizar respaldos automáticos</p>
-                </div>
-                <Switch
-                  checked={settings.autoBackup}
-                  onCheckedChange={(checked) => handleSettingChange('autoBackup', checked)}
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="backupFrequency">{t('settings_backup_frequency')}</Label>
-                <select
-                  id="backupFrequency"
-                  value={settings.backupFrequency}
-                  onChange={(e) => handleSettingChange('backupFrequency', e.target.value)}
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
-                >
-                  <option value="daily">Diario</option>
-                  <option value="weekly">Semanal</option>
-                  <option value="monthly">Mensual</option>
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="backupLocation">{t('settings_backup_location')}</Label>
-                <Input
-                  id="backupLocation"
-                  value={settings.backupLocation}
-                  onChange={(e) => handleSettingChange('backupLocation', e.target.value)}
-                  placeholder="/backups/"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="backupRetention">{t('settings_backup_retention')} (días)</Label>
-                <Input
-                  id="backupRetention"
-                  type="number"
-                  value={settings.backupRetention}
-                  onChange={(e) => handleSettingChange('backupRetention', e.target.value)}
-                  placeholder="30"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="p-4 bg-muted rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Clock className="h-4 w-4" />
-                  <span className="font-medium">Último Respaldo</span>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {lastBackup ? new Date(lastBackup).toLocaleString() : 'Nunca'}
-                </p>
-              </div>
-
-              <div className="p-4 bg-muted rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <HardDrive className="h-4 w-4" />
-                  <span className="font-medium">Estado del Sistema</span>
-                </div>
-                <p className="text-sm text-green-600">Sistema funcionando correctamente</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap gap-4 pt-4 border-t">
-            <Button onClick={handleCreateBackup}>
-              <Database className="mr-2 h-4 w-4" />
-              {t('settings_backup_now')}
-            </Button>
-            
-            <Button variant="outline" onClick={handleDownloadBackup}>
-              <Download className="mr-2 h-4 w-4" />
-              {t('settings_download_backup')}
-            </Button>
-            
-            <div>
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleRestoreBackup}
-                className="hidden"
-                id="restore-backup"
-              />
-              <label htmlFor="restore-backup">
-                <Button variant="outline" asChild>
-                  <span>
-                    <Upload className="mr-2 h-4 w-4" />
-                    {t('settings_restore_backup')}
-                  </span>
-                </Button>
-              </label>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Acciones de Configuración */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Gestión de Configuración</CardTitle>
-          <CardDescription>
-            Importar, exportar y guardar configuraciones
+            Herramientas para exportar e importar datos del sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-wrap gap-4">
-            <Button onClick={handleSaveSettings}>
-              <Save className="mr-2 h-4 w-4" />
-              {t('settings_save')}
-            </Button>
-            
-            <Button variant="outline" onClick={handleExportSettings}>
-              <Download className="mr-2 h-4 w-4" />
-              {t('settings_export')}
-            </Button>
-            
-            <div>
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImportSettings}
-                className="hidden"
-                id="import-settings"
-              />
-              <label htmlFor="import-settings">
-                <Button variant="outline" asChild>
-                  <span>
-                    <Upload className="mr-2 h-4 w-4" />
-                    {t('settings_import')}
-                  </span>
-                </Button>
-              </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <h4 className="font-medium">Exportar Backup</h4>
+              <p className="text-sm text-muted-foreground">
+                Descargar una copia de seguridad completa del sistema incluyendo todos los datos
+              </p>
+              <Button onClick={handleExportBackup} className="w-full">
+                <Download className="mr-2 h-4 w-4" />
+                Descargar Backup
+              </Button>
             </div>
+
+            <div className="space-y-2">
+              <h4 className="font-medium">Importar Backup</h4>
+              <p className="text-sm text-muted-foreground">
+                Restaurar datos desde un archivo de backup previamente exportado
+              </p>
+              <div className="relative">
+                <input
+                  type="file"
+                  accept=".json"
+                  onChange={handleImportBackup}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+                <Button variant="outline" className="w-full">
+                  <Upload className="mr-2 h-4 w-4" />
+                  Restaurar Backup
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
+            <p className="text-sm text-yellow-800">
+              <strong>Importante:</strong> Al importar un backup se sobrescribirán todos los datos actuales del sistema. 
+              Asegúrese de tener una copia de seguridad actual antes de proceder.
+            </p>
           </div>
         </CardContent>
       </Card>

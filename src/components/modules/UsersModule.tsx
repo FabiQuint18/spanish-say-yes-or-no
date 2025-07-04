@@ -60,6 +60,14 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
       // Initialize with default users
       const defaultUsers: User[] = [
         {
+          id: '0',
+          full_name: 'Super Administrador',
+          email: 'superadmin@company.com',
+          role: 'super_administrador',
+          created_at: '2024-01-01T00:00:00Z',
+          last_login: '2024-01-15T11:00:00Z'
+        },
+        {
           id: '1',
           full_name: 'Administrador Sistema',
           email: 'admin@company.com',
@@ -81,15 +89,18 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     }
   }, []);
 
-  // Control de acceso
-  if (userRole !== 'administrador') {
+  // Control de acceso - solo super admin puede hacer CRUD
+  const canManageUsers = userRole === 'super_administrador';
+  const canViewUsers = userRole === 'super_administrador' || userRole === 'administrador';
+
+  if (!canViewUsers) {
     return (
       <div className="p-6">
         <Card>
           <CardHeader>
             <CardTitle>Acceso Restringido</CardTitle>
             <CardDescription>
-              Solo los administradores pueden gestionar usuarios
+              No tienes permisos para ver este módulo
             </CardDescription>
           </CardHeader>
         </Card>
@@ -98,13 +109,22 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
   }
 
   const rolePermissions: RolePermissions = {
+    super_administrador: [
+      { module: 'Dashboard', create: false, read: true, update: false, delete: false },
+      { module: 'Validaciones', create: false, read: false, update: false, delete: false },
+      { module: 'Productos', create: false, read: false, update: false, delete: false },
+      { module: 'Equipos', create: false, read: false, update: false, delete: false },
+      { module: 'Usuarios', create: true, read: true, update: true, delete: true },
+      { module: 'Seguridad', create: true, read: true, update: true, delete: true },
+      { module: 'Configuración', create: false, read: false, update: false, delete: false },
+    ],
     administrador: [
       { module: 'Dashboard', create: true, read: true, update: true, delete: true },
       { module: 'Validaciones', create: true, read: true, update: true, delete: true },
       { module: 'Productos', create: true, read: true, update: true, delete: true },
       { module: 'Equipos', create: true, read: true, update: true, delete: true },
-      { module: 'Usuarios', create: true, read: true, update: true, delete: true },
-      { module: 'Seguridad', create: true, read: true, update: true, delete: true },
+      { module: 'Usuarios', create: false, read: true, update: false, delete: false },
+      { module: 'Seguridad', create: false, read: true, update: false, delete: false },
       { module: 'Configuración', create: true, read: true, update: true, delete: true },
     ],
     coordinador: [
@@ -112,8 +132,8 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
       { module: 'Validaciones', create: true, read: true, update: true, delete: true },
       { module: 'Productos', create: true, read: true, update: true, delete: false },
       { module: 'Equipos', create: true, read: true, update: true, delete: false },
-      { module: 'Usuarios', create: false, read: true, update: false, delete: false },
-      { module: 'Seguridad', create: false, read: true, update: false, delete: false },
+      { module: 'Usuarios', create: false, read: false, update: false, delete: false },
+      { module: 'Seguridad', create: false, read: false, update: false, delete: false },
       { module: 'Configuración', create: false, read: false, update: false, delete: false },
     ],
     analista: [
@@ -258,10 +278,12 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
             {t('users_subtitle')}
           </p>
         </div>
-        <Button onClick={handleNewUser}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t('users_new')}
-        </Button>
+        {canManageUsers && (
+          <Button onClick={handleNewUser}>
+            <Plus className="mr-2 h-4 w-4" />
+            {t('users_new')}
+          </Button>
+        )}
       </div>
 
       {/* Lista de Usuarios */}
@@ -283,7 +305,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
                     <TableHead>{t('users_role')}</TableHead>
                     <TableHead>Fecha Creación</TableHead>
                     <TableHead>Último Acceso</TableHead>
-                    <TableHead>Acciones</TableHead>
+                    {canManageUsers && <TableHead>Acciones</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -300,21 +322,23 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
                       <TableCell>
                         {user.last_login ? new Date(user.last_login).toLocaleDateString() : 'Nunca'}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleDeleteUser(user.id)}
-                            disabled={user.email === 'admin@company.com'}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
+                      {canManageUsers && (
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handleDeleteUser(user.id)}
+                              disabled={user.email === 'superadmin@company.com'}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -386,90 +410,92 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
       </Card>
 
       {/* New User Dialog */}
-      <Dialog open={showNewUserDialog} onOpenChange={setShowNewUserDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t('users_new')}</DialogTitle>
-            <DialogDescription>
-              Crear un nuevo usuario en el sistema con contraseña local
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="full_name">{t('users_name')}</Label>
-              <Input
-                id="full_name"
-                value={newUser.full_name}
-                onChange={(e) => setNewUser({...newUser, full_name: e.target.value})}
-                placeholder="Nombre completo del usuario"
-              />
+      {canManageUsers && (
+        <Dialog open={showNewUserDialog} onOpenChange={setShowNewUserDialog}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t('users_new')}</DialogTitle>
+              <DialogDescription>
+                Crear un nuevo usuario en el sistema con contraseña local
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="full_name">{t('users_name')}</Label>
+                <Input
+                  id="full_name"
+                  value={newUser.full_name}
+                  onChange={(e) => setNewUser({...newUser, full_name: e.target.value})}
+                  placeholder="Nombre completo del usuario"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="email">{t('users_email')}</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                  placeholder="usuario@empresa.com"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="role">{t('users_role')}</Label>
+                <Select value={newUser.role} onValueChange={(value) => setNewUser({...newUser, role: value as UserRole})}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Seleccionar rol" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="administrador">{t('roles_administrador')}</SelectItem>
+                    <SelectItem value="coordinador">{t('roles_coordinador')}</SelectItem>
+                    <SelectItem value="analista">{t('roles_analista')}</SelectItem>
+                    <SelectItem value="visualizador">{t('roles_visualizador')}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">{t('users_password')}</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({...newUser, password: e.target.value})}
+                  placeholder="Contraseña"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">{t('users_confirm_password')}</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={newUser.confirmPassword}
+                  onChange={(e) => setNewUser({...newUser, confirmPassword: e.target.value})}
+                  placeholder="Confirmar contraseña"
+                />
+              </div>
+
+              <div className="p-3 bg-blue-50 rounded-lg">
+                <p className="text-sm text-blue-800">
+                  {t('users_password_requirements')}
+                </p>
+              </div>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="email">{t('users_email')}</Label>
-              <Input
-                id="email"
-                type="email"
-                value={newUser.email}
-                onChange={(e) => setNewUser({...newUser, email: e.target.value})}
-                placeholder="usuario@empresa.com"
-              />
+            <div className="flex justify-end space-x-2 pt-4">
+              <Button variant="outline" onClick={handleCloseDialog}>
+                {t('common_cancel')}
+              </Button>
+              <Button onClick={handleSaveUser}>
+                {t('common_save')}
+              </Button>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="role">{t('users_role')}</Label>
-              <Select value={newUser.role} onValueChange={(value) => setNewUser({...newUser, role: value as UserRole})}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Seleccionar rol" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="administrador">{t('roles_administrador')}</SelectItem>
-                  <SelectItem value="coordinador">{t('roles_coordinador')}</SelectItem>
-                  <SelectItem value="analista">{t('roles_analista')}</SelectItem>
-                  <SelectItem value="visualizador">{t('roles_visualizador')}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">{t('users_password')}</Label>
-              <Input
-                id="password"
-                type="password"
-                value={newUser.password}
-                onChange={(e) => setNewUser({...newUser, password: e.target.value})}
-                placeholder="Contraseña"
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword">{t('users_confirm_password')}</Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={newUser.confirmPassword}
-                onChange={(e) => setNewUser({...newUser, confirmPassword: e.target.value})}
-                placeholder="Confirmar contraseña"
-              />
-            </div>
-
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-800">
-                {t('users_password_requirements')}
-              </p>
-            </div>
-          </div>
-          
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={handleCloseDialog}>
-              {t('common_cancel')}
-            </Button>
-            <Button onClick={handleSaveUser}>
-              {t('common_save')}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };

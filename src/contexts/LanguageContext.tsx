@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { Language } from '@/types/validation';
 
 interface LanguageContextType {
@@ -8,184 +8,212 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
 const translations = {
   es: {
-    // Sistema
-    system_title: 'Sistema de Validaciones',
-    system_subtitle: 'Control de Calidad Farmacéutica',
+    // Menu items
+    menu_dashboard: 'Dashboard',
+    menu_products: 'Productos',
+    menu_validations: 'Validaciones',
+    menu_equipments: 'Equipos',
+    menu_users: 'Usuarios',
+    menu_security: 'Seguridad',
+    menu_settings: 'Configuración',
+
+    // Common
+    common_cancel: 'Cancelar',
+    common_save: 'Guardar',
+    common_edit: 'Editar',
+    common_delete: 'Eliminar',
+    common_add: 'Agregar',
+    common_search: 'Buscar',
+    common_filter: 'Filtrar',
+    common_export: 'Exportar',
+    common_import: 'Importar',
+    common_close: 'Cerrar',
+    common_confirm: 'Confirmar',
+    common_loading: 'Cargando...',
+    
+    // System
+    system_title: 'Sistema de Gestión de Validaciones',
+    system_subtitle: 'Gestión integral de validaciones farmacéuticas',
     
     // Login
     login_title: 'Iniciar Sesión',
     login_email: 'Correo Electrónico',
     login_password: 'Contraseña',
     login_button: 'Iniciar Sesión',
-    login_loading: 'Ingresando...',
+    login_loading: 'Iniciando sesión...',
     login_success: 'Inicio de sesión exitoso',
-    login_error: 'Error al iniciar sesión',
     login_welcome: 'Bienvenido al sistema',
+    login_error: 'Error de autenticación',
     login_logout: 'Cerrar Sesión',
     login_logoutSuccess: 'Sesión cerrada exitosamente',
     
-    // Menú
-    menu_dashboard: 'Dashboard',
-    menu_validations: 'Validaciones',
-    menu_products: 'Productos',
-    menu_equipments: 'Equipos',
-    menu_users: 'Usuarios',
-    menu_security: 'Seguridad',
-    menu_settings: 'Configuración',
-    
     // Dashboard
-    dashboard_title: 'Dashboard',
-    dashboard_subtitle: 'Panel de Control del Sistema',
-    dashboard_total_validations: 'Total Validaciones',
-    dashboard_pending_validations: 'Validaciones Pendientes',
-    dashboard_completed_validations: 'Validaciones Completadas',
-    dashboard_expired_validations: 'Validaciones Vencidas',
-    dashboard_recent_validations: 'Validaciones Recientes',
-    dashboard_validation_trends: 'Tendencias de Validación',
-    dashboard_filter_by_type: 'Filtrar por Tipo',
-    dashboard_all_types: 'Todos los Tipos',
+    dashboard_title: 'Panel de Control',
+    dashboard_subtitle: 'Resumen general del sistema',
     
-    // Validaciones
+    // Validations
     validations_title: 'Validaciones',
-    validations_subtitle: 'Gestión de Validaciones de Procesos',
+    validations_subtitle: 'Gestión de validaciones de métodos y procesos',
     validations_new: 'Nueva Validación',
     validations_list: 'Lista de Validaciones',
-    validations_search: 'Buscar validaciones',
+    validations_code: 'Código de Validación',
+    validations_product: 'Producto',
+    validations_type: 'Tipo',
+    validations_equipment: 'Equipo',
+    validations_status: 'Estado',
+    validations_issue_date: 'Fecha Emisión',
+    validations_expiry_date: 'Fecha Vencimiento',
     validations_search_by_code: 'Buscar por código',
-    validations_all: 'Todas',
-    validations_pending: 'Pendientes',
-    validations_in_progress: 'En Progreso',
+    validations_filter_by_type: 'Filtrar por tipo',
+    validations_filter_by_status: 'Filtrar por estado',
     validations_completed: 'Completadas',
-    validations_expired: 'Vencidas',
-    validations_filter_status: 'Filtrar por Estado',
-    validations_filter_type: 'Filtrar por Tipo',
-    validations_filter_equipment: 'Filtrar por Equipo',
-    validations_filter_user: 'Filtrar por Usuario',
-    validations_process: 'Proceso',
-    validations_cleaning: 'Limpieza',
-    validations_analytical: 'Analítico',
-    validations_computer: 'Sistema Informático',
+    validations_next30days: 'Próximas a vencer (30 días)',
+    validations_immediate: 'Acción inmediata requerida',
+    validations_protocols: 'Protocolos',
+    validations_withDocumentation: 'Con documentación',
     
-    // Productos
-    products_title: 'Productos',
-    products_subtitle: 'Gestión de Productos',
-    products_add_product: 'Agregar Producto',
-    products_finished_products: 'Productos Terminados',
-    products_raw_materials: 'Materias Primas',
-    products_packaging_materials: 'Materiales de Empaque',
-    products_increase_last_month: '+20.1% del mes pasado',
-    products_product_list: 'Lista de Productos',
-    products_registered_products: 'Productos registrados en el sistema',
-    products_module_in_development: 'Módulo de productos en desarrollo',
-    products_add_new_product: 'Agregar Nuevo Producto',
-    products_product_code: 'Código del Producto',
-    products_product_name: 'Nombre del Producto',
-    products_product_type: 'Tipo de Producto',
-    products_description: 'Descripción',
-    products_product_description: 'Descripción del producto',
-    products_select_type: 'Seleccionar tipo',
-    products_finished_product: 'Producto Terminado',
-    products_raw_material: 'Materia Prima',
-    products_packaging_material: 'Material de Empaque',
-    products_created: 'Producto Creado',
-    products_product: 'Producto',
-    products_added_successfully: 'agregado exitosamente',
-    
-    // Equipos
+    // Equipment
     equipments_title: 'Equipos',
-    equipments_subtitle: 'Gestión de Equipos Analíticos',
+    equipments_subtitle: 'Gestión de equipos analíticos',
     equipments_add: 'Agregar Equipo',
     equipments_list: 'Lista de Equipos',
     
-    // Usuarios
+    // Products
+    products_title: 'Productos',
+    products_subtitle: 'Gestión de productos y materias primas',
+    products_add: 'Agregar Producto',
+    products_list: 'Lista de Productos',
+    
+    // Users
     users_title: 'Usuarios',
-    users_subtitle: 'Gestión de Usuarios del Sistema',
+    users_subtitle: 'Gestión de usuarios del sistema',
     users_new: 'Nuevo Usuario',
     users_list: 'Lista de Usuarios',
     users_manage: 'Gestionar usuarios del sistema',
     users_name: 'Nombre Completo',
     users_email: 'Correo Electrónico',
     users_role: 'Rol',
-    users_create_password: 'El usuario deberá crear su contraseña al ingresar por primera vez',
-    users_password_requirements: 'La contraseña debe tener al menos 7 caracteres, 1 mayúscula y 1 símbolo especial (*,+,etc)',
-    users_create_local_password: 'Crear Contraseña',
     users_password: 'Contraseña',
     users_confirm_password: 'Confirmar Contraseña',
+    users_password_requirements: 'Mínimo 7 caracteres, 1 mayúscula, 1 símbolo especial (*,+,-,_,@,#,$,%,^,&,!,?), números y letras',
+    users_password_weak: 'La contraseña no cumple con los requisitos de seguridad',
     users_password_mismatch: 'Las contraseñas no coinciden',
-    users_password_weak: 'La contraseña no cumple los requisitos mínimos',
     users_created_successfully: 'Usuario creado exitosamente',
     
+    // Security
+    security_title: 'Seguridad',
+    security_subtitle: 'Configuración de seguridad del sistema',
+    security_settings: 'Configuración de Seguridad',
+    security_settings_desc: 'Ajustes de seguridad y políticas del sistema',
+    security_two_factor: 'Autenticación de Dos Factores',
+    security_two_factor_desc: 'Habilitar 2FA para mayor seguridad',
+    security_password_expiry: 'Expiración de Contraseña (días)',
+    security_session_timeout: 'Tiempo de Sesión (minutos)',
+    security_login_attempts: 'Intentos de Login Máximos',
+    security_audit_logging: 'Registro de Auditoría',
+    security_audit_logging_desc: 'Registrar todas las acciones del sistema',
+    security_encryption: 'Cifrado de Datos',
+    security_encryption_desc: 'Cifrar datos sensibles',
+    security_audit_log: 'Registro de Auditoría',
+    security_audit_log_desc: 'Historial de acciones del sistema',
+    security_date_time: 'Fecha y Hora',
+    security_user: 'Usuario',
+    security_action: 'Acción',
+    security_resource: 'Recurso',
+    security_status: 'Estado',
+    security_ip_address: 'Dirección IP',
+    security_download_audit: 'Descargar Auditoría',
+    security_view_audit_pdf: 'Ver Auditoría PDF',
+    security_password_change: 'Cambiar Contraseña',
+    security_password_reset: 'Restablecer Contraseña',
+    security_setting_updated: 'Configuración actualizada',
+    security_setting_updated_desc: 'La configuración de seguridad ha sido actualizada',
+    
+    // Settings
+    settings_title: 'Configuración',
+    settings_subtitle: 'Configuración general del sistema',
+    
     // Roles
+    roles_super_administrador: 'Super Administrador',
     roles_administrador: 'Administrador',
     roles_coordinador: 'Coordinador',
     roles_analista: 'Analista',
     roles_visualizador: 'Visualizador',
     
-    // Seguridad
-    security_title: 'Seguridad',
-    security_subtitle: 'Configuración de Seguridad del Sistema',
-    security_password_change: 'Cambio de Contraseña',
-    security_audit_trail: 'Registro de Auditoría',
-    security_access_control: 'Control de Acceso',
-    security_session_management: 'Gestión de Sesiones',
-    security_download_audit: 'Descargar Auditoría',
-    security_view_audit_pdf: 'Ver Auditoría PDF',
-    security_change_password: 'Cambiar Contraseña',
-    security_forgot_password: 'Recuperar Contraseña',
-    security_current_password: 'Contraseña Actual',
-    security_new_password: 'Nueva Contraseña',
-    security_confirm_new_password: 'Confirmar Nueva Contraseña',
-    security_password_changed: 'Contraseña cambiada exitosamente',
-    security_audit_downloaded: 'Registro de auditoría descargado',
+    // Validation Types
+    validation_type_metodos_analiticos: 'Métodos Analíticos',
+    validation_type_procesos: 'Procesos',
+    validation_type_limpieza: 'Limpieza',
+    validation_type_sistemas_computarizados: 'Sistemas Computarizados',
     
-    // Configuración
-    settings_title: 'Configuración',
-    settings_subtitle: 'Configuración del Sistema',
-    settings_company_info: 'Información de la Empresa',
-    settings_system_config: 'Configuración del Sistema',
-    settings_backup_config: 'Configuración de Respaldo',
-    settings_save: 'Guardar Configuración',
-    settings_export: 'Exportar Configuración',
-    settings_import: 'Importar Configuración',
-    settings_backup_enabled: 'Respaldo Automático Habilitado',
-    settings_backup_frequency: 'Frecuencia de Respaldo',
-    settings_backup_location: 'Ubicación de Respaldo',
-    settings_backup_retention: 'Retención de Respaldos',
-    settings_backup_now: 'Respaldar Ahora',
-    settings_download_backup: 'Descargar Respaldo',
-    settings_restore_backup: 'Restaurar Respaldo',
-    settings_backup_created: 'Respaldo creado exitosamente',
-    settings_backup_downloaded: 'Respaldo descargado exitosamente',
+    // Validation Statuses
+    validation_status_borrador: 'Borrador',
+    validation_status_primera_revision: 'Primera Revisión',
+    validation_status_segunda_revision: 'Segunda Revisión',
+    validation_status_en_validacion: 'En Validación',
+    validation_status_validado: 'Validado',
+    validation_status_proximo_vencer: 'Próximo a Vencer',
+    validation_status_vencido: 'Vencido',
+    validation_status_por_revalidar: 'Por Revalidar',
     
-    // Común
-    common_save: 'Guardar',
-    common_cancel: 'Cancelar',
-    common_edit: 'Editar',
-    common_delete: 'Eliminar',
-    common_search: 'Buscar',
-    common_filter: 'Filtrar',
-    common_export: 'Exportar',
-    common_import: 'Importar',
-    common_download: 'Descargar',
-    common_upload: 'Subir',
-    common_view: 'Ver',
-    common_close: 'Cerrar',
-    common_confirm: 'Confirmar',
-    common_loading: 'Cargando...',
-    common_error: 'Error',
-    common_success: 'Éxito',
-    common_warning: 'Advertencia',
-    common_info: 'Información',
-    common_yes: 'Sí',
-    common_no: 'No',
-    common_all: 'Todos',
+    // Product Types
+    product_type_producto_terminado: 'Producto Terminado',
+    product_type_materia_prima: 'Materia Prima',
+    product_type_material_empaque: 'Material de Empaque',
+    product_type_granel: 'Granel',
+    
+    // Equipment Types
+    equipment_type_hplc: 'HPLC',
+    equipment_type_gc: 'GC',
+    equipment_type_uvvis: 'UV-VIS',
+    equipment_type_nir: 'NIR',
+    equipment_type_raman: 'RAMAN',
+    equipment_type_ir: 'IR',
+    equipment_type_aa: 'AA',
+    equipment_type_karl_fischer: 'Karl Fischer',
+    
+    // Stats
+    stats_validated: 'Validadas',
+    stats_expiring: 'Por Vencer',
+    stats_expired: 'Vencidas',
+    stats_in_validation: 'En Validación',
+    
+    // Status
+    status_success: 'Exitoso',
+    status_failed: 'Fallido',
+    status_warning: 'Advertencia',
   },
   en: {
-    // Sistema
-    system_title: 'Validation System',
-    system_subtitle: 'Pharmaceutical Quality Control',
+    // Menu items
+    menu_dashboard: 'Dashboard',
+    menu_products: 'Products',
+    menu_validations: 'Validations',
+    menu_equipments: 'Equipment',
+    menu_users: 'Users',
+    menu_security: 'Security',
+    menu_settings: 'Settings',
+
+    // Common
+    common_cancel: 'Cancel',
+    common_save: 'Save',
+    common_edit: 'Edit',
+    common_delete: 'Delete',
+    common_add: 'Add',
+    common_search: 'Search',
+    common_filter: 'Filter',
+    common_export: 'Export',
+    common_import: 'Import',
+    common_close: 'Close',
+    common_confirm: 'Confirm',
+    common_loading: 'Loading...',
+    
+    // System
+    system_title: 'Validation Management System',
+    system_subtitle: 'Comprehensive pharmaceutical validation management',
     
     // Login
     login_title: 'Sign In',
@@ -193,366 +221,345 @@ const translations = {
     login_password: 'Password',
     login_button: 'Sign In',
     login_loading: 'Signing in...',
-    login_success: 'Sign in successful',
-    login_error: 'Sign in error',
+    login_success: 'Login successful',
     login_welcome: 'Welcome to the system',
-    login_logout: 'Sign Out',
-    login_logoutSuccess: 'Signed out successfully',
-    
-    // Menú
-    menu_dashboard: 'Dashboard',
-    menu_validations: 'Validations',
-    menu_products: 'Products',
-    menu_equipments: 'Equipment',
-    menu_users: 'Users',
-    menu_security: 'Security',
-    menu_settings: 'Settings',
+    login_error: 'Authentication error',
+    login_logout: 'Logout',
+    login_logoutSuccess: 'Logged out successfully',
     
     // Dashboard
     dashboard_title: 'Dashboard',
-    dashboard_subtitle: 'System Control Panel',
-    dashboard_total_validations: 'Total Validations',
-    dashboard_pending_validations: 'Pending Validations',
-    dashboard_completed_validations: 'Completed Validations',
-    dashboard_expired_validations: 'Expired Validations',
-    dashboard_recent_validations: 'Recent Validations',
-    dashboard_validation_trends: 'Validation Trends',
-    dashboard_filter_by_type: 'Filter by Type',
-    dashboard_all_types: 'All Types',
+    dashboard_subtitle: 'System overview',
     
-    // Validaciones
+    // Validations
     validations_title: 'Validations',
-    validations_subtitle: 'Process Validation Management',
+    validations_subtitle: 'Method and process validation management',
     validations_new: 'New Validation',
     validations_list: 'Validation List',
-    validations_search: 'Search validations',
+    validations_code: 'Validation Code',
+    validations_product: 'Product',
+    validations_type: 'Type',
+    validations_equipment: 'Equipment',
+    validations_status: 'Status',
+    validations_issue_date: 'Issue Date',
+    validations_expiry_date: 'Expiry Date',
     validations_search_by_code: 'Search by code',
-    validations_all: 'All',
-    validations_pending: 'Pending',
-    validations_in_progress: 'In Progress',
+    validations_filter_by_type: 'Filter by type',
+    validations_filter_by_status: 'Filter by status',
     validations_completed: 'Completed',
-    validations_expired: 'Expired',
-    validations_filter_status: 'Filter by Status',
-    validations_filter_type: 'Filter by Type',
-    validations_filter_equipment: 'Filter by Equipment',
-    validations_filter_user: 'Filter by User',
-    validations_process: 'Process',
-    validations_cleaning: 'Cleaning',
-    validations_analytical: 'Analytical',
-    validations_computer: 'Computer System',
+    validations_next30days: 'Expiring soon (30 days)',
+    validations_immediate: 'Immediate action required',
+    validations_protocols: 'Protocols',
+    validations_withDocumentation: 'With documentation',
     
-    // Productos
-    products_title: 'Products',
-    products_subtitle: 'Product Management',
-    products_add_product: 'Add Product',
-    products_finished_products: 'Finished Products',
-    products_raw_materials: 'Raw Materials',
-    products_packaging_materials: 'Packaging Materials',
-    products_increase_last_month: '+20.1% from last month',
-    products_product_list: 'Product List',
-    products_registered_products: 'Products registered in the system',
-    products_module_in_development: 'Product module in development',
-    products_add_new_product: 'Add New Product',
-    products_product_code: 'Product Code',
-    products_product_name: 'Product Name',
-    products_product_type: 'Product Type',
-    products_description: 'Description',
-    products_product_description: 'Product description',
-    products_select_type: 'Select type',
-    products_finished_product: 'Finished Product',
-    products_raw_material: 'Raw Material',
-    products_packaging_material: 'Packaging Material',
-    products_created: 'Product Created',
-    products_product: 'Product',
-    products_added_successfully: 'added successfully',
-    
-    // Equipos
+    // Equipment
     equipments_title: 'Equipment',
-    equipments_subtitle: 'Analytical Equipment Management',
+    equipments_subtitle: 'Analytical equipment management',
     equipments_add: 'Add Equipment',
     equipments_list: 'Equipment List',
     
-    // Usuarios
+    // Products
+    products_title: 'Products',
+    products_subtitle: 'Product and raw material management',
+    products_add: 'Add Product',
+    products_list: 'Product List',
+    
+    // Users
     users_title: 'Users',
-    users_subtitle: 'System User Management',
+    users_subtitle: 'System user management',
     users_new: 'New User',
     users_list: 'User List',
     users_manage: 'Manage system users',
     users_name: 'Full Name',
     users_email: 'Email',
     users_role: 'Role',
-    users_create_password: 'User must create password on first login',
-    users_password_requirements: 'Password must have at least 7 characters, 1 uppercase and 1 special symbol (*,+,etc)',
-    users_create_local_password: 'Create Password',
     users_password: 'Password',
     users_confirm_password: 'Confirm Password',
+    users_password_requirements: 'Minimum 7 characters, 1 uppercase, 1 special symbol (*,+,-,_,@,#,$,%,^,&,!,?), numbers and letters',
+    users_password_weak: 'Password does not meet security requirements',
     users_password_mismatch: 'Passwords do not match',
-    users_password_weak: 'Password does not meet minimum requirements',
     users_created_successfully: 'User created successfully',
     
+    // Security
+    security_title: 'Security',
+    security_subtitle: 'System security configuration',
+    security_settings: 'Security Settings',
+    security_settings_desc: 'Security settings and system policies',
+    security_two_factor: 'Two-Factor Authentication',
+    security_two_factor_desc: 'Enable 2FA for enhanced security',
+    security_password_expiry: 'Password Expiry (days)',
+    security_session_timeout: 'Session Timeout (minutes)',
+    security_login_attempts: 'Maximum Login Attempts',
+    security_audit_logging: 'Audit Logging',
+    security_audit_logging_desc: 'Log all system actions',
+    security_encryption: 'Data Encryption',
+    security_encryption_desc: 'Encrypt sensitive data',
+    security_audit_log: 'Audit Log',
+    security_audit_log_desc: 'System action history',
+    security_date_time: 'Date & Time',
+    security_user: 'User',
+    security_action: 'Action',
+    security_resource: 'Resource',
+    security_status: 'Status',
+    security_ip_address: 'IP Address',
+    security_download_audit: 'Download Audit',
+    security_view_audit_pdf: 'View Audit PDF',
+    security_password_change: 'Change Password',
+    security_password_reset: 'Reset Password',
+    security_setting_updated: 'Setting updated',
+    security_setting_updated_desc: 'Security setting has been updated',
+    
+    // Settings
+    settings_title: 'Settings',
+    settings_subtitle: 'General system configuration',
+    
     // Roles
+    roles_super_administrador: 'Super Administrator',
     roles_administrador: 'Administrator',
     roles_coordinador: 'Coordinator',
     roles_analista: 'Analyst',
     roles_visualizador: 'Viewer',
     
-    // Seguridad
-    security_title: 'Security',
-    security_subtitle: 'System Security Configuration',
-    security_password_change: 'Password Change',
-    security_audit_trail: 'Audit Trail',
-    security_access_control: 'Access Control',
-    security_session_management: 'Session Management',
-    security_download_audit: 'Download Audit',
-    security_view_audit_pdf: 'View Audit PDF',
-    security_change_password: 'Change Password',
-    security_forgot_password: 'Forgot Password',
-    security_current_password: 'Current Password',
-    security_new_password: 'New Password',
-    security_confirm_new_password: 'Confirm New Password',
-    security_password_changed: 'Password changed successfully',
-    security_audit_downloaded: 'Audit trail downloaded',
+    // Validation Types
+    validation_type_metodos_analiticos: 'Analytical Methods',
+    validation_type_procesos: 'Processes',
+    validation_type_limpieza: 'Cleaning',
+    validation_type_sistemas_computarizados: 'Computer Systems',
     
-    // Configuración
-    settings_title: 'Settings',
-    settings_subtitle: 'System Settings',
-    settings_company_info: 'Company Information',
-    settings_system_config: 'System Configuration',
-    settings_backup_config: 'Backup Configuration',
-    settings_save: 'Save Settings',
-    settings_export: 'Export Settings',
-    settings_import: 'Import Settings',
-    settings_backup_enabled: 'Automatic Backup Enabled',
-    settings_backup_frequency: 'Backup Frequency',
-    settings_backup_location: 'Backup Location',
-    settings_backup_retention: 'Backup Retention',
-    settings_backup_now: 'Backup Now',
-    settings_download_backup: 'Download Backup',
-    settings_restore_backup: 'Restore Backup',
-    settings_backup_created: 'Backup created successfully',
-    settings_backup_downloaded: 'Backup downloaded successfully',
+    // Validation Statuses
+    validation_status_borrador: 'Draft',
+    validation_status_primera_revision: 'First Review',
+    validation_status_segunda_revision: 'Second Review',
+    validation_status_en_validacion: 'In Validation',
+    validation_status_validado: 'Validated',
+    validation_status_proximo_vencer: 'Expiring Soon',
+    validation_status_vencido: 'Expired',
+    validation_status_por_revalidar: 'For Revalidation',
     
-    // Común
-    common_save: 'Save',
-    common_cancel: 'Cancel',
-    common_edit: 'Edit',
-    common_delete: 'Delete',
-    common_search: 'Search',
-    common_filter: 'Filter',
-    common_export: 'Export',
-    common_import: 'Import',
-    common_download: 'Download',
-    common_upload: 'Upload',
-    common_view: 'View',
-    common_close: 'Close',
-    common_confirm: 'Confirm',
-    common_loading: 'Loading...',
-    common_error: 'Error',
-    common_success: 'Success',
-    common_warning: 'Warning',
-    common_info: 'Information',
-    common_yes: 'Yes',
-    common_no: 'No',
-    common_all: 'All',
+    // Product Types
+    product_type_producto_terminado: 'Finished Product',
+    product_type_materia_prima: 'Raw Material',
+    product_type_material_empaque: 'Packaging Material',
+    product_type_granel: 'Bulk',
+    
+    // Equipment Types
+    equipment_type_hplc: 'HPLC',
+    equipment_type_gc: 'GC',
+    equipment_type_uvvis: 'UV-VIS',
+    equipment_type_nir: 'NIR',
+    equipment_type_raman: 'RAMAN',
+    equipment_type_ir: 'IR',
+    equipment_type_aa: 'AA',
+    equipment_type_karl_fischer: 'Karl Fischer',
+    
+    // Stats
+    stats_validated: 'Validated',
+    stats_expiring: 'Expiring',
+    stats_expired: 'Expired',
+    stats_in_validation: 'In Validation',
+    
+    // Status
+    status_success: 'Success',
+    status_failed: 'Failed',
+    status_warning: 'Warning',
   },
   pt: {
-    // Sistema
-    system_title: 'Sistema de Validações',
-    system_subtitle: 'Controle de Qualidade Farmacêutica',
+    // Menu items
+    menu_dashboard: 'Painel',
+    menu_products: 'Produtos',
+    menu_validations: 'Validações',
+    menu_equipments: 'Equipamentos',
+    menu_users: 'Usuários',
+    menu_security: 'Segurança',
+    menu_settings: 'Configurações',
+
+    // Common
+    common_cancel: 'Cancelar',
+    common_save: 'Salvar',
+    common_edit: 'Editar',
+    common_delete: 'Excluir',
+    common_add: 'Adicionar',
+    common_search: 'Pesquisar',
+    common_filter: 'Filtrar',
+    common_export: 'Exportar',
+    common_import: 'Importar',
+    common_close: 'Fechar',
+    common_confirm: 'Confirmar',
+    common_loading: 'Carregando...',
+    
+    // System
+    system_title: 'Sistema de Gestão de Validações',
+    system_subtitle: 'Gestão integral de validações farmacêuticas',
     
     // Login
-    login_title: 'Entrar',
+    login_title: 'Fazer Login',
     login_email: 'Email',
     login_password: 'Senha',
     login_button: 'Entrar',
     login_loading: 'Entrando...',
     login_success: 'Login realizado com sucesso',
-    login_error: 'Erro no login',
     login_welcome: 'Bem-vindo ao sistema',
+    login_error: 'Erro de autenticação',
     login_logout: 'Sair',
     login_logoutSuccess: 'Logout realizado com sucesso',
     
-    // Menú
-    menu_dashboard: 'Dashboard',
-    menu_validations: 'Validações',
-    menu_products: 'Produtos',
-    menu_equipments: 'Equipamentos',
-    menu_users: 'Usuários',
-    menu_security: 'Segurança',
-    menu_settings: 'Configurações',
-    
     // Dashboard
-    dashboard_title: 'Dashboard',
-    dashboard_subtitle: 'Painel de Controle do Sistema',
-    dashboard_total_validations: 'Total de Validações',
-    dashboard_pending_validations: 'Validações Pendentes',
-    dashboard_completed_validations: 'Validações Concluídas',
-    dashboard_expired_validations: 'Validações Vencidas',
-    dashboard_recent_validations: 'Validações Recentes',
-    dashboard_validation_trends: 'Tendências de Validação',
-    dashboard_filter_by_type: 'Filtrar por Tipo',
-    dashboard_all_types: 'Todos os Tipos',
+    dashboard_title: 'Painel de Controle',
+    dashboard_subtitle: 'Visão geral do sistema',
     
-    // Validaciones
+    // Validations
     validations_title: 'Validações',
-    validations_subtitle: 'Gestão de Validações de Processos',
+    validations_subtitle: 'Gestão de validações de métodos e processos',
     validations_new: 'Nova Validação',
     validations_list: 'Lista de Validações',
-    validations_search: 'Buscar validações',
-    validations_search_by_code: 'Buscar por código',
-    validations_all: 'Todas',
-    validations_pending: 'Pendentes',
-    validations_in_progress: 'Em Progresso',
-    validations_completed: 'Concluídas',
-    validations_expired: 'Vencidas',
-    validations_filter_status: 'Filtrar por Status',
-    validations_filter_type: 'Filtrar por Tipo',
-    validations_filter_equipment: 'Filtrar por Equipamento',
-    validations_filter_user: 'Filtrar por Usuário',
-    validations_process: 'Processo',
-    validations_cleaning: 'Limpeza',
-    validations_analytical: 'Analítico',
-    validations_computer: 'Sistema Computacional',
+    validations_code: 'Código de Validação',
+    validations_product: 'Produto',
+    validations_type: 'Tipo',
+    validations_equipment: 'Equipamento',
+    validations_status: 'Status',
+    validations_issue_date: 'Data de Emissão',
+    validations_expiry_date: 'Data de Vencimento',
+    validations_search_by_code: 'Pesquisar por código',
+    validations_filter_by_type: 'Filtrar por tipo',
+    validations_filter_by_status: 'Filtrar por status',
+    validations_completed: 'Completadas',
+    validations_next30days: 'Vencendo em breve (30 dias)',
+    validations_immediate: 'Ação imediata necessária',
+    validations_protocols: 'Protocolos',
+    validations_withDocumentation: 'Com documentação',
     
-    // Produtos
-    products_title: 'Produtos',
-    products_subtitle: 'Gestão de Produtos',
-    products_add_product: 'Adicionar Produto',
-    products_finished_products: 'Produtos Acabados',
-    products_raw_materials: 'Matérias-Primas',
-    products_packaging_materials: 'Materiais de Embalagem',
-    products_increase_last_month: '+20.1% do mês passado',
-    products_product_list: 'Lista de Produtos',
-    products_registered_products: 'Produtos registrados no sistema',
-    products_module_in_development: 'Módulo de produtos em desenvolvimento',
-    products_add_new_product: 'Adicionar Novo Produto',
-    products_product_code: 'Código do Produto',
-    products_product_name: 'Nome do Produto',
-    products_product_type: 'Tipo de Produto',
-    products_description: 'Descrição',
-    products_product_description: 'Descrição do produto',
-    products_select_type: 'Selecionar tipo',
-    products_finished_product: 'Produto Acabado',
-    products_raw_material: 'Matéria-Prima',
-    products_packaging_material: 'Material de Embalagem',
-    products_created: 'Produto Criado',
-    products_product: 'Produto',
-    products_added_successfully: 'adicionado com sucesso',
-    
-    // Equipos
+    // Equipment
     equipments_title: 'Equipamentos',
-    equipments_subtitle: 'Gestão de Equipamentos Analíticos',
+    equipments_subtitle: 'Gestão de equipamentos analíticos',
     equipments_add: 'Adicionar Equipamento',
     equipments_list: 'Lista de Equipamentos',
     
-    // Usuarios
+    // Products
+    products_title: 'Produtos',
+    products_subtitle: 'Gestão de produtos e matérias-primas',
+    products_add: 'Adicionar Produto',
+    products_list: 'Lista de Produtos',
+    
+    // Users
     users_title: 'Usuários',
-    users_subtitle: 'Gestão de Usuários do Sistema',
+    users_subtitle: 'Gestão de usuários do sistema',
     users_new: 'Novo Usuário',
     users_list: 'Lista de Usuários',
     users_manage: 'Gerenciar usuários do sistema',
     users_name: 'Nome Completo',
     users_email: 'Email',
     users_role: 'Função',
-    users_create_password: 'Usuário deve criar senha no primeiro login',
-    users_password_requirements: 'A senha deve ter pelo menos 7 caracteres, 1 maiúscula e 1 símbolo especial (*,+,etc)',
-    users_create_local_password: 'Criar Senha',
     users_password: 'Senha',
     users_confirm_password: 'Confirmar Senha',
+    users_password_requirements: 'Mínimo 7 caracteres, 1 maiúscula, 1 símbolo especial (*,+,-,_,@,#,$,%,^,&,!,?), números e letras',
+    users_password_weak: 'A senha não atende aos requisitos de segurança',
     users_password_mismatch: 'As senhas não coincidem',
-    users_password_weak: 'A senha não atende aos requisitos mínimos',
     users_created_successfully: 'Usuário criado com sucesso',
     
+    // Security
+    security_title: 'Segurança',
+    security_subtitle: 'Configuração de segurança do sistema',
+    security_settings: 'Configurações de Segurança',
+    security_settings_desc: 'Configurações de segurança e políticas do sistema',
+    security_two_factor: 'Autenticação de Dois Fatores',
+    security_two_factor_desc: 'Habilizar 2FA para maior segurança',
+    security_password_expiry: 'Expiração da Senha (dias)',
+    security_session_timeout: 'Tempo de Sessão (minutos)',
+    security_login_attempts: 'Tentativas Máximas de Login',
+    security_audit_logging: 'Registro de Auditoria',
+    security_audit_logging_desc: 'Registrar todas as ações do sistema',
+    security_encryption: 'Criptografia de Dados',
+    security_encryption_desc: 'Criptografar dados sensíveis',
+    security_audit_log: 'Registro de Auditoria',
+    security_audit_log_desc: 'Histórico de ações do sistema',
+    security_date_time: 'Data e Hora',
+    security_user: 'Usuário',
+    security_action: 'Ação',
+    security_resource: 'Recurso',
+    security_status: 'Status',
+    security_ip_address: 'Endereço IP',
+    security_download_audit: 'Baixar Auditoria',
+    security_view_audit_pdf: 'Ver Auditoria PDF',
+    security_password_change: 'Alterar Senha',
+    security_password_reset: 'Redefinir Senha',
+    security_setting_updated: 'Configuração atualizada',
+    security_setting_updated_desc: 'A configuração de segurança foi atualizada',
+    
+    // Settings
+    settings_title: 'Configurações',
+    settings_subtitle: 'Configuração geral do sistema',
+    
     // Roles
+    roles_super_administrador: 'Super Administrador',
     roles_administrador: 'Administrador',
     roles_coordinador: 'Coordenador',
     roles_analista: 'Analista',
     roles_visualizador: 'Visualizador',
     
-    // Segurança
-    security_title: 'Segurança',
-    security_subtitle: 'Configuração de Segurança do Sistema',
-    security_password_change: 'Mudança de Senha',
-    security_audit_trail: 'Trilha de Auditoria',
-    security_access_control: 'Controle de Acesso',
-    security_session_management: 'Gestão de Sessões',
-    security_download_audit: 'Baixar Auditoria',
-    security_view_audit_pdf: 'Ver Auditoria PDF',
-    security_change_password: 'Alterar Senha',
-    security_forgot_password: 'Esqueci a Senha',
-    security_current_password: 'Senha Atual',
-    security_new_password: 'Nova Senha',
-    security_confirm_new_password: 'Confirmar Nova Senha',
-    security_password_changed: 'Senha alterada com sucesso',
-    security_audit_downloaded: 'Trilha de auditoria baixada',
+    // Validation Types
+    validation_type_metodos_analiticos: 'Métodos Analíticos',
+    validation_type_procesos: 'Processos',
+    validation_type_limpieza: 'Limpeza',
+    validation_type_sistemas_computarizados: 'Sistemas Computadorizados',
     
-    // Configuração
-    settings_title: 'Configurações',
-    settings_subtitle: 'Configurações do Sistema',
-    settings_company_info: 'Informações da Empresa',
-    settings_system_config: 'Configuração do Sistema',
-    settings_backup_config: 'Configuração de Backup',
-    settings_save: 'Salvar Configurações',
-    settings_export: 'Exportar Configurações',
-    settings_import: 'Importar Configurações',
-    settings_backup_enabled: 'Backup Automático Habilitado',
-    settings_backup_frequency: 'Frequência de Backup',
-    settings_backup_location: 'Local do Backup',
-    settings_backup_retention: 'Retenção de Backups',
-    settings_backup_now: 'Fazer Backup Agora',
-    settings_download_backup: 'Baixar Backup',
-    settings_restore_backup: 'Restaurar Backup',
-    settings_backup_created: 'Backup criado com sucesso',
-    settings_backup_downloaded: 'Backup baixado com sucesso',
+    // Validation Statuses
+    validation_status_borrador: 'Rascunho',
+    validation_status_primera_revision: 'Primeira Revisão',
+    validation_status_segunda_revision: 'Segunda Revisão',
+    validation_status_en_validacion: 'Em Validação',
+    validation_status_validado: 'Validado',
+    validation_status_proximo_vencer: 'Vencendo em Breve',
+    validation_status_vencido: 'Vencido',
+    validation_status_por_revalidar: 'Para Revalidação',
     
-    // Comum
-    common_save: 'Salvar',
-    common_cancel: 'Cancelar',
-    common_edit: 'Editar',
-    common_delete: 'Excluir',
-    common_search: 'Buscar',
-    common_filter: 'Filtrar',
-    common_export: 'Exportar',
-    common_import: 'Importar',
-    common_download: 'Baixar',
-    common_upload: 'Enviar',
-    common_view: 'Ver',
-    common_close: 'Fechar',
-    common_confirm: 'Confirmar',
-    common_loading: 'Carregando...',
-    common_error: 'Erro',
-    common_success: 'Sucesso',
-    common_warning: 'Aviso',
-    common_info: 'Informação',
-    common_yes: 'Sim',
-    common_no: 'Não',
-    common_all: 'Todos',
+    // Product Types
+    product_type_producto_terminado: 'Produto Acabado',
+    product_type_materia_prima: 'Matéria-Prima',
+    product_type_material_empaque: 'Material de Embalagem',
+    product_type_granel: 'Granel',
+    
+    // Equipment Types
+    equipment_type_hplc: 'HPLC',
+    equipment_type_gc: 'GC',
+    equipment_type_uvvis: 'UV-VIS',
+    equipment_type_nir: 'NIR',
+    equipment_type_raman: 'RAMAN',
+    equipment_type_ir: 'IR',
+    equipment_type_aa: 'AA',
+    equipment_type_karl_fischer: 'Karl Fischer',
+    
+    // Stats
+    stats_validated: 'Validadas',
+    stats_expiring: 'Vencendo',
+    stats_expired: 'Vencidas',
+    stats_in_validation: 'Em Validação',
+    
+    // Status
+    status_success: 'Sucesso',
+    status_failed: 'Falhou',
+    status_warning: 'Aviso',
   }
 };
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+interface LanguageProviderProps {
+  children: ReactNode;
+}
 
-export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const [language, setLanguage] = useState<Language>('es');
 
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language') as Language;
-    if (savedLanguage && ['es', 'en', 'pt'].includes(savedLanguage)) {
-      setLanguage(savedLanguage);
-    }
-  }, []);
-
-  const handleSetLanguage = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
+  const t = (key: string): string => {
+    return translations[language][key as keyof typeof translations[typeof language]] || key;
   };
 
-  const t = (key: string): string => {
-    return translations[language][key] || key;
+  const value = {
+    language,
+    setLanguage,
+    t,
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage: handleSetLanguage, t }}>
+    <LanguageContext.Provider value={value}>
       {children}
     </LanguageContext.Provider>
   );

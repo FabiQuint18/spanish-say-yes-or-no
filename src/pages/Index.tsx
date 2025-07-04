@@ -42,8 +42,15 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [companyLogo, setCompanyLogo] = useState<string | null>(null);
 
-  // Mock users for demonstration
+  // Mock users for demonstration - agregando super administrador
   const mockUsers: User[] = [
+    {
+      id: '0',
+      email: 'superadmin@company.com',
+      full_name: 'Super Administrador', 
+      role: 'super_administrador',
+      last_login: '2024-01-15T11:00:00Z'
+    },
     {
       id: '1',
       email: 'admin@company.com',
@@ -74,8 +81,9 @@ const Index = () => {
     }
   ];
 
-  // Mock passwords for demonstration (in real app, these would be hashed)
+  // Mock passwords for demonstration
   const mockPasswords: Record<string, string> = {
+    'superadmin@company.com': 'Super123!',
     'admin@company.com': 'Admin123!',
     'coordinador@company.com': 'Coord123!',
     'analista@company.com': 'Analyst123!',
@@ -162,6 +170,11 @@ const Index = () => {
     }
   };
 
+  const handleLogoChange = (newLogo: string) => {
+    setCompanyLogo(newLogo);
+    localStorage.setItem('companyLogo', newLogo);
+  };
+
   const renderModule = () => {
     const userRole = currentUser?.role || 'visualizador';
     
@@ -175,11 +188,11 @@ const Index = () => {
       case 'equipments':
         return <EquipmentsModule />;
       case 'users':
-        return <UsersModule />;
+        return <UsersModule userRole={userRole} />;
       case 'security':
-        return <SecurityModule />;
+        return <SecurityModule userRole={userRole} />;
       case 'settings':
-        return <SettingsModule />;
+        return <SettingsModule onLogoChange={handleLogoChange} />;
       default:
         return <Dashboard userRole={userRole} currentUserEmail={currentUser?.email} />;
     }
@@ -249,6 +262,7 @@ const Index = () => {
             <div className="mt-6 p-4 bg-blue-50 rounded-lg">
               <h4 className="font-semibold text-blue-900 mb-2">Credenciales de Demostración:</h4>
               <div className="text-sm text-blue-800 space-y-1">
+                <div><strong>Super Admin:</strong> superadmin@company.com / Super123!</div>
                 <div><strong>Administrador:</strong> admin@company.com / Admin123!</div>
                 <div><strong>Coordinador:</strong> coordinador@company.com / Coord123!</div>
                 <div><strong>Analista:</strong> analista@company.com / Analyst123!</div>
