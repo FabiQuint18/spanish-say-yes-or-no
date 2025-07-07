@@ -83,8 +83,8 @@ const ProductsModule = () => {
     localStorage.setItem('systemProducts', JSON.stringify(updatedProducts));
 
     toast({
-      title: t('products_created'),
-      description: `${t('products_product')} ${formData.name} ${t('products_added_successfully')}`,
+      title: "Producto Creado",
+      description: `Producto ${formData.name} agregado exitosamente`,
     });
     
     setShowForm(false);
@@ -109,12 +109,12 @@ const ProductsModule = () => {
 
   const getProductTypeLabel = (type: string) => {
     switch (type) {
-      case 'producto_terminado':
-        return t('products_finished_product');
-      case 'materia_prima':
-        return t('products_raw_material');
-      case 'material_empaque':
-        return t('products_packaging_material');
+          case 'producto_terminado':
+            return 'Producto Terminado';
+          case 'materia_prima':
+            return 'Materia Prima';
+          case 'material_empaque':
+            return 'Material de Empaque';
       default:
         return type;
     }
@@ -141,7 +141,7 @@ const ProductsModule = () => {
         </div>
         <Button onClick={handleAddProduct} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
-          {t('products_add_product')}
+          Agregar Producto
         </Button>
       </div>
 
@@ -149,7 +149,7 @@ const ProductsModule = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('products_finished_products')}
+              Productos Terminados
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -164,7 +164,7 @@ const ProductsModule = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('products_raw_materials')}
+              Materias Primas
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -179,7 +179,7 @@ const ProductsModule = () => {
         <Card className="sm:col-span-2 lg:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('products_packaging_materials')}
+              Materiales de Empaque
             </CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
@@ -194,9 +194,9 @@ const ProductsModule = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('products_product_list')}</CardTitle>
+          <CardTitle>Lista de Productos</CardTitle>
           <CardDescription>
-            {t('products_registered_products')}
+            Productos registrados en el sistema
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -256,11 +256,11 @@ const ProductsModule = () => {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="bg-popover border border-border max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-center">{t('products_add_new_product')}</DialogTitle>
+            <DialogTitle className="text-center">Agregar Nuevo Producto</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="code">{t('products_product_code')}</Label>
+              <Label htmlFor="code">Código del Producto</Label>
               <Input
                 id="code"
                 value={formData.code}
@@ -270,7 +270,7 @@ const ProductsModule = () => {
               />
             </div>
             <div>
-              <Label htmlFor="name">{t('products_product_name')}</Label>
+              <Label htmlFor="name">Nombre del Producto</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -280,25 +280,25 @@ const ProductsModule = () => {
               />
             </div>
             <div>
-              <Label htmlFor="type">{t('products_product_type')}</Label>
+              <Label htmlFor="type">Tipo de Producto</Label>
               <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
                 <SelectTrigger>
-                  <SelectValue placeholder={t('products_select_type')} />
+                  <SelectValue placeholder="Seleccionar tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="producto_terminado">{t('products_finished_product')}</SelectItem>
-                  <SelectItem value="materia_prima">{t('products_raw_material')}</SelectItem>
-                  <SelectItem value="material_empaque">{t('products_packaging_material')}</SelectItem>
+                  <SelectItem value="producto_terminado">Producto Terminado</SelectItem>
+                  <SelectItem value="materia_prima">Materia Prima</SelectItem>
+                  <SelectItem value="material_empaque">Material de Empaque</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="description">{t('products_description')}</Label>
+              <Label htmlFor="description">Descripción</Label>
               <Input
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder={t('products_product_description')}
+                placeholder="Descripción del producto"
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2 justify-end">
@@ -306,7 +306,7 @@ const ProductsModule = () => {
                 {t('common_cancel')}
               </Button>
               <Button type="submit" className="w-full sm:w-auto">
-                {t('products_add_product')}
+                Agregar Producto
               </Button>
             </div>
           </form>

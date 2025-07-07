@@ -116,10 +116,10 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
       ...prev,
       [setting]: value
     }));
-    toast({
-      title: t('security_setting_updated'),
-      description: t('security_setting_updated_desc'),
-    });
+            toast({
+              title: "Configuración Actualizada",
+              description: "La configuración de seguridad ha sido actualizada",
+            });
   };
 
   const handlePasswordReset = () => {
@@ -194,14 +194,14 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     window.URL.revokeObjectURL(url);
     
     toast({
-      title: t('security_download_audit'),
+      title: "Auditoría Descargada",
       description: "Registro de auditoría descargado exitosamente",
     });
   };
 
   const viewAuditPDF = () => {
     toast({
-      title: t('security_view_audit_pdf'),
+      title: "Generando PDF de Auditoría",
       description: "Generando reporte PDF del registro de auditoría...",
     });
     // Aquí se implementaría la generación de PDF
@@ -219,7 +219,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
         <div className="flex gap-2">
           <Button variant="outline" onClick={handlePasswordReset}>
             <Lock className="mr-2 h-4 w-4" />
-            {t('security_password_change')}
+            Cambiar Contraseña
           </Button>
         </div>
       </div>
@@ -230,10 +230,10 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              {t('security_settings')}
+              Configuraciones de Seguridad
             </CardTitle>
             <CardDescription>
-              {t('security_settings_desc')}
+              Configurar parámetros de seguridad del sistema
               {!canManageSecurity && (
                 <span className="block text-orange-600 mt-1">
                   Solo lectura - Contacte al Super Administrador para cambios
@@ -244,8 +244,8 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <Label>{t('security_two_factor')}</Label>
-                <p className="text-sm text-muted-foreground">{t('security_two_factor_desc')}</p>
+                <Label>Autenticación de Dos Factores</Label>
+                <p className="text-sm text-muted-foreground">Habilitar autenticación de dos factores para mayor seguridad</p>
               </div>
               <Switch
                 checked={securitySettings.twoFactorAuth}
@@ -255,7 +255,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="passwordExpiry">{t('security_password_expiry')}</Label>
+              <Label htmlFor="passwordExpiry">Expiración de Contraseña (días)</Label>
               <Input
                 id="passwordExpiry"
                 type="number"
@@ -266,7 +266,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="sessionTimeout">{t('security_session_timeout')}</Label>
+              <Label htmlFor="sessionTimeout">Tiempo de Sesión (minutos)</Label>
               <Input
                 id="sessionTimeout"
                 type="number"
@@ -277,7 +277,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="loginAttempts">{t('security_login_attempts')}</Label>
+              <Label htmlFor="loginAttempts">Intentos de Login Permitidos</Label>
               <Input
                 id="loginAttempts"
                 type="number"
@@ -289,8 +289,8 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
 
             <div className="flex items-center justify-between">
               <div>
-                <Label>{t('security_audit_logging')}</Label>
-                <p className="text-sm text-muted-foreground">{t('security_audit_logging_desc')}</p>
+                <Label>Registro de Auditoría</Label>
+                <p className="text-sm text-muted-foreground">Activar registro de todas las actividades del sistema</p>
               </div>
               <Switch
                 checked={securitySettings.auditLogging}
@@ -301,8 +301,8 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
 
             <div className="flex items-center justify-between">
               <div>
-                <Label>{t('security_encryption')}</Label>
-                <p className="text-sm text-muted-foreground">{t('security_encryption_desc')}</p>
+                <Label>Encriptación de Datos</Label>
+                <p className="text-sm text-muted-foreground">Habilitar encriptación para datos sensibles</p>
               </div>
               <Switch
                 checked={securitySettings.encryptionEnabled}
@@ -326,13 +326,13 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
           <CardContent className="space-y-4">
             <Button onClick={handlePasswordReset} className="w-full">
               <Lock className="mr-2 h-4 w-4" />
-              {t('security_password_change')}
+              Cambiar Contraseña
             </Button>
             
             {canManageSecurity && (
               <Button variant="outline" className="w-full">
                 <Key className="mr-2 h-4 w-4" />
-                {t('security_password_reset')}
+                Restablecer Contraseña de Usuario
               </Button>
             )}
             
@@ -356,20 +356,20 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             <div>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5" />
-                {t('security_audit_log')}
+                Registro de Auditoría
               </CardTitle>
               <CardDescription>
-                {t('security_audit_log_desc')}
+                Historial de actividades y eventos de seguridad del sistema
               </CardDescription>
             </div>
             <div className="flex gap-2">
               <Button variant="outline" onClick={downloadAuditTrail}>
                 <Download className="mr-2 h-4 w-4" />
-                {t('security_download_audit')}
+                Descargar Auditoría
               </Button>
               <Button variant="outline" onClick={viewAuditPDF}>
                 <FileText className="mr-2 h-4 w-4" />
-                {t('security_view_audit_pdf')}
+                Ver PDF de Auditoría
               </Button>
             </div>
           </div>
@@ -379,12 +379,12 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>{t('security_date_time')}</TableHead>
-                  <TableHead>{t('security_user')}</TableHead>
-                  <TableHead>{t('security_action')}</TableHead>
-                  <TableHead>{t('security_resource')}</TableHead>
-                  <TableHead>{t('security_status')}</TableHead>
-                  <TableHead>{t('security_ip_address')}</TableHead>
+                  <TableHead>Fecha y Hora</TableHead>
+                  <TableHead>Usuario</TableHead>
+                  <TableHead>Acción</TableHead>
+                  <TableHead>Recurso</TableHead>
+                  <TableHead>Estado</TableHead>
+                  <TableHead>Dirección IP</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -410,7 +410,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
       <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>{t('security_password_change')}</DialogTitle>
+            <DialogTitle>Cambiar Contraseña</DialogTitle>
             <DialogDescription>
               Cambiar contraseña de usuario actual
             </DialogDescription>
