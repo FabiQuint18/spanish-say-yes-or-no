@@ -75,26 +75,26 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
     switch (validationType) {
       case 'procesos':
         return [
-          { value: 'fabricacion', label: t('validations_manufacturing') },
-          { value: 'empaque', label: t('validations_packaging') },
+          { value: 'fabricacion', label: t('validations.manufacturing') },
+          { value: 'empaque', label: t('validations.packaging') },
         ];
       case 'metodos_analiticos':
         return [
-          { value: 'valoracion', label: t('validations_assay') },
-          { value: 'disolucion', label: t('validations_dissolution') },
-          { value: 'impurezas', label: t('validations_impurities') },
-          { value: 'uniformidad_unidades_dosificacion', label: t('validations_uniformity') },
-          { value: 'identificacion', label: t('validations_identification') },
-          { value: 'trazas', label: t('validations_traces') },
+          { value: 'valoracion', label: t('validations.assay') },
+          { value: 'disolucion', label: t('validations.dissolution') },
+          { value: 'impurezas', label: t('validations.impurities') },
+          { value: 'uniformidad_unidades_dosificacion', label: t('validations.uniformity') },
+          { value: 'identificacion', label: t('validations.identification') },
+          { value: 'trazas', label: t('validations.traces') },
         ];
       case 'limpieza':
         return [
-          { value: 'no_aplica', label: t('validations_not_applicable') },
+          { value: 'no_aplica', label: t('validations.not_applicable') },
         ];
       case 'sistemas_computarizados':
         return [
-          { value: 'validacion_inicial', label: t('validations_initial_validation') },
-          { value: 'revalidacion_periodica', label: t('validations_periodic_revalidation') },
+          { value: 'validacion_inicial', label: t('validations.initial_validation') },
+          { value: 'revalidacion_periodica', label: t('validations.periodic_revalidation') },
         ];
       default:
         return [];
@@ -103,14 +103,14 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
 
   const getStatusOptions = (): Array<{value: ValidationStatus, label: string}> => {
     return [
-      { value: 'validado', label: t('status_validated') },
-      { value: 'proximo_vencer', label: t('status_expiring_soon') },
-      { value: 'vencido', label: t('status_expired') },
-      { value: 'en_revalidacion', label: t('status_under_revalidation') },
-      { value: 'en_validacion', label: t('status_under_validation') },
-      { value: 'por_revalidar', label: t('status_pending_revalidation') },
-      { value: 'primera_revision', label: t('status_first_revision') },
-      { value: 'segunda_revision', label: t('status_second_revision') },
+      { value: 'validado', label: t('status.validado') },
+      { value: 'proximo_vencer', label: t('status.proximo') },
+      { value: 'vencido', label: t('status.vencido') },
+      { value: 'en_revalidacion', label: t('status.revalidacion') },
+      { value: 'en_validacion', label: t('status.en_validacion') },
+      { value: 'por_revalidar', label: t('status.por_revalidar') },
+      { value: 'primera_revision', label: t('status.primera_revision') },
+      { value: 'segunda_revision', label: t('status.segunda_revision') },
     ];
   };
 
@@ -231,10 +231,10 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
                   <SelectValue placeholder="Seleccionar tipo" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="procesos">{t('validations_processes')}</SelectItem>
-                  <SelectItem value="metodos_analiticos">{t('validations_analytical_methods')}</SelectItem>
-                  <SelectItem value="limpieza">{t('validations_cleaning')}</SelectItem>
-                  <SelectItem value="sistemas_computarizados">{t('validations_computerized_systems')}</SelectItem>
+                  <SelectItem value="procesos">{t('validations.processes')}</SelectItem>
+                  <SelectItem value="metodos_analiticos">{t('validations.analytical_methods')}</SelectItem>
+                  <SelectItem value="limpieza">{t('validations.cleaning')}</SelectItem>
+                  <SelectItem value="sistemas_computarizados">{t('validations.computerized_systems')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -329,7 +329,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
 
           <div className="flex justify-end space-x-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              {t('common_cancel')}
+              {t('common.cancel')}
             </Button>
             <Button type="submit">
               {editingValidation ? 'Actualizar Validación' : 'Crear Validación'}

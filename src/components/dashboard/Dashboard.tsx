@@ -71,9 +71,9 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">{t('dashboard_title')}</h1>
+        <h1 className="text-3xl font-bold text-foreground">{t('dashboard.title')}</h1>
         <p className="text-muted-foreground mt-1">
-          {t('dashboard_subtitle')}
+          {t('dashboard.subtitle')}
         </p>
       </div>
 
@@ -109,11 +109,11 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
                     <SelectValue placeholder="Seleccionar tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">{t('common_all')}</SelectItem>
-                    <SelectItem value="procesos">{t('validations_processes')}</SelectItem>
-                    <SelectItem value="limpieza">{t('validations_cleaning')}</SelectItem>
-                    <SelectItem value="metodos_analiticos">{t('validations_analytical_methods')}</SelectItem>
-                    <SelectItem value="sistemas_computarizados">{t('validations_computerized_systems')}</SelectItem>
+                    <SelectItem value="all">{t('common.all')}</SelectItem>
+                    <SelectItem value="procesos">{t('validations.processes')}</SelectItem>
+                    <SelectItem value="limpieza">{t('validations.cleaning')}</SelectItem>
+                    <SelectItem value="metodos_analiticos">{t('validations.analytical_methods')}</SelectItem>
+                    <SelectItem value="sistemas_computarizados">{t('validations.computerized_systems')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -125,24 +125,24 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatsCard
-          title={t('stats_validations')}
+          title={t('stats.validations')}
           value={stats.validations}
           icon={ClipboardCheck}
-          description={t('stats_total_validations')}
+          description={t('stats.total_validations')}
           trend={{ value: 12, isPositive: true }}
         />
         <StatsCard
-          title={t('stats_products')}
+          title={t('stats.products')}
           value={stats.products}
           icon={Package}
-          description={t('stats_registered_products')}
+          description={t('stats.registered_products')}
           trend={{ value: 5, isPositive: true }}
         />
         <StatsCard
-          title={t('stats_expiring')}
+          title={t('stats.expiring')}
           value={stats.expiring}
           icon={AlertTriangle}
-          description={t('stats_next_30_days')}
+          description={t('stats.next_30_days')}
           trend={{ value: stats.expiring, isPositive: false }}
         />
         <StatsCard
@@ -212,9 +212,9 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
         <div className="grid gap-6">
           <Card>
             <CardHeader>
-              <CardTitle>{t('analytics_title')}</CardTitle>
+              <CardTitle>{t('analytics.title')}</CardTitle>
               <CardDescription>
-                {t('analytics_subtitle')} - {selectedYear}
+                {t('analytics.subtitle')} - {selectedYear}
                 {selectedValidationType !== 'all' && ` - ${t(`validations_${selectedValidationType.replace('_', '').toLowerCase()}`)}`}
               </CardDescription>
             </CardHeader>
@@ -231,9 +231,9 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
       {!canViewAnalytics && (
         <Card>
           <CardHeader>
-            <CardTitle>{t('dashboard_access_restricted')}</CardTitle>
+            <CardTitle>{t('dashboard.access_restricted')}</CardTitle>
             <CardDescription>
-              {t('dashboard_contact_administrator')}
+              {t('dashboard.contact_administrator')}
             </CardDescription>
           </CardHeader>
         </Card>
