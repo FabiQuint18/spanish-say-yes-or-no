@@ -215,7 +215,7 @@ const Dashboard = ({ userRole = 'visualizador', currentUserEmail }: DashboardPro
               <CardTitle>{t('analytics.title')}</CardTitle>
               <CardDescription>
                 {t('analytics.subtitle')} - {selectedYear}
-                {selectedValidationType !== 'all' && ` - ${t(`validations_${selectedValidationType.replace('_', '').toLowerCase()}`)}`}
+                {selectedValidationType !== 'all' && ` - ${t('validations.' + selectedValidationType.replace('_', '.'))}`}
               </CardDescription>
             </CardHeader>
             <CardContent>

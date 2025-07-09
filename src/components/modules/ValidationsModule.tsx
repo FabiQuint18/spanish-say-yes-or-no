@@ -225,15 +225,15 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
     <div className="p-4 md:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('validations_title')}</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-foreground">{t('validations.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('validations_subtitle')}
+            {t('validations.subtitle')}
           </p>
         </div>
         {canAdd && (
           <Button onClick={handleAdd} className="w-full sm:w-auto">
             <Plus className="mr-2 h-4 w-4" />
-            {t('validations_new')}
+            {t('validations.new')}
           </Button>
         )}
       </div>
@@ -243,14 +243,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('stats_validated')}
+              {t('stats.validated')}
             </CardTitle>
             <ClipboardCheck className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.validated}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations_completed')}
+              {t('validations.completed')}
             </p>
           </CardContent>
         </Card>
@@ -258,14 +258,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('stats_expiring')}
+              {t('stats.expiring')}
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-yellow-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.expiring}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations_next30days')}
+              {t('validations.next30days')}
             </p>
           </CardContent>
         </Card>
@@ -273,14 +273,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('stats_expired')}
+              {t('stats.expired')}
             </CardTitle>
             <AlertTriangle className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.expired}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations_immediate')}
+              {t('validations.immediate')}
             </p>
           </CardContent>
         </Card>
@@ -288,14 +288,14 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              {t('validations_protocols')}
+              {t('validations.protocols')}
             </CardTitle>
             <ClipboardCheck className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{validations.filter(v => v.files && v.files.length > 0).length}</div>
             <p className="text-xs text-muted-foreground">
-              {t('validations_withDocumentation')}
+              {t('validations.withDocumentation')}
             </p>
           </CardContent>
         </Card>

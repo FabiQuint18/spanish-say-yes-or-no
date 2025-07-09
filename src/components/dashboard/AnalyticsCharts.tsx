@@ -19,17 +19,17 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
   // Data for validation types chart
   const validationTypeData = [
     { 
-      name: t('validations_processes'), 
+      name: t('validations.processes'), 
       value: safeValidations.filter(v => v.validation_type === 'procesos').length,
       fill: '#3b82f6'
     },
     { 
-      name: t('validations_cleaning'), 
+      name: t('validations.cleaning'), 
       value: safeValidations.filter(v => v.validation_type === 'limpieza').length,
       fill: '#10b981'
     },
     { 
-      name: t('validations_analytical_methods'), 
+      name: t('validations.analytical_methods'), 
       value: safeValidations.filter(v => v.validation_type === 'metodos_analiticos').length,
       fill: '#f59e0b'
     },
@@ -89,9 +89,9 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
         <CardContent className="flex justify-center">
           <ChartContainer
             config={{
-              procesos: { label: t('validations_processes'), color: '#3b82f6' },
-              limpieza: { label: t('validations_cleaning'), color: '#10b981' },
-              metodos: { label: t('validations_analytical_methods'), color: '#f59e0b' },
+              procesos: { label: t('validations.processes'), color: '#3b82f6' },
+              limpieza: { label: t('validations.cleaning'), color: '#10b981' },
+              metodos: { label: t('validations.analytical_methods'), color: '#f59e0b' },
             }}
             className="h-[200px] w-full"
           >
