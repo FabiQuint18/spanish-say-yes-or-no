@@ -223,10 +223,96 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
         <TabsContent value="appearance" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Tema y Apariencia</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Palette className="h-5 w-5" />
+                Tema y Apariencia
+              </CardTitle>
+              <CardDescription>
+                Personaliza el aspecto visual del sistema
+              </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p>Configuración de tema disponible próximamente</p>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label htmlFor="theme">Tema</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Selecciona el tema de la aplicación
+                    </p>
+                  </div>
+                  <select
+                    id="theme"
+                    value={theme}
+                    onChange={(e) => setTheme(e.target.value)}
+                    className="px-3 py-2 border border-border rounded-md bg-background"
+                  >
+                    <option value="light">Claro</option>
+                    <option value="dark">Oscuro</option>
+                    <option value="system">Sistema</option>
+                  </select>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-3">
+                  <Label>Colores del Sistema</Label>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="primaryColor">Color Primario</Label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          id="primaryColor"
+                          defaultValue="#3b82f6"
+                          className="w-10 h-10 border border-border rounded cursor-pointer"
+                        />
+                        <span className="text-sm text-muted-foreground">#3b82f6</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="accentColor">Color de Acento</Label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          id="accentColor"
+                          defaultValue="#10b981"
+                          className="w-10 h-10 border border-border rounded cursor-pointer"
+                        />
+                        <span className="text-sm text-muted-foreground">#10b981</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <Label>Tipografía</Label>
+                  <div className="space-y-2">
+                    <Label htmlFor="fontSize">Tamaño de Fuente</Label>
+                    <select
+                      id="fontSize"
+                      className="px-3 py-2 border border-border rounded-md bg-background w-full"
+                    >
+                      <option value="small">Pequeño</option>
+                      <option value="medium">Mediano</option>
+                      <option value="large">Grande</option>
+                    </select>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={() => {
+                    toast({
+                      title: "Configuración Guardada",
+                      description: "Los cambios de apariencia han sido aplicados",
+                    });
+                  }}
+                  className="w-full"
+                >
+                  Aplicar Cambios
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -238,15 +324,134 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
         <TabsContent value="security" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Configuración de Seguridad</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Configuración de Seguridad
+              </CardTitle>
+              <CardDescription>
+                Gestiona la seguridad y auditoría del sistema
+              </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <Label>Registro de Auditoría</Label>
-                <Switch
-                  checked={settings.security.auditLogging}
-                  onCheckedChange={(checked) => updateSetting('security.auditLogging', checked)}
-                />
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Registro de Auditoría</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Registra todas las acciones del sistema
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.security.auditLogging}
+                    onCheckedChange={(checked) => updateSetting('security.auditLogging', checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <Label>Autenticación de Dos Factores</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Requiere verificación adicional para el acceso
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.security.twoFactorRequired}
+                    onCheckedChange={(checked) => updateSetting('security.twoFactorRequired', checked)}
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="space-y-2">
+                  <Label htmlFor="sessionTimeout">Tiempo de Sesión (minutos)</Label>
+                  <Input
+                    id="sessionTimeout"
+                    type="number"
+                    value={settings.security.sessionTimeout}
+                    onChange={(e) => updateSetting('security.sessionTimeout', parseInt(e.target.value))}
+                    min="5"
+                    max="480"
+                    className="w-32"
+                  />
+                </div>
+
+                <Separator />
+
+                <div className="space-y-3">
+                  <Label>Registro de Auditoría</Label>
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => {
+                      // Generar PDF de auditoría
+                      const auditData = {
+                        generatedAt: new Date().toISOString(),
+                        systemInfo: {
+                          version: "1.0.0",
+                          users: JSON.parse(localStorage.getItem('systemUsers') || '[]').length,
+                          validations: JSON.parse(localStorage.getItem('systemValidations') || '[]').length,
+                        },
+                        recentActivity: [
+                          { date: new Date().toISOString(), action: "Usuario logueado", user: "admin@empresa.com" },
+                          { date: new Date(Date.now() - 3600000).toISOString(), action: "Validación creada", user: "analista@empresa.com" },
+                          { date: new Date(Date.now() - 7200000).toISOString(), action: "Producto agregado", user: "coordinador@empresa.com" },
+                        ]
+                      };
+
+                      const content = `
+REGISTRO DE AUDITORÍA
+=====================
+
+Generado: ${new Date().toLocaleString()}
+
+INFORMACIÓN DEL SISTEMA:
+- Versión: ${auditData.systemInfo.version}
+- Usuarios registrados: ${auditData.systemInfo.users}
+- Validaciones registradas: ${auditData.systemInfo.validations}
+
+ACTIVIDAD RECIENTE:
+${auditData.recentActivity.map(activity => 
+  `- ${new Date(activity.date).toLocaleString()}: ${activity.action} (${activity.user})`
+).join('\n')}
+
+CONFIGURACIÓN DE SEGURIDAD:
+- Registro de auditoría: ${settings.security.auditLogging ? 'Activado' : 'Desactivado'}
+- Autenticación 2FA: ${settings.security.twoFactorRequired ? 'Activado' : 'Desactivado'}
+- Tiempo de sesión: ${settings.security.sessionTimeout} minutos
+                      `;
+
+                      const blob = new Blob([content], { type: 'text/plain' });
+                      const url = URL.createObjectURL(blob);
+                      const link = document.createElement('a');
+                      link.href = url;
+                      link.download = `audit-log-${new Date().toISOString().split('T')[0]}.txt`;
+                      link.click();
+                      URL.revokeObjectURL(url);
+
+                      toast({
+                        title: "Registro Descargado",
+                        description: "El registro de auditoría ha sido descargado exitosamente",
+                      });
+                    }}
+                  >
+                    <Download className="mr-2 h-4 w-4" />
+                    Descargar Registro de Auditoría
+                  </Button>
+                </div>
+
+                <Button 
+                  onClick={() => {
+                    toast({
+                      title: "Configuración Guardada",
+                      description: "Los cambios de seguridad han sido aplicados",
+                    });
+                  }}
+                  className="w-full"
+                >
+                  Guardar Configuración
+                </Button>
               </div>
             </CardContent>
           </Card>

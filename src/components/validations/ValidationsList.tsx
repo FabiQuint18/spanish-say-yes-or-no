@@ -200,10 +200,18 @@ const ValidationsList = ({
                       >
                         <Eye className="h-3 w-3" />
                       </Button>
-                      <Button
+                        <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => window.print()}
+                        onClick={() => {
+                          const link = document.createElement('a');
+                          link.href = file.file_url;
+                          link.target = '_blank';
+                          link.download = file.file_name;
+                          document.body.appendChild(link);
+                          link.click();
+                          document.body.removeChild(link);
+                        }}
                         title="Imprimir"
                       >
                         <Printer className="h-3 w-3" />
@@ -305,9 +313,10 @@ const ValidationsList = ({
                     <TableHead className="min-w-[120px]">{t('validations.subcategory')}</TableHead>
                     <TableHead className="min-w-[100px]">{t('validations.equipment')}</TableHead>
                     <TableHead className="min-w-[120px]">{t('validations.status')}</TableHead>
+                    <TableHead className="min-w-[120px]">{t('validations.validity_date')}</TableHead>
                     <TableHead className="min-w-[120px]">{t('validations.expiry_date')}</TableHead>
                     <TableHead className="min-w-[120px]">{t('validations.files')}</TableHead>
-                    {(canEdit || canDelete) && <TableHead className="min-w-[100px]">{t('validations.actions')}</TableHead>}
+                    {(canEdit || canDelete) && <TableHead className="min-w-[120px]">{t('validations.actions')}</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -331,6 +340,7 @@ const ValidationsList = ({
                       <TableCell>{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
                       <TableCell>{validation.equipment_type}</TableCell>
                       <TableCell>{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
+                      <TableCell>{formatDate(validation.issue_date)}</TableCell>
                       <TableCell>{formatDate(validation.expiry_date)}</TableCell>
                       <TableCell>
                         <FilesDropdown validation={validation} />
