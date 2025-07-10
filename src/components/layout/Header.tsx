@@ -30,9 +30,9 @@ const Header = ({ currentUser, onLogout, companyLogo }: HeaderProps) => {
             )}
             <div>
               <h1 className="text-2xl font-bold text-foreground">
-                {t('system_title')}
+                {t('system.title')}
               </h1>
-              <p className="text-sm text-muted-foreground">{t('system_subtitle')}</p>
+              <p className="text-sm text-muted-foreground">{t('system.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@ const Header = ({ currentUser, onLogout, companyLogo }: HeaderProps) => {
             <DropdownMenuContent align="end" className="w-56 bg-popover border border-border">
               <DropdownMenuItem onClick={onLogout} className="hover:bg-accent hover:text-accent-foreground cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />
-                {t('login_logout')}
+                {t('login.logout')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

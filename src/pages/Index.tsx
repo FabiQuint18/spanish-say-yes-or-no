@@ -123,19 +123,19 @@ const Index = () => {
         localStorage.setItem('currentUser', JSON.stringify(updatedUser));
         
         toast({
-          title: t('login_success'),
-          description: t('login_welcome'),
+          title: t('login.success'),
+          description: t('login.welcome'),
         });
       } else {
         toast({
-          title: t('login_error'),
+          title: t('login.error'),
           description: 'Credenciales inválidas',
           variant: "destructive",
         });
       }
     } catch (error) {
       toast({
-        title: t('login_error'),
+        title: t('login.error'),
         description: 'Error al conectar con el servidor',
         variant: "destructive",
       });
@@ -152,8 +152,8 @@ const Index = () => {
     setLoginData({ email: '', password: '' });
     
     toast({
-      title: t('login_logout'),
-      description: t('login_logoutSuccess'),
+      title: t('login.logout'),
+      description: t('login.logoutSuccess'),
     });
   };
 
@@ -212,15 +212,15 @@ const Index = () => {
                 </div>
               )}
             </div>
-            <CardTitle className="text-2xl text-center">{t('login_title')}</CardTitle>
+            <CardTitle className="text-2xl text-center">{t('login.title')}</CardTitle>
             <CardDescription className="text-center">
-              {t('system_subtitle')}
+              {t('system.subtitle')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">{t('login_email')}</Label>
+                <Label htmlFor="email">{t('login.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -231,7 +231,7 @@ const Index = () => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password">{t('login_password')}</Label>
+                <Label htmlFor="password">{t('login.password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -242,7 +242,7 @@ const Index = () => {
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? t('login_loading') : t('login_button')}
+                {isLoading ? t('login.loading') : t('login.button')}
               </Button>
             </form>
             
