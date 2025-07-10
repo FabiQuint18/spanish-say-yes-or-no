@@ -184,7 +184,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     if (!validatePassword(newUser.password)) {
       toast({
         title: "Error",
-        description: t('users_password_weak'),
+        description: t('users.password.weak'),
         variant: "destructive",
       });
       return;
@@ -194,7 +194,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     if (newUser.password !== newUser.confirmPassword) {
       toast({
         title: "Error",
-        description: t('users_password_mismatch'),
+        description: t('users.password.mismatch'),
         variant: "destructive",
       });
       return;
@@ -224,7 +224,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     localStorage.setItem('systemUsers', JSON.stringify(updatedUsers));
     
     toast({
-      title: t('users_created_successfully'),
+      title: t('users.created.successfully'),
       description: `Usuario ${newUser.full_name} creado exitosamente`,
     });
 
@@ -273,15 +273,15 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('users_title')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('users.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('users_subtitle')}
+            {t('users.subtitle')}
           </p>
         </div>
         {canManageUsers && (
           <Button onClick={handleNewUser}>
             <Plus className="mr-2 h-4 w-4" />
-            {t('users_new')}
+            {t('users.new')}
           </Button>
         )}
       </div>
@@ -289,9 +289,9 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
       {/* Lista de Usuarios */}
       <Card>
         <CardHeader>
-          <CardTitle>{t('users_list')}</CardTitle>
+          <CardTitle>{t('users.list')}</CardTitle>
           <CardDescription>
-            {t('users_manage')}
+            {t('users.manage')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -300,9 +300,9 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>{t('users_name')}</TableHead>
-                    <TableHead>{t('users_email')}</TableHead>
-                    <TableHead>{t('users_role')}</TableHead>
+                    <TableHead>{t('users.name')}</TableHead>
+                    <TableHead>{t('users.email')}</TableHead>
+                    <TableHead>{t('users.role')}</TableHead>
                     <TableHead>Fecha Creación</TableHead>
                     <TableHead>Último Acceso</TableHead>
                     {canManageUsers && <TableHead>Acciones</TableHead>}
@@ -315,7 +315,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
                       <TableCell>{user.email}</TableCell>
                       <TableCell>
                         <Badge variant="outline">
-                          {t(`roles_${user.role}`)}
+                          {t(`roles.${user.role}`)}
                         </Badge>
                       </TableCell>
                       <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
@@ -383,7 +383,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
                       {index === 0 && (
                         <TableCell rowSpan={permissions.length} className="font-medium align-top">
                           <Badge variant="outline" className="mt-1">
-                            {t(`roles_${role}`)}
+                            {t(`roles.${role}`)}
                           </Badge>
                         </TableCell>
                       )}
@@ -414,14 +414,14 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
         <Dialog open={showNewUserDialog} onOpenChange={setShowNewUserDialog}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{t('users_new')}</DialogTitle>
+              <DialogTitle>{t('users.new')}</DialogTitle>
               <DialogDescription>
                 Crear un nuevo usuario en el sistema con contraseña local
               </DialogDescription>
             </DialogHeader>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="full_name">{t('users_name')}</Label>
+                <Label htmlFor="full_name">{t('users.name')}</Label>
                 <Input
                   id="full_name"
                   value={newUser.full_name}
@@ -431,7 +431,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="email">{t('users_email')}</Label>
+                <Label htmlFor="email">{t('users.email')}</Label>
                 <Input
                   id="email"
                   type="email"
@@ -442,22 +442,22 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="role">{t('users_role')}</Label>
+                <Label htmlFor="role">{t('users.role')}</Label>
                 <Select value={newUser.role} onValueChange={(value) => setNewUser({...newUser, role: value as UserRole})}>
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar rol" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="administrador">{t('roles_administrador')}</SelectItem>
-                    <SelectItem value="coordinador">{t('roles_coordinador')}</SelectItem>
-                    <SelectItem value="analista">{t('roles_analista')}</SelectItem>
-                    <SelectItem value="visualizador">{t('roles_visualizador')}</SelectItem>
+                    <SelectItem value="administrador">{t('roles.administrador')}</SelectItem>
+                    <SelectItem value="coordinador">{t('roles.coordinador')}</SelectItem>
+                    <SelectItem value="analista">{t('roles.analista')}</SelectItem>
+                    <SelectItem value="visualizador">{t('roles.visualizador')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">{t('users_password')}</Label>
+                <Label htmlFor="password">{t('users.password')}</Label>
                 <Input
                   id="password"
                   type="password"
@@ -468,7 +468,7 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t('users_confirm_password')}</Label>
+                <Label htmlFor="confirmPassword">{t('users.confirm.password')}</Label>
                 <Input
                   id="confirmPassword"
                   type="password"
@@ -480,17 +480,17 @@ const UsersModule = ({ userRole = 'administrador' }: UsersModuleProps) => {
 
               <div className="p-3 bg-blue-50 rounded-lg">
                 <p className="text-sm text-blue-800">
-                  {t('users_password_requirements')}
+                  {t('users.password.requirements')}
                 </p>
               </div>
             </div>
             
             <div className="flex justify-end space-x-2 pt-4">
               <Button variant="outline" onClick={handleCloseDialog}>
-                {t('common_cancel')}
+                {t('common.cancel')}
               </Button>
               <Button onClick={handleSaveUser}>
-                {t('common_save')}
+                {t('common.save')}
               </Button>
             </div>
           </DialogContent>

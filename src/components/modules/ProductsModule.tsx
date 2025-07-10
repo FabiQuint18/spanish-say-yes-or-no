@@ -134,9 +134,9 @@ const ProductsModule = () => {
     <div className="p-4 sm:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{t('products_title')}</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground">{t('products.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('products_subtitle')}
+            {t('products.subtitle')}
           </p>
         </div>
         <Button onClick={handleAddProduct} className="w-full sm:w-auto">
@@ -303,7 +303,7 @@ const ProductsModule = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-2 justify-end">
               <Button type="button" variant="outline" onClick={handleClose} className="w-full sm:w-auto">
-                {t('common_cancel')}
+                {t('common.cancel')}
               </Button>
               <Button type="submit" className="w-full sm:w-auto">
                 Agregar Producto

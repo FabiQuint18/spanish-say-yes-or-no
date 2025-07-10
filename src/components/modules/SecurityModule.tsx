@@ -88,11 +88,11 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'success':
-        return <Badge className="bg-green-100 text-green-800">{t('status_success')}</Badge>;
+        return <Badge className="bg-green-100 text-green-800">{t('status.success')}</Badge>;
       case 'failed':
-        return <Badge className="bg-red-100 text-red-800">{t('status_failed')}</Badge>;
+        return <Badge className="bg-red-100 text-red-800">{t('status.failed')}</Badge>;
       case 'warning':
-        return <Badge className="bg-yellow-100 text-yellow-800">{t('status_warning')}</Badge>;
+        return <Badge className="bg-yellow-100 text-yellow-800">{t('status.warning')}</Badge>;
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -154,7 +154,7 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     if (!minLength || !hasUppercase || !hasSpecialChar || !hasAlphaNumeric) {
       toast({
         title: "Error de Contraseña",
-        description: t('users_password_requirements'),
+        description: t('users.password.requirements'),
         variant: "destructive",
       });
       return;
@@ -211,9 +211,9 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('security_title')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('security.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('security_subtitle')}
+            {t('security.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -448,14 +448,14 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
 
             <div className="p-3 bg-blue-50 rounded-lg">
               <p className="text-sm text-blue-800">
-                {t('users_password_requirements')}
+                {t('users.password.requirements')}
               </p>
             </div>
           </div>
           
           <div className="flex justify-end space-x-2 pt-4">
             <Button variant="outline" onClick={() => setShowPasswordDialog(false)}>
-              {t('common_cancel')}
+              {t('common.cancel')}
             </Button>
             <Button onClick={handlePasswordChange}>
               Cambiar Contraseña

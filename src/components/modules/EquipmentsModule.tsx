@@ -124,14 +124,14 @@ const EquipmentsModule = () => {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">{t('equipments_title')}</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t('equipments.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            {t('equipments_subtitle')}
+            {t('equipments.subtitle')}
           </p>
         </div>
         <Button onClick={handleAddEquipment}>
           <Plus className="mr-2 h-4 w-4" />
-          {t('equipments_add')}
+          {t('equipments.add')}
         </Button>
       </div>
 
@@ -184,7 +184,7 @@ const EquipmentsModule = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>{t('equipments_list')}</CardTitle>
+          <CardTitle>{t('equipments.list')}</CardTitle>
           <CardDescription>
             Lista de equipos registrados en el sistema
           </CardDescription>
@@ -308,10 +308,10 @@ const EquipmentsModule = () => {
             </div>
             <div className="flex gap-2 justify-end">
               <Button type="button" variant="outline" onClick={handleClose}>
-                {t('common_cancel')}
+                {t('common.cancel')}
               </Button>
               <Button type="submit">
-                {t('equipments_add')}
+                {t('equipments.add')}
               </Button>
             </div>
           </form>
