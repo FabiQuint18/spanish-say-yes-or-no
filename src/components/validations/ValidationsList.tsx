@@ -8,7 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Validation, UserRole, ValidationFilters as ValidationFiltersType } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
-import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer } from 'lucide-react';
+import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer, Download } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 
@@ -81,6 +81,97 @@ const ValidationsList = ({
   };
 
   const filteredValidations = applyFilters(validations);
+
+  const handlePrintByType = (type?: string) => {
+    const validationsToPrint = type 
+      ? filteredValidations.filter(v => v.validation_type === type)
+      : filteredValidations;
+    
+    const printContent = generatePrintableContent(validationsToPrint, type);
+    const printWindow = window.open('', '_blank');
+    
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleDownloadPDF = (type?: string) => {
+    const validationsToPrint = type 
+      ? filteredValidations.filter(v => v.validation_type === type)
+      : filteredValidations;
+    
+    const printContent = generatePrintableContent(validationsToPrint, type);
+    const blob = new Blob([printContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `validaciones_${type || 'todas'}_${new Date().toISOString().split('T')[0]}.html`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const generatePrintableContent = (validationsList: Validation[], type?: string) => {
+    const typeLabel = type ? getValidationTypeLabel(type) : 'Todas';
+    
+    return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Reporte de Validaciones - ${typeLabel}</title>
+          <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { color: #333; text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+            th { background-color: #f2f2f2; }
+            .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+            .validado { background-color: #dcfce7; color: #166534; }
+            .proximo_vencer { background-color: #fef3c7; color: #92400e; }
+            .vencido { background-color: #fecaca; color: #991b1b; }
+            .en_validacion { background-color: #dbeafe; color: #1e40af; }
+          </style>
+        </head>
+        <body>
+          <h1>Reporte de Validaciones - ${typeLabel}</h1>
+          <p><strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
+          <p><strong>Total de registros:</strong> ${validationsList.length}</p>
+          
+          <table>
+            <thead>
+              <tr>
+                <th>Código de Validación</th>
+                <th>Producto</th>
+                <th>Tipo de Validación</th>
+                <th>Equipo</th>
+                <th>Fecha de Vigencia</th>
+                <th>Fecha de Vencimiento</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${validationsList.map(validation => `
+                <tr>
+                  <td>${validation.validation_code}</td>
+                  <td>${validation.product?.name || 'N/A'}</td>
+                  <td>${getValidationTypeLabel(validation.validation_type)}</td>
+                  <td>${validation.equipment_type}</td>
+                  <td>${formatDate(validation.issue_date)}</td>
+                  <td>${formatDate(validation.expiry_date)}</td>
+                  <td><span class="status-badge ${validation.status}">${validation.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+  };
+
+  const validationTypes = [...new Set(validations.map(v => v.validation_type))];
 
   const getStatusBadge = (status: string, expiryDate: string) => {
     const daysUntilExpiry = getDaysUntilExpiry(expiryDate);
@@ -275,20 +366,53 @@ const ValidationsList = ({
 
       <Card>
         <CardHeader>
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <CardTitle>{t('validations.list')}</CardTitle>
-              <CardDescription>
-                {t('validations.manage')}
-              </CardDescription>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <CardTitle>{t('validations.list')}</CardTitle>
+                <CardDescription>
+                  {t('validations.manage')}
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline" className="gap-2">
+                      <Printer className="h-4 w-4" />
+                      {t('validations.print.options')}
+                      <ChevronDown className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    <DropdownMenuItem onClick={() => handlePrintByType()}>
+                      <Printer className="h-4 w-4 mr-2" />
+                      {t('validations.print.all')}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDownloadPDF()}>
+                      <Download className="h-4 w-4 mr-2" />
+                      {t('validations.print.downloadAll')}
+                    </DropdownMenuItem>
+                    {validationTypes.map(type => (
+                      <React.Fragment key={type}>
+                        <DropdownMenuItem onClick={() => handlePrintByType(type)}>
+                          <Eye className="h-4 w-4 mr-2" />
+                          {t('validations.print.byType')} {getValidationTypeLabel(type)}
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadPDF(type)}>
+                          <Download className="h-4 w-4 mr-2" />
+                          {t('validations.print.downloadByType')} {getValidationTypeLabel(type)}
+                        </DropdownMenuItem>
+                      </React.Fragment>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                {canAdd && (
+                  <Button onClick={onAdd} className="w-full sm:w-auto">
+                    <Plus className="mr-2 h-4 w-4" />
+                    {t('validations.new')}
+                  </Button>
+                )}
+              </div>
             </div>
-            {canAdd && (
-              <Button onClick={onAdd} className="w-full sm:w-auto">
-                <Plus className="mr-2 h-4 w-4" />
-                {t('validations.new')}
-              </Button>
-            )}
-          </div>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
