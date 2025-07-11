@@ -82,12 +82,18 @@ const ValidationsList = ({
 
   const filteredValidations = applyFilters(validations);
 
-  const handlePrintByType = (type?: string) => {
-    const validationsToPrint = type 
-      ? filteredValidations.filter(v => v.validation_type === type)
-      : filteredValidations;
+  const handlePrintByType = (type?: string, subcategory?: string) => {
+    let validationsToPrint = filteredValidations;
     
-    const printContent = generatePrintableContent(validationsToPrint, type);
+    if (type) {
+      validationsToPrint = validationsToPrint.filter(v => v.validation_type === type);
+    }
+    
+    if (subcategory) {
+      validationsToPrint = validationsToPrint.filter(v => v.subcategory === subcategory);
+    }
+    
+    const printContent = generatePrintableContent(validationsToPrint, type, subcategory);
     const printWindow = window.open('', '_blank');
     
     if (printWindow) {
@@ -97,59 +103,110 @@ const ValidationsList = ({
     }
   };
 
-  const handleDownloadPDF = (type?: string) => {
-    const validationsToPrint = type 
-      ? filteredValidations.filter(v => v.validation_type === type)
-      : filteredValidations;
+  const handleDownloadPDF = (type?: string, subcategory?: string) => {
+    let validationsToPrint = filteredValidations;
     
-    const printContent = generatePrintableContent(validationsToPrint, type);
+    if (type) {
+      validationsToPrint = validationsToPrint.filter(v => v.validation_type === type);
+    }
+    
+    if (subcategory) {
+      validationsToPrint = validationsToPrint.filter(v => v.subcategory === subcategory);
+    }
+    
+    const printContent = generatePrintableContent(validationsToPrint, type, subcategory);
     const blob = new Blob([printContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
+    const fileName = getFileName(type, subcategory);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `validaciones_${type || 'todas'}_${new Date().toISOString().split('T')[0]}.html`;
+    link.download = `${fileName}_${new Date().toISOString().split('T')[0]}.html`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
 
-  const generatePrintableContent = (validationsList: Validation[], type?: string) => {
-    const typeLabel = type ? getValidationTypeLabel(type) : 'Todas';
+  const getFileName = (type?: string, subcategory?: string) => {
+    if (subcategory && type) {
+      return `validaciones_${type}_${subcategory}`;
+    } else if (type) {
+      return `validaciones_${type}`;
+    } else {
+      return 'validaciones_todas';
+    }
+  };
+
+  const getReportTitle = (type?: string, subcategory?: string) => {
+    if (subcategory && type) {
+      const typeLabel = getValidationTypeLabel(type);
+      const subcategoryLabel = getSubcategoryLabel(type, subcategory);
+      return `Listado de Validaciones ${typeLabel} - ${subcategoryLabel}`;
+    } else if (type) {
+      return `Listado de Validaciones ${getValidationTypeLabel(type)}`;
+    } else {
+      return 'Listado de Todas las Validaciones';
+    }
+  };
+
+  const generatePrintableContent = (validationsList: Validation[], type?: string, subcategory?: string) => {
+    const reportTitle = getReportTitle(type, subcategory);
     
     return `
       <!DOCTYPE html>
       <html>
         <head>
-          <title>Reporte de Validaciones - ${typeLabel}</title>
+          <title>${reportTitle}</title>
           <style>
             body { font-family: Arial, sans-serif; margin: 20px; }
-            h1 { color: #333; text-align: center; }
-            table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-            th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-            th { background-color: #f2f2f2; }
-            .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+            .header { text-align: center; margin-bottom: 30px; }
+            .logo { width: 150px; height: auto; margin-bottom: 20px; }
+            h1 { color: #333; text-align: center; margin: 20px 0; font-size: 24px; }
+            .info { margin-bottom: 20px; text-align: center; }
+            table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 12px; }
+            th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+            th { background-color: #f2f2f2; font-weight: bold; }
+            .status-badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; }
             .validado { background-color: #dcfce7; color: #166534; }
             .proximo_vencer { background-color: #fef3c7; color: #92400e; }
             .vencido { background-color: #fecaca; color: #991b1b; }
             .en_validacion { background-color: #dbeafe; color: #1e40af; }
+            .en_revalidacion { background-color: #e0e7ff; color: #3730a3; }
+            .por_revalidar { background-color: #fed7aa; color: #c2410c; }
+            .primera_revision { background-color: #cffafe; color: #155e75; }
+            .segunda_revision { background-color: #e0e7ff; color: #4338ca; }
+            @media print {
+              body { margin: 10px; }
+              .header { page-break-inside: avoid; }
+            }
           </style>
         </head>
         <body>
-          <h1>Reporte de Validaciones - ${typeLabel}</h1>
-          <p><strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES')}</p>
-          <p><strong>Total de registros:</strong> ${validationsList.length}</p>
+          <div class="header">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDE1MCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMjU2M2ViIi8+Cjx0ZXh0IHg9Ijc1IiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE4IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiPkVNUFJFU0E8L3RleHQ+Cjx0ZXh0IHg9Ijc1IiB5PSI2NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+U2lzdGVtYSBkZSBWYWxpZGFjaW9uZXM8L3RleHQ+Cjwvc3ZnPgo=" alt="Logo Empresa" class="logo" />
+            <h1>${reportTitle}</h1>
+          </div>
+          <div class="info">
+            <p><strong>Fecha de generación:</strong> ${new Date().toLocaleDateString('es-ES', { 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</p>
+            <p><strong>Total de registros:</strong> ${validationsList.length}</p>
+          </div>
           
           <table>
             <thead>
               <tr>
                 <th>Código de Validación</th>
-                <th>Producto</th>
+                <th>Producto/Materia Prima</th>
+                <th>Código de Producto</th>
                 <th>Tipo de Validación</th>
+                <th>Subcategoría</th>
                 <th>Equipo</th>
+                <th>Estado</th>
                 <th>Fecha de Vigencia</th>
                 <th>Fecha de Vencimiento</th>
-                <th>Estado</th>
               </tr>
             </thead>
             <tbody>
@@ -157,11 +214,13 @@ const ValidationsList = ({
                 <tr>
                   <td>${validation.validation_code}</td>
                   <td>${validation.product?.name || 'N/A'}</td>
+                  <td>${validation.product?.code || 'N/A'}</td>
                   <td>${getValidationTypeLabel(validation.validation_type)}</td>
+                  <td>${getSubcategoryLabel(validation.validation_type, validation.subcategory)}</td>
                   <td>${validation.equipment_type}</td>
+                  <td><span class="status-badge ${validation.status}">${validation.status.replace(/_/g, ' ')}</span></td>
                   <td>${formatDate(validation.issue_date)}</td>
                   <td>${formatDate(validation.expiry_date)}</td>
-                  <td><span class="status-badge ${validation.status}">${validation.status}</span></td>
                 </tr>
               `).join('')}
             </tbody>
@@ -382,7 +441,21 @@ const ValidationsList = ({
                       <ChevronDown className="h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
+                  <DropdownMenuContent align="end" className="w-64">
+                    {/* Opciones sincronizadas con filtros actuales */}
+                    <DropdownMenuItem onClick={() => handlePrintByType(filters.validationType, filters.subcategory)}>
+                      <Printer className="h-4 w-4 mr-2" />
+                      Imprimir: {getReportTitle(filters.validationType, filters.subcategory)}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => handleDownloadPDF(filters.validationType, filters.subcategory)}>
+                      <Download className="h-4 w-4 mr-2" />
+                      Descargar: {getReportTitle(filters.validationType, filters.subcategory)}
+                    </DropdownMenuItem>
+                    
+                    {/* Separador */}
+                    <div className="border-t my-1"></div>
+                    
+                    {/* Opciones generales */}
                     <DropdownMenuItem onClick={() => handlePrintByType()}>
                       <Printer className="h-4 w-4 mr-2" />
                       {t('validations.print.all')}
@@ -391,6 +464,8 @@ const ValidationsList = ({
                       <Download className="h-4 w-4 mr-2" />
                       {t('validations.print.downloadAll')}
                     </DropdownMenuItem>
+                    
+                    {/* Opciones por tipo */}
                     {validationTypes.map(type => (
                       <React.Fragment key={type}>
                         <DropdownMenuItem onClick={() => handlePrintByType(type)}>
