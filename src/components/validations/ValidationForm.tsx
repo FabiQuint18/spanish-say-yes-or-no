@@ -127,8 +127,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
     }
 
     const submissionData = {
-      ...formData,
-      expiry_date: formData.expiry_date || calculateExpiryDate(formData.issue_date, formData.validation_type as ValidationType)
+      ...formData
     };
 
     onSubmit(submissionData);
@@ -149,12 +148,6 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
         ...(field === 'validation_type' ? { subcategory: '' } : {})
       };
 
-      // Auto-calculate expiry date when issue date or validation type changes
-      if (field === 'issue_date' || field === 'validation_type') {
-        if (newData.issue_date && newData.validation_type) {
-          newData.expiry_date = calculateExpiryDate(newData.issue_date, newData.validation_type as ValidationType);
-        }
-      }
 
       return newData;
     });
@@ -301,7 +294,7 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
             </div>
 
             <div>
-              <Label htmlFor="issue_date">Fecha de Emisión</Label>
+              <Label htmlFor="issue_date">Fecha de Vigencia</Label>
               <Input
                 id="issue_date"
                 type="date"
@@ -317,13 +310,8 @@ const ValidationForm = ({ isOpen, onClose, onSubmit, editingValidation }: Valida
                 type="date"
                 value={formData.expiry_date}
                 onChange={(e) => updateField('expiry_date', e.target.value)}
-                placeholder={formData.validation_type === 'metodos_analiticos' ? 'Auto-calculado (2 años)' : 'Auto-calculado (5 años)'}
+                placeholder="Seleccionar fecha de vencimiento"
               />
-              {formData.validation_type === 'metodos_analiticos' && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Los métodos analíticos se vencen 2 años después de la fecha de emisión
-                </p>
-              )}
             </div>
           </div>
 
