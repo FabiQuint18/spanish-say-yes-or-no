@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -132,7 +131,7 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
             <Label htmlFor="product-code">{t('validations.product_code')}</Label>
             <Input
               id="product-code"
-              placeholder={t('validations.search_by_product')}
+              placeholder="Buscar por código de producto/MP"
               value={filters.productCode || ''}
               onChange={(e) => updateFilter('productCode', e.target.value)}
             />

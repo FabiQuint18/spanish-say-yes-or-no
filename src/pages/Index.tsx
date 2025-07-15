@@ -106,6 +106,54 @@ const Index = () => {
     e.preventDefault();
     setIsLoading(true);
 
+    // Check for SSO authentication
+    if (loginData.email.includes('@gmail.com') || loginData.email.includes('@google.com')) {
+      // Simulate Google OAuth
+      toast({
+        title: "Autenticación Google",
+        description: "Redirigiendo a Google para autenticación...",
+      });
+      
+      setTimeout(() => {
+        const user = mockUsers.find(u => u.email === 'analista@company.com'); // Default user for demo
+        if (user) {
+          const updatedUser = { ...user, last_login: new Date().toISOString() };
+          setCurrentUser(updatedUser);
+          setIsLoggedIn(true);
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          toast({
+            title: "Login con Google exitoso",
+            description: "Bienvenido al sistema",
+          });
+        }
+        setIsLoading(false);
+      }, 2000);
+      return;
+    }
+
+    if (loginData.email.includes('@outlook.com') || loginData.email.includes('@hotmail.com') || loginData.email.includes('@live.com')) {
+      // Simulate Microsoft OAuth
+      toast({
+        title: "Autenticación Microsoft",
+        description: "Redirigiendo a Microsoft para autenticación...",
+      });
+      
+      setTimeout(() => {
+        const user = mockUsers.find(u => u.email === 'coordinador@company.com'); // Default user for demo
+        if (user) {
+          const updatedUser = { ...user, last_login: new Date().toISOString() };
+          setCurrentUser(updatedUser);
+          setIsLoggedIn(true);
+          localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+          toast({
+            title: "Login con Microsoft exitoso",
+            description: "Bienvenido al sistema",
+          });
+        }
+        setIsLoading(false);
+      }, 2000);
+      return;
+    }
     try {
       await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
 
@@ -267,6 +315,13 @@ const Index = () => {
                 <div><strong>Coordinador:</strong> coordinador@company.com / Coord123!</div>
                 <div><strong>Analista:</strong> analista@company.com / Analyst123!</div>
                 <div><strong>Visualizador:</strong> viewer@company.com / Viewer123!</div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-blue-200">
+                <h5 className="font-semibold text-blue-900 mb-1">Autenticación SSO (Demo):</h5>
+                <div className="text-sm text-blue-800 space-y-1">
+                  <div><strong>Google:</strong> cualquier@gmail.com (sin contraseña)</div>
+                  <div><strong>Microsoft:</strong> cualquier@outlook.com (sin contraseña)</div>
+                </div>
               </div>
             </div>
 

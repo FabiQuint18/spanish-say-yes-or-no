@@ -95,6 +95,39 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   };
 
   const handleFormSubmit = (formData: any) => {
+    // Handle Excel import data
+    if (Array.isArray(formData)) {
+      const newValidations = formData.map(item => ({
+        id: Date.now().toString() + Math.random(),
+        product_id: Date.now().toString() + Math.random(),
+        validation_code: item.validation_code,
+        equipment_type: item.equipment_type,
+        validation_type: item.validation_type,
+        subcategory: item.subcategory,
+        issue_date: item.issue_date,
+        expiry_date: item.expiry_date,
+        status: item.status,
+        created_by: 'current_user',
+        updated_by: 'current_user',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        product: {
+          id: Date.now().toString() + Math.random(),
+          code: item.product_code,
+          name: item.product_name,
+          type: 'producto_terminado',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        },
+        files: []
+      }));
+
+      const updatedValidations = [...newValidations, ...validations];
+      setValidations(updatedValidations);
+      localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
+      return;
+    }
+
     if (editingValidation) {
       // Actualizar validación existente
       const updatedValidations = validations.map(v => 
@@ -309,6 +342,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         onAdd={handleAdd}
         onFileUpload={handleFileUpload}
         onFileDelete={handleFileDelete}
+        onImportExcel={handleFormSubmit}
         userRole={userRole}
       />
 

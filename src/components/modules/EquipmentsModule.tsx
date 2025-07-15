@@ -27,6 +27,7 @@ const EquipmentsModule = () => {
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [equipments, setEquipments] = useState<Equipment[]>([]);
+  const [editingEquipment, setEditingEquipment] = useState<Equipment | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     type: '',
@@ -44,6 +45,20 @@ const EquipmentsModule = () => {
   }, []);
 
   const handleAddEquipment = () => {
+    setEditingEquipment(null);
+    setFormData({ name: '', type: '', model: '', serial: '', location: '' });
+    setShowForm(true);
+  };
+
+  const handleEditEquipment = (equipment: Equipment) => {
+    setEditingEquipment(equipment);
+    setFormData({
+      name: equipment.name,
+      type: equipment.type,
+      model: equipment.model,
+      serial: equipment.serial,
+      location: equipment.location
+    });
     setShowForm(true);
   };
 
@@ -60,8 +75,11 @@ const EquipmentsModule = () => {
       return;
     }
 
-    // Check if serial already exists
-    if (equipments.some(equipment => equipment.serial === formData.serial)) {
+    // Check if serial already exists (only for new equipment or different equipment)
+    if (equipments.some(equipment => 
+      equipment.serial === formData.serial && 
+      (!editingEquipment || equipment.id !== editingEquipment.id)
+    )) {
       toast({
         title: "Error",
         description: "Ya existe un equipo con este número de serie",
@@ -70,32 +88,52 @@ const EquipmentsModule = () => {
       return;
     }
 
-    // Create new equipment
-    const newEquipment: Equipment = {
-      id: Date.now().toString(),
-      name: formData.name,
-      type: formData.type,
-      model: formData.model,
-      serial: formData.serial,
-      location: formData.location,
-      created_at: new Date().toISOString()
-    };
+    let updatedEquipments;
+    
+    if (editingEquipment) {
+      // Update existing equipment
+      updatedEquipments = equipments.map(equipment =>
+        equipment.id === editingEquipment.id
+          ? {
+              ...equipment,
+              name: formData.name,
+              type: formData.type,
+              model: formData.model,
+              serial: formData.serial,
+              location: formData.location
+            }
+          : equipment
+      );
+    } else {
+      // Create new equipment
+      const newEquipment: Equipment = {
+        id: Date.now().toString(),
+        name: formData.name,
+        type: formData.type,
+        model: formData.model,
+        serial: formData.serial,
+        location: formData.location,
+        created_at: new Date().toISOString()
+      };
+      updatedEquipments = [...equipments, newEquipment];
+    }
 
-    const updatedEquipments = [...equipments, newEquipment];
     setEquipments(updatedEquipments);
     localStorage.setItem('systemEquipments', JSON.stringify(updatedEquipments));
 
     toast({
-      title: "Equipo Agregado",
-      description: `El equipo ${formData.name} ha sido registrado exitosamente`,
+      title: editingEquipment ? "Equipo Actualizado" : "Equipo Agregado",
+      description: `El equipo ${formData.name} ha sido ${editingEquipment ? 'actualizado' : 'registrado'} exitosamente`,
     });
     
     setShowForm(false);
+    setEditingEquipment(null);
     setFormData({ name: '', type: '', model: '', serial: '', location: '' });
   };
 
   const handleClose = () => {
     setShowForm(false);
+    setEditingEquipment(null);
     setFormData({ name: '', type: '', model: '', serial: '', location: '' });
   };
 
@@ -218,7 +256,10 @@ const EquipmentsModule = () => {
                       <TableCell>
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
+                            <Edit 
+                              className="h-4 w-4" 
+                              onClick={() => handleEditEquipment(equipment)}
+                            />
                           </Button>
                           <Button 
                             variant="outline" 
@@ -246,7 +287,9 @@ const EquipmentsModule = () => {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="bg-popover border border-border">
           <DialogHeader>
-            <DialogTitle className="text-center">Agregar Nuevo Equipo</DialogTitle>
+            <DialogTitle className="text-center">
+              {editingEquipment ? 'Editar Equipo' : 'Agregar Nuevo Equipo'}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -311,7 +354,7 @@ const EquipmentsModule = () => {
                 {t('common.cancel')}
               </Button>
               <Button type="submit">
-                {t('equipments.add')}
+                {editingEquipment ? 'Actualizar Equipo' : t('equipments.add')}
               </Button>
             </div>
           </form>
