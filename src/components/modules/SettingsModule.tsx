@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Download, Upload, Settings, Database, Building, Image, Palette, Link, Shield } from 'lucide-react';
+import { Download, Upload, Settings, Database, Building, Image, Palette, Link, Shield, Globe, Zap, Bell, Lock, Users, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import ActivityIntegrationService from '@/components/integrations/ActivityIntegrationService';
@@ -39,7 +39,28 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
     security: {
       twoFactorRequired: false,
       auditLogging: true,
-      sessionTimeout: 30
+      sessionTimeout: 30,
+      passwordExpiry: 90,
+      loginAttempts: 5,
+      encryptionEnabled: true
+    },
+    notifications: {
+      emailEnabled: true,
+      pushEnabled: true,
+      smsEnabled: false,
+      frequency: 'immediate'
+    },
+    performance: {
+      cacheEnabled: true,
+      compressionEnabled: true,
+      cdnEnabled: false,
+      analyticsEnabled: true
+    },
+    advanced: {
+      apiRateLimit: 1000,
+      maxFileSize: 10,
+      backupFrequency: 'daily',
+      logRetention: 30
     }
   });
 
@@ -147,34 +168,36 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-6 bg-gradient-to-r from-blue-100 to-purple-100">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="appearance">Apariencia</TabsTrigger>
+          <TabsTrigger value="notifications">Notificaciones</TabsTrigger>
+          <TabsTrigger value="performance">Rendimiento</TabsTrigger>
           <TabsTrigger value="integrations">Integraciones</TabsTrigger>
           <TabsTrigger value="security">Seguridad</TabsTrigger>
         </TabsList>
 
         <TabsContent value="general" className="space-y-6">
           <div className="grid gap-6 md:grid-cols-2">
-            <Card>
-              <CardHeader>
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-blue-50">
+              <CardHeader className="bg-gradient-to-r from-blue-600 to-purple-700 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-2">
                   <Building className="h-5 w-5" />
                   Información de la Empresa
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 p-6">
                 <div className="space-y-2">
                   <Label>Logo de la Empresa</Label>
                   <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50">
+                    <div className="w-16 h-16 border-2 border-dashed border-blue-300 rounded-lg flex items-center justify-center bg-blue-50">
                       {currentLogo ? (
                         <img src={currentLogo} alt="Company Logo" className="w-full h-full object-contain rounded-lg" />
                       ) : (
-                        <Image className="h-6 w-6 text-gray-400" />
+                        <Image className="h-6 w-6 text-blue-400" />
                       )}
                     </div>
-                    <Button variant="outline" onClick={handleLogoClick}>
+                    <Button variant="outline" onClick={handleLogoClick} className="bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 border-0">
                       <Upload className="mr-2 h-4 w-4" />
                       Cambiar Logo
                     </Button>
@@ -197,21 +220,82 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
                     placeholder="Nombre de la empresa"
                   />
                 </div>
-                <Button onClick={handleSaveCompanyInfo} className="w-full">
+                
+                <div className="space-y-2">
+                  <Label htmlFor="companyAddress">Dirección</Label>
+                  <Input
+                    id="companyAddress"
+                    value={companyInfo.address}
+                    onChange={(e) => handleCompanyInfoChange('address', e.target.value)}
+                    placeholder="Dirección de la empresa"
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="companyPhone">Teléfono</Label>
+                    <Input
+                      id="companyPhone"
+                      value={companyInfo.phone}
+                      onChange={(e) => handleCompanyInfoChange('phone', e.target.value)}
+                      placeholder="+1234567890"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="companyEmail">Email</Label>
+                    <Input
+                      id="companyEmail"
+                      type="email"
+                      value={companyInfo.email}
+                      onChange={(e) => handleCompanyInfoChange('email', e.target.value)}
+                      placeholder="contacto@empresa.com"
+                    />
+                  </div>
+                </div>
+                
+                <Button onClick={handleSaveCompanyInfo} className="w-full bg-gradient-to-r from-blue-600 to-purple-700 text-white">
                   Guardar Información
                 </Button>
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
+            <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-green-50">
+              <CardHeader className="bg-gradient-to-r from-green-600 to-blue-600 text-white rounded-t-lg">
                 <CardTitle className="flex items-center gap-2">
                   <Database className="h-5 w-5" />
                   Gestión de Backup
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <Button onClick={handleExportBackup} className="w-full">
+              <CardContent className="space-y-4 p-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div>
+                      <Label className="text-green-800">Backup Automático</Label>
+                      <p className="text-sm text-green-600">Respaldo automático diario</p>
+                    </div>
+                    <Switch
+                      checked={systemSettings.autoBackup}
+                      onCheckedChange={(checked) => handleSystemSettingChange('autoBackup', checked)}
+                    />
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Frecuencia de Backup</Label>
+                    <Select value={systemSettings.backupFrequency} onValueChange={(value) => handleSystemSettingChange('backupFrequency', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="hourly">Cada Hora</SelectItem>
+                        <SelectItem value="daily">Diario</SelectItem>
+                        <SelectItem value="weekly">Semanal</SelectItem>
+                        <SelectItem value="monthly">Mensual</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <Button onClick={handleExportBackup} className="w-full bg-gradient-to-r from-green-600 to-blue-600 text-white">
                   <Download className="mr-2 h-4 w-4" />
                   Descargar Backup
                 </Button>
@@ -221,17 +305,17 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
         </TabsContent>
 
         <TabsContent value="appearance" className="space-y-6">
-          <Card>
-            <CardHeader>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-purple-50">
+            <CardHeader className="bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <Palette className="h-5 w-5" />
                 Tema y Apariencia
               </CardTitle>
               <CardDescription>
-                Personaliza el aspecto visual del sistema
+                <span className="text-purple-100">Personaliza el aspecto visual del sistema</span>
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 p-6">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -308,10 +392,159 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
                       description: "Los cambios de apariencia han sido aplicados",
                     });
                   }}
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white"
                 >
                   Aplicar Cambios
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="notifications" className="space-y-6">
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-yellow-50">
+            <CardHeader className="bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-2">
+                <Bell className="h-5 w-5" />
+                Configuración de Notificaciones
+              </CardTitle>
+              <CardDescription>
+                <span className="text-yellow-100">Gestiona cómo y cuándo recibir notificaciones</span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div>
+                    <Label className="text-blue-800">Notificaciones por Email</Label>
+                    <p className="text-sm text-blue-600">Recibir alertas por correo electrónico</p>
+                  </div>
+                  <Switch
+                    checked={settings.notifications.emailEnabled}
+                    onCheckedChange={(checked) => updateSetting('notifications.emailEnabled', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div>
+                    <Label className="text-green-800">Notificaciones Push</Label>
+                    <p className="text-sm text-green-600">Notificaciones en tiempo real en el navegador</p>
+                  </div>
+                  <Switch
+                    checked={settings.notifications.pushEnabled}
+                    onCheckedChange={(checked) => updateSetting('notifications.pushEnabled', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <div>
+                    <Label className="text-purple-800">Notificaciones SMS</Label>
+                    <p className="text-sm text-purple-600">Alertas críticas por mensaje de texto</p>
+                  </div>
+                  <Switch
+                    checked={settings.notifications.smsEnabled}
+                    onCheckedChange={(checked) => updateSetting('notifications.smsEnabled', checked)}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Frecuencia de Notificaciones</Label>
+                  <Select value={settings.notifications.frequency} onValueChange={(value) => updateSetting('notifications.frequency', value)}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="immediate">Inmediata</SelectItem>
+                      <SelectItem value="hourly">Cada Hora</SelectItem>
+                      <SelectItem value="daily">Diaria</SelectItem>
+                      <SelectItem value="weekly">Semanal</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-6">
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-green-50">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-t-lg">
+              <CardTitle className="flex items-center gap-2">
+                <Zap className="h-5 w-5" />
+                Configuración de Rendimiento
+              </CardTitle>
+              <CardDescription>
+                <span className="text-green-100">Optimiza el rendimiento del sistema</span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 p-6">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
+                  <div>
+                    <Label className="text-blue-800">Cache Habilitado</Label>
+                    <p className="text-sm text-blue-600">Mejora la velocidad de carga</p>
+                  </div>
+                  <Switch
+                    checked={settings.performance.cacheEnabled}
+                    onCheckedChange={(checked) => updateSetting('performance.cacheEnabled', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div>
+                    <Label className="text-green-800">Compresión de Datos</Label>
+                    <p className="text-sm text-green-600">Reduce el uso de ancho de banda</p>
+                  </div>
+                  <Switch
+                    checked={settings.performance.compressionEnabled}
+                    onCheckedChange={(checked) => updateSetting('performance.compressionEnabled', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <div>
+                    <Label className="text-purple-800">CDN Habilitado</Label>
+                    <p className="text-sm text-purple-600">Red de distribución de contenido</p>
+                  </div>
+                  <Switch
+                    checked={settings.performance.cdnEnabled}
+                    onCheckedChange={(checked) => updateSetting('performance.cdnEnabled', checked)}
+                  />
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <div>
+                    <Label className="text-orange-800">Analytics Habilitado</Label>
+                    <p className="text-sm text-orange-600">Seguimiento de uso y rendimiento</p>
+                  </div>
+                  <Switch
+                    checked={settings.performance.analyticsEnabled}
+                    onCheckedChange={(checked) => updateSetting('performance.analyticsEnabled', checked)}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Límite de API (req/min)</Label>
+                    <Input
+                      type="number"
+                      value={settings.advanced.apiRateLimit}
+                      onChange={(e) => updateSetting('advanced.apiRateLimit', parseInt(e.target.value))}
+                      min="100"
+                      max="10000"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Tamaño Máx. Archivo (MB)</Label>
+                    <Input
+                      type="number"
+                      value={settings.advanced.maxFileSize}
+                      onChange={(e) => updateSetting('advanced.maxFileSize', parseInt(e.target.value))}
+                      min="1"
+                      max="100"
+                    />
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -322,21 +555,21 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
         </TabsContent>
 
         <TabsContent value="security" className="space-y-6">
-          <Card>
-            <CardHeader>
+          <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-red-50">
+            <CardHeader className="bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-t-lg">
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5" />
                 Configuración de Seguridad
               </CardTitle>
               <CardDescription>
-                Gestiona la seguridad y auditoría del sistema
+                <span className="text-red-100">Gestiona la seguridad y auditoría del sistema</span>
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-6 p-6">
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg border border-blue-200">
                   <div>
-                    <Label>Registro de Auditoría</Label>
+                    <Label className="text-blue-800">Registro de Auditoría</Label>
                     <p className="text-sm text-muted-foreground">
                       Registra todas las acciones del sistema
                     </p>
@@ -349,9 +582,9 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
 
                 <Separator />
 
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg border border-green-200">
                   <div>
-                    <Label>Autenticación de Dos Factores</Label>
+                    <Label className="text-green-800">Autenticación de Dos Factores</Label>
                     <p className="text-sm text-muted-foreground">
                       Requiere verificación adicional para el acceso
                     </p>
@@ -363,6 +596,44 @@ const SettingsModule = ({ onLogoChange }: SettingsModuleProps) => {
                 </div>
 
                 <Separator />
+
+                <div className="flex items-center justify-between p-4 bg-purple-50 rounded-lg border border-purple-200">
+                  <div>
+                    <Label className="text-purple-800">Encriptación de Datos</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Encripta datos sensibles en la base de datos
+                    </p>
+                  </div>
+                  <Switch
+                    checked={settings.security.encryptionEnabled}
+                    onCheckedChange={(checked) => updateSetting('security.encryptionEnabled', checked)}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="passwordExpiry">Expiración de Contraseña (días)</Label>
+                    <Input
+                      id="passwordExpiry"
+                      type="number"
+                      value={settings.security.passwordExpiry}
+                      onChange={(e) => updateSetting('security.passwordExpiry', parseInt(e.target.value))}
+                      min="30"
+                      max="365"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="loginAttempts">Intentos de Login Máximos</Label>
+                    <Input
+                      id="loginAttempts"
+                      type="number"
+                      value={settings.security.loginAttempts}
+                      onChange={(e) => updateSetting('security.loginAttempts', parseInt(e.target.value))}
+                      min="3"
+                      max="10"
+                    />
+                  </div>
+                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="sessionTimeout">Tiempo de Sesión (minutos)</Label>
@@ -448,7 +719,7 @@ CONFIGURACIÓN DE SEGURIDAD:
                       description: "Los cambios de seguridad han sido aplicados",
                     });
                   }}
-                  className="w-full"
+                  className="w-full bg-gradient-to-r from-red-600 to-pink-600 text-white"
                 >
                   Guardar Configuración
                 </Button>
