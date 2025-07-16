@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Download, Upload, Settings, Database, Building, Image, Palette, Link, Shield, Globe, Zap, Bell, Lock, Users, BarChart3 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ActivityIntegrationService from '@/components/integrations/ActivityIntegrationService';
 
 interface SettingsModuleProps {

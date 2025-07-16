@@ -22,17 +22,20 @@ const Header = ({ currentUser, onLogout, companyLogo }: HeaderProps) => {
           {/* Logo */}
           <div className="flex items-center space-x-3">
             {companyLogo ? (
-              <img src={companyLogo} alt="Company Logo" className="w-10 h-10 object-contain rounded-lg shadow-lg" />
+              <div className="relative">
+                <img src={companyLogo} alt="Company Logo" className="w-12 h-12 object-contain rounded-xl shadow-lg" />
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 to-purple-600/10 rounded-xl"></div>
+              </div>
             ) : (
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center shadow-lg">
-                <FlaskConical className="text-white h-6 w-6" />
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
+                <FlaskConical className="text-white h-7 w-7" />
               </div>
             )}
             <div>
-              <h1 className="text-2xl font-bold text-foreground">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 {t('system.title')}
               </h1>
-              <p className="text-sm text-muted-foreground">{t('system.subtitle')}</p>
+              <p className="text-sm text-blue-600/70">{t('system.subtitle')}</p>
             </div>
           </div>
         </div>
@@ -42,13 +45,13 @@ const Header = ({ currentUser, onLogout, companyLogo }: HeaderProps) => {
           
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="flex items-center space-x-2 hover:bg-accent hover:text-accent-foreground">
+              <Button variant="ghost" className="flex items-center space-x-2 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-all duration-300">
                 <User className="h-4 w-4" />
-                <span>{currentUser?.full_name || currentUser?.email}</span>
+                <span className="font-medium">{currentUser?.full_name || currentUser?.email}</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56 bg-popover border border-border">
-              <DropdownMenuItem onClick={onLogout} className="hover:bg-accent hover:text-accent-foreground cursor-pointer">
+            <DropdownMenuContent align="end" className="w-56 bg-white border border-gray-200 shadow-xl rounded-xl">
+              <DropdownMenuItem onClick={onLogout} className="hover:bg-red-50 hover:text-red-700 cursor-pointer rounded-lg m-1">
                 <LogOut className="mr-2 h-4 w-4" />
                 {t('login.logout')}
               </DropdownMenuItem>

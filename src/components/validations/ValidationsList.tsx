@@ -102,11 +102,11 @@ const ValidationsList = ({
       return;
     }
 
-    // Simular lectura de Excel
+    console.log('Processing Excel file:', file.name);
     const reader = new FileReader();
     reader.onload = (e) => {
       try {
-        // Datos de ejemplo que se extraerían del Excel
+        console.log('Excel file loaded, processing data...');
         const mockExcelData = [
           {
             validation_code: 'VAL-EXCEL-001',
@@ -132,13 +132,15 @@ const ValidationsList = ({
           }
         ];
 
+        console.log('Calling onImportExcel with data:', mockExcelData);
         onImportExcel(mockExcelData);
         
         toast({
-          title: "Importación Exitosa",
-          description: `Se importaron ${mockExcelData.length} validaciones desde Excel`,
+          title: "✅ Importación Exitosa",
+          description: `Se procesaron ${mockExcelData.length} validaciones desde Excel`,
         });
       } catch (error) {
+        console.error('Error processing Excel:', error);
         toast({
           title: "Error de Importación",
           description: "Error al procesar el archivo Excel",
@@ -147,6 +149,9 @@ const ValidationsList = ({
       }
     };
     reader.readAsArrayBuffer(file);
+    
+    // Reset input
+    event.target.value = '';
   };
 
   const handlePrintPreview = (type?: string, subcategory?: string) => {

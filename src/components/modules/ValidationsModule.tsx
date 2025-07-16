@@ -97,6 +97,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
   const handleFormSubmit = (formData: any) => {
     // Handle Excel import data
     if (Array.isArray(formData)) {
+      console.log('Importing Excel data:', formData);
       const newValidations = formData.map(item => ({
         id: Date.now().toString() + Math.random(),
         product_id: Date.now().toString() + Math.random(),
@@ -122,9 +123,46 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         files: []
       }));
 
-      const updatedValidations = [...newValidations, ...validations];
+      const updatedValidations = [...validations, ...newValidations];
       setValidations(updatedValidations);
       localStorage.setItem('systemValidations', JSON.stringify(updatedValidations));
+      
+      // Sync with other modules
+      const existingProducts = JSON.parse(localStorage.getItem('systemProducts') || '[]');
+      const existingEquipments = JSON.parse(localStorage.getItem('systemEquipments') || '[]');
+      
+      // Add new products from validations
+      const newProducts = newValidations
+        .filter(v => v.product && !existingProducts.some(p => p.code === v.product.code))
+        .map(v => v.product);
+      
+      if (newProducts.length > 0) {
+        const updatedProducts = [...existingProducts, ...newProducts];
+        localStorage.setItem('systemProducts', JSON.stringify(updatedProducts));
+      }
+      
+      // Add new equipments from validations
+      const newEquipments = newValidations
+        .filter(v => v.equipment_type && !existingEquipments.some(e => e.type === v.equipment_type))
+        .map(v => ({
+          id: Date.now().toString() + Math.random(),
+          name: `${v.equipment_type}-${Math.floor(Math.random() * 1000)}`,
+          type: v.equipment_type,
+          model: 'Modelo Importado',
+          serial: `SN-${Math.floor(Math.random() * 10000)}`,
+          location: 'Laboratorio',
+          created_at: new Date().toISOString()
+        }));
+      
+      if (newEquipments.length > 0) {
+        const updatedEquipments = [...existingEquipments, ...newEquipments];
+        localStorage.setItem('systemEquipments', JSON.stringify(updatedEquipments));
+      }
+      
+      toast({
+        title: "✅ Importación Exitosa",
+        description: `Se importaron ${newValidations.length} validaciones, ${newProducts.length} productos y ${newEquipments.length} equipos`,
+      });
       return;
     }
 

@@ -82,7 +82,7 @@ const Sidebar = ({ activeModule, onModuleChange, userRole, alertCounts }: Sideba
   };
 
   return (
-    <aside className="w-64 bg-sidebar border-r border-sidebar-border h-full">
+    <aside className="w-64 bg-gradient-to-b from-slate-900 via-blue-900 to-indigo-900 border-r border-blue-800/30 h-full shadow-2xl">
       <nav className="p-4 space-y-2">
         {filteredItems.map((item) => {
           const Icon = item.icon;
@@ -94,17 +94,17 @@ const Sidebar = ({ activeModule, onModuleChange, userRole, alertCounts }: Sideba
               key={item.id}
               variant={isActive ? 'default' : 'ghost'}
               className={cn(
-                'w-full justify-start transition-colors',
+                'w-full justify-start transition-all duration-300 rounded-xl',
                 isActive 
-                  ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-sm hover:bg-sidebar-primary/90' 
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                  ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg transform scale-105' 
+                  : 'text-blue-100 hover:bg-white/10 hover:text-white hover:transform hover:scale-105'
               )}
               onClick={() => handleModuleClick(item.id)}
             >
-              <Icon className="mr-3 h-4 w-4" />
-              {item.label}
+              <Icon className="mr-3 h-5 w-5" />
+              <span className="font-medium">{item.label}</span>
               {showAlert && (
-                <Badge variant="destructive" className="ml-auto text-xs px-1.5 py-0.5">
+                <Badge variant="destructive" className="ml-auto text-xs px-2 py-1 bg-red-500 text-white rounded-full animate-pulse">
                   {alertCounts.expiring + alertCounts.expired}
                 </Badge>
               )}
