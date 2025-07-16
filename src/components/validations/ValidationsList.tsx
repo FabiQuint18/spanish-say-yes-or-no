@@ -12,6 +12,7 @@ import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer
 import { useLanguage } from '@/contexts/LanguageContext';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 import { useToast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
 
 interface ValidationsListProps {
   validations: Validation[];
@@ -89,7 +90,7 @@ const ValidationsList = ({
 
   const filteredValidations = applyFilters(validations);
 
-  const handleExcelImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -102,71 +103,52 @@ const ValidationsList = ({
       return;
     }
 
-    console.log('Processing Excel file:', file.name);
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        console.log('Excel file loaded, processing data...');
-        const mockExcelData = [
-          {
-            validation_code: 'VAL-EXCEL-001',
-            product_code: 'PT-EXCEL-001',
-            product_name: 'Producto desde Excel',
-            validation_type: 'metodos_analiticos',
-            subcategory: 'valoracion',
-            equipment_type: 'HPLC',
-            status: 'validado',
-            issue_date: '2024-01-01',
-            expiry_date: '2027-01-01'
-          },
-          {
-            validation_code: 'VAL-EXCEL-002',
-            product_code: 'MP-EXCEL-001',
-            product_name: 'Materia Prima desde Excel',
-            validation_type: 'procesos',
-            subcategory: 'fabricacion',
-            equipment_type: 'GC',
-            status: 'en_validacion',
-            issue_date: '2024-02-01',
-            expiry_date: '2026-02-01'
-          }
-        ];
+    try {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet);
 
-        console.log('Calling onImportExcel with data:', mockExcelData);
-        onImportExcel(mockExcelData);
-        
-        toast({
-          title: "✅ Importación Exitosa",
-          description: `Se procesaron ${mockExcelData.length} validaciones desde Excel`,
-        });
-      } catch (error) {
-        console.error('Error processing Excel:', error);
-        toast({
-          title: "Error de Importación",
-          description: "Error al procesar el archivo Excel",
-          variant: "destructive",
-        });
-      }
-    };
-    reader.readAsArrayBuffer(file);
+      console.log('Excel data loaded:', jsonData);
+
+      // Mapear datos del Excel al formato esperado
+      const mappedData = jsonData.map((row: any, index: number) => ({
+        validation_code: row['Código de Validación'] || row['validation_code'] || `VAL-EXCEL-${index + 1}`,
+        product_code: row['Código de Producto/MP'] || row['product_code'] || `PT-EXCEL-${index + 1}`,
+        product_name: row['Producto/Materia Prima'] || row['product_name'] || `Producto Excel ${index + 1}`,
+        material_type: row['Tipo de Material'] || row['material_type'] || 'producto_terminado',
+        validation_type: row['Tipo de Validación'] || row['validation_type'] || 'metodos_analiticos',
+        subcategory: row['Subcategoría'] || row['subcategory'] || 'valoracion',
+        equipment_type: row['Equipo'] || row['equipment_type'] || 'HPLC',
+        status: row['Estado'] || row['status'] || 'validado',
+        issue_date: row['Fecha de Vigencia'] || row['issue_date'] || new Date().toISOString().split('T')[0],
+        expiry_date: row['Fecha de Vencimiento'] || row['expiry_date'] || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+      }));
+
+      console.log('Mapped data:', mappedData);
+      onImportExcel(mappedData);
+      
+      toast({
+        title: "✅ Importación Exitosa",
+        description: `Se procesaron ${mappedData.length} validaciones desde Excel`,
+      });
+    } catch (error) {
+      console.error('Error processing Excel:', error);
+      toast({
+        title: "Error de Importación",
+        description: "Error al procesar el archivo Excel. Verifique el formato.",
+        variant: "destructive",
+      });
+    }
     
     // Reset input
     event.target.value = '';
   };
 
-  const handlePrintPreview = (type?: string, subcategory?: string) => {
-    let validationsToPrint = filteredValidations;
-    
-    if (type) {
-      validationsToPrint = validationsToPrint.filter(v => v.validation_type === type);
-    }
-    
-    if (subcategory) {
-      validationsToPrint = validationsToPrint.filter(v => v.subcategory === subcategory);
-    }
-    
-    const content = generatePrintableContent(validationsToPrint, type, subcategory);
-    const title = getReportTitle(type, subcategory);
+  const handlePrintPreview = () => {
+    const content = generatePrintableContent(filteredValidations);
+    const title = getReportTitle();
     
     setPreviewContent(content);
     setPreviewTitle(title);
@@ -183,21 +165,11 @@ const ValidationsList = ({
     setShowPreview(false);
   };
 
-  const handleDownloadPDF = (type?: string, subcategory?: string) => {
-    let validationsToPrint = filteredValidations;
-    
-    if (type) {
-      validationsToPrint = validationsToPrint.filter(v => v.validation_type === type);
-    }
-    
-    if (subcategory) {
-      validationsToPrint = validationsToPrint.filter(v => v.subcategory === subcategory);
-    }
-    
-    const printContent = generatePrintableContent(validationsToPrint, type, subcategory);
+  const handleDownloadPDF = () => {
+    const printContent = generatePrintableContent(filteredValidations);
     const blob = new Blob([printContent], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
-    const fileName = getFileName(type, subcategory);
+    const fileName = getFileName();
     const link = document.createElement('a');
     link.href = url;
     link.download = `${fileName}_${new Date().toISOString().split('T')[0]}.html`;
@@ -207,30 +179,30 @@ const ValidationsList = ({
     URL.revokeObjectURL(url);
   };
 
-  const getFileName = (type?: string, subcategory?: string) => {
-    if (subcategory && type) {
-      return `validaciones_${type}_${subcategory}`;
-    } else if (type) {
-      return `validaciones_${type}`;
+  const getFileName = () => {
+    if (filters.subcategory && filters.validationType) {
+      return `validaciones_${filters.validationType}_${filters.subcategory}`;
+    } else if (filters.validationType) {
+      return `validaciones_${filters.validationType}`;
     } else {
       return 'validaciones_todas';
     }
   };
 
-  const getReportTitle = (type?: string, subcategory?: string) => {
-    if (subcategory && type) {
-      const typeLabel = getValidationTypeLabel(type);
-      const subcategoryLabel = getSubcategoryLabel(type, subcategory);
+  const getReportTitle = () => {
+    if (filters.subcategory && filters.validationType) {
+      const typeLabel = getValidationTypeLabel(filters.validationType);
+      const subcategoryLabel = getSubcategoryLabel(filters.validationType, filters.subcategory);
       return `Listado de Validaciones ${typeLabel} - ${subcategoryLabel}`;
-    } else if (type) {
-      return `Listado de Validaciones ${getValidationTypeLabel(type)}`;
+    } else if (filters.validationType) {
+      return `Listado de Validaciones ${getValidationTypeLabel(filters.validationType)}`;
     } else {
       return 'Listado de Todas las Validaciones';
     }
   };
 
-  const generatePrintableContent = (validationsList: Validation[], type?: string, subcategory?: string) => {
-    const reportTitle = getReportTitle(type, subcategory);
+  const generatePrintableContent = (validationsList: Validation[]) => {
+    const reportTitle = getReportTitle();
     
     return `
       <!DOCTYPE html>
@@ -292,7 +264,7 @@ const ValidationsList = ({
             th, td { 
               border: 1px solid #e2e8f0; 
               padding: 12px 8px; 
-              text-align: left; 
+              text-align: center; 
             }
             th { 
               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -315,15 +287,16 @@ const ValidationsList = ({
               font-weight: 600;
               text-transform: uppercase;
               letter-spacing: 0.5px;
+              color: white;
             }
-            .validado { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
-            .proximo_vencer { background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%); color: white; }
-            .vencido { background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%); color: white; }
-            .en_validacion { background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%); color: white; }
-            .en_revalidacion { background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%); color: white; }
-            .por_revalidar { background: linear-gradient(135deg, #f6ad55 0%, #ed8936 100%); color: white; }
-            .primera_revision { background: linear-gradient(135deg, #4fd1c7 0%, #38b2ac 100%); color: white; }
-            .segunda_revision { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+            .validado { background: #48bb78; }
+            .proximo_vencer { background: #ed8936; }
+            .vencido { background: #f56565; }
+            .en_validacion { background: #4299e1; }
+            .en_revalidacion { background: #9f7aea; }
+            .por_revalidar { background: #f6ad55; }
+            .primera_revision { background: #4fd1c7; }
+            .segunda_revision { background: #667eea; }
             .footer {
               margin-top: 30px;
               text-align: center;
@@ -366,6 +339,7 @@ const ValidationsList = ({
             <table>
               <thead>
                 <tr>
+                  <th>Número</th>
                   <th>Código de Validación</th>
                   <th>Producto/Materia Prima</th>
                   <th>Código de Producto/MP</th>
@@ -378,8 +352,9 @@ const ValidationsList = ({
                 </tr>
               </thead>
               <tbody>
-                ${validationsList.map(validation => `
+                ${validationsList.map((validation, index) => `
                   <tr>
+                    <td><strong>${index + 1}</strong></td>
                     <td><strong>${validation.validation_code}</strong></td>
                     <td>${validation.product?.name || 'N/A'}</td>
                     <td>${validation.product?.code || 'N/A'}</td>
@@ -403,8 +378,6 @@ const ValidationsList = ({
       </html>
     `;
   };
-
-  const validationTypes = [...new Set(validations.map(v => v.validation_type))];
 
   const getStatusBadge = (status: string, expiryDate: string) => {
     const daysUntilExpiry = getDaysUntilExpiry(expiryDate);
@@ -495,7 +468,7 @@ const ValidationsList = ({
     }
 
     return (
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center justify-center space-x-2">
         {files.length > 0 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -631,49 +604,26 @@ const ValidationsList = ({
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" className="gap-2 bg-white text-blue-600 hover:bg-blue-50">
                     <Printer className="h-4 w-4" />
-                    {t('validations.print.options')}
+                    Imprimir
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-64 bg-white shadow-xl border border-gray-200">
-                  {/* Vista previa */}
-                  <DropdownMenuItem onClick={() => handlePrintPreview(filters.validationType, filters.subcategory)}>
+                  <DropdownMenuItem onClick={handlePrintPreview}>
                     <Eye className="h-4 w-4 mr-2" />
-                    Vista Previa: {getReportTitle(filters.validationType, filters.subcategory)}
+                    Vista Previa
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownloadPDF(filters.validationType, filters.subcategory)}>
+                  <DropdownMenuItem onClick={handlePrintFromPreview}>
+                    <Printer className="h-4 w-4 mr-2" />
+                    Imprimir
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDownloadPDF}>
                     <Download className="h-4 w-4 mr-2" />
-                    Descargar: {getReportTitle(filters.validationType, filters.subcategory)}
+                    Descargar PDF
                   </DropdownMenuItem>
-                  
-                  {/* Separador */}
-                  <div className="border-t my-1"></div>
-                  
-                  {/* Opciones generales */}
-                  <DropdownMenuItem onClick={() => handlePrintPreview()}>
-                    <Eye className="h-4 w-4 mr-2" />
-                    Vista Previa - Todas
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleDownloadPDF()}>
-                    <Download className="h-4 w-4 mr-2" />
-                    Descargar PDF - Todas
-                  </DropdownMenuItem>
-                  
-                  {/* Opciones por tipo */}
-                  {validationTypes.map(type => (
-                    <React.Fragment key={type}>
-                      <DropdownMenuItem onClick={() => handlePrintPreview(type)}>
-                        <Eye className="h-4 w-4 mr-2" />
-                        Vista Previa - {getValidationTypeLabel(type)}
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => handleDownloadPDF(type)}>
-                        <Download className="h-4 w-4 mr-2" />
-                        Descargar - {getValidationTypeLabel(type)}
-                      </DropdownMenuItem>
-                    </React.Fragment>
-                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
+              
               {canAdd && (
                 <Button onClick={onAdd} className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
                   <Plus className="mr-2 h-4 w-4" />
@@ -699,26 +649,30 @@ const ValidationsList = ({
               <Table>
                 <TableHeader>
                   <TableRow className="bg-gradient-to-r from-gray-50 to-blue-50">
-                    <TableHead className="min-w-[120px] font-semibold text-gray-700">{t('validations.validation_code')}</TableHead>
-                    <TableHead className="min-w-[150px] font-semibold text-gray-700">{t('validations.product_raw_material')}</TableHead>
-                    <TableHead className="min-w-[100px] font-semibold text-gray-700">Código de Producto/MP</TableHead>
-                    <TableHead className="min-w-[150px] font-semibold text-gray-700">{t('validations.validation_type')}</TableHead>
-                    <TableHead className="min-w-[120px] font-semibold text-gray-700">{t('validations.subcategory')}</TableHead>
-                    <TableHead className="min-w-[100px] font-semibold text-gray-700">{t('validations.equipment')}</TableHead>
-                    <TableHead className="min-w-[120px] font-semibold text-gray-700">{t('validations.status')}</TableHead>
-                    <TableHead className="min-w-[120px] font-semibold text-gray-700">{t('validations.validity_date')}</TableHead>
-                    <TableHead className="min-w-[120px] font-semibold text-gray-700">{t('validations.expiry_date')}</TableHead>
-                    <TableHead className="min-w-[120px] font-semibold text-gray-700">{t('validations.files')}</TableHead>
-                    {(canEdit || canDelete) && <TableHead className="min-w-[120px] font-semibold text-gray-700">{t('validations.actions')}</TableHead>}
+                    <TableHead className="text-center font-semibold text-gray-700">Número</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.validation_code')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.product_raw_material')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">Código de Producto/MP</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.validation_type')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.subcategory')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.equipment')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.status')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.validity_date')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.expiry_date')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.files')}</TableHead>
+                    {(canEdit || canDelete) && <TableHead className="text-center font-semibold text-gray-700">{t('validations.actions')}</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredValidations.map((validation, index) => (
                     <TableRow key={validation.id} className={`hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 transition-all duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                      <TableCell className="font-medium text-blue-700">
+                      <TableCell className="text-center font-bold text-blue-700">
+                        {index + 1}
+                      </TableCell>
+                      <TableCell className="text-center font-medium text-blue-700">
                         {validation.validation_code}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <div>
                           <div className="font-medium text-gray-900">{validation.product?.name}</div>
                           <div className="text-sm text-gray-500">
@@ -726,29 +680,29 @@ const ValidationsList = ({
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="font-medium text-purple-700">
+                      <TableCell className="text-center font-medium text-purple-700">
                         {validation.product?.code}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">
                           {getValidationTypeLabel(validation.validation_type)}
                         </Badge>
                       </TableCell>
-                      <TableCell>{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">{getSubcategoryLabel(validation.validation_type, validation.subcategory)}</TableCell>
+                      <TableCell className="text-center">
                         <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
                           {validation.equipment_type}
                         </Badge>
                       </TableCell>
-                      <TableCell>{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
-                      <TableCell className="text-gray-700">{formatDate(validation.issue_date)}</TableCell>
-                      <TableCell className="text-gray-700">{formatDate(validation.expiry_date)}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">{getStatusBadge(validation.status, validation.expiry_date)}</TableCell>
+                      <TableCell className="text-center text-gray-700">{formatDate(validation.issue_date)}</TableCell>
+                      <TableCell className="text-center text-gray-700">{formatDate(validation.expiry_date)}</TableCell>
+                      <TableCell className="text-center">
                         <FilesDropdown validation={validation} />
                       </TableCell>
                       {(canEdit || canDelete) && (
-                        <TableCell>
-                          <div className="flex items-center space-x-2">
+                        <TableCell className="text-center">
+                          <div className="flex items-center justify-center space-x-2">
                             {canEdit && (
                               <Button
                                 variant="outline"

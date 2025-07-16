@@ -16,101 +16,117 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
   // Ensure validations is always an array
   const safeValidations = Array.isArray(validations) ? validations : [];
 
-  // Data for expired validations
-  const expiredValidations = safeValidations.filter(v => v.status === 'vencido');
-  const expiringValidations = safeValidations.filter(v => v.status === 'proximo_vencer');
+  // Productos validados
+  const validatedProducts = safeValidations.filter(v => v.status === 'validado');
+  const uniqueValidatedProducts = [...new Set(validatedProducts.map(v => v.product?.id))].length;
 
-  // Data for expiry analysis
-  const expiryAnalysisData = [
-    { 
-      name: 'Vencidas', 
-      value: expiredValidations.length,
-      fill: '#ef4444'
-    },
-    { 
-      name: 'Por Vencer (30 días)', 
-      value: expiringValidations.length,
-      fill: '#f59e0b'
-    },
-    { 
-      name: 'Por Vencer (60 días)', 
-      value: safeValidations.filter(v => {
-        const days = getDaysUntilExpiry(v.expiry_date);
-        return days > 30 && days <= 60;
-      }).length,
-      fill: '#eab308'
-    },
-    { 
-      name: 'Por Vencer (90 días)', 
-      value: safeValidations.filter(v => {
-        const days = getDaysUntilExpiry(v.expiry_date);
-        return days > 60 && days <= 90;
-      }).length,
-      fill: '#84cc16'
-    },
-  ];
-
-  // Data for validation types of expired/expiring
-  const criticalValidationTypes = [
+  // Validaciones por tipo
+  const validationsByType = [
     { 
       name: 'Procesos', 
-      expired: expiredValidations.filter(v => v.validation_type === 'procesos').length,
-      expiring: expiringValidations.filter(v => v.validation_type === 'procesos').length
+      value: safeValidations.filter(v => v.validation_type === 'procesos').length,
+      fill: '#3b82f6'
     },
     { 
       name: 'Métodos Analíticos', 
-      expired: expiredValidations.filter(v => v.validation_type === 'metodos_analiticos').length,
-      expiring: expiringValidations.filter(v => v.validation_type === 'metodos_analiticos').length
+      value: safeValidations.filter(v => v.validation_type === 'metodos_analiticos').length,
+      fill: '#10b981'
     },
     { 
       name: 'Limpieza', 
-      expired: expiredValidations.filter(v => v.validation_type === 'limpieza').length,
-      expiring: expiringValidations.filter(v => v.validation_type === 'limpieza').length
+      value: safeValidations.filter(v => v.validation_type === 'limpieza').length,
+      fill: '#f59e0b'
     },
     { 
       name: 'Sistemas', 
-      expired: expiredValidations.filter(v => v.validation_type === 'sistemas_computarizados').length,
-      expiring: expiringValidations.filter(v => v.validation_type === 'sistemas_computarizados').length
+      value: safeValidations.filter(v => v.validation_type === 'sistemas_computarizados').length,
+      fill: '#8b5cf6'
     },
   ];
 
-  // Monthly expiry trend
-  const monthlyExpiryData = [];
-  const currentDate = new Date();
-  for (let i = 0; i < 12; i++) {
-    const month = new Date(currentDate.getFullYear(), currentDate.getMonth() + i, 1);
-    const monthName = month.toLocaleDateString('es-ES', { month: 'short' });
-    const expiring = safeValidations.filter(v => {
-      const expiryDate = new Date(v.expiry_date);
-      return expiryDate.getMonth() === month.getMonth() && 
-             expiryDate.getFullYear() === month.getFullYear();
-    }).length;
-    
-    monthlyExpiryData.push({
-      month: monthName,
-      expiring
-    });
-  }
+  // Validaciones por subcategoría
+  const validationsBySubcategory = [
+    { 
+      name: 'Valoración', 
+      value: safeValidations.filter(v => v.subcategory === 'valoracion').length
+    },
+    { 
+      name: 'Disolución', 
+      value: safeValidations.filter(v => v.subcategory === 'disolucion').length
+    },
+    { 
+      name: 'Impurezas', 
+      value: safeValidations.filter(v => v.subcategory === 'impurezas').length
+    },
+    { 
+      name: 'Fabricación', 
+      value: safeValidations.filter(v => v.subcategory === 'fabricacion').length
+    },
+    { 
+      name: 'Empaque', 
+      value: safeValidations.filter(v => v.subcategory === 'empaque').length
+    },
+    { 
+      name: 'Identificación', 
+      value: safeValidations.filter(v => v.subcategory === 'identificacion').length
+    },
+  ].filter(item => item.value > 0);
+
+  // Protocolos (validaciones con archivos)
+  const protocolsCount = safeValidations.filter(v => v.files && v.files.length > 0).length;
+
+  // Reportes (validaciones completadas)
+  const reportsCount = safeValidations.filter(v => 
+    v.status === 'validado' || 
+    v.status === 'primera_revision' || 
+    v.status === 'segunda_revision'
+  ).length;
+
+  // Estadísticas generales
+  const generalStats = [
+    { 
+      name: 'Productos Validados', 
+      value: uniqueValidatedProducts,
+      fill: '#10b981'
+    },
+    { 
+      name: 'Total Validaciones', 
+      value: safeValidations.length,
+      fill: '#3b82f6'
+    },
+    { 
+      name: 'Protocolos', 
+      value: protocolsCount,
+      fill: '#f59e0b'
+    },
+    { 
+      name: 'Reportes', 
+      value: reportsCount,
+      fill: '#8b5cf6'
+    },
+  ];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-      {/* Expiry Status Analysis */}
-      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-red-50">
-        <CardHeader className="text-center bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-t-lg">
-          <CardTitle className="text-lg font-bold">🚨 Análisis de Vencimientos</CardTitle>
+      {/* Estadísticas Generales */}
+      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-blue-50">
+        <CardHeader className="text-center bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-t-lg">
+          <CardTitle className="text-lg font-bold">📊 Estadísticas Generales</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center p-6">
           <ChartContainer
             config={{
-              vencidas: { label: 'Vencidas', color: '#ef4444' },
-              por_vencer: { label: 'Por Vencer', color: '#f59e0b' },
+              productos: { label: 'Productos Validados', color: '#10b981' },
+              validaciones: { label: 'Total Validaciones', color: '#3b82f6' },
+              protocolos: { label: 'Protocolos', color: '#f59e0b' },
+              reportes: { label: 'Reportes', color: '#8b5cf6' },
             }}
             className="h-[250px] w-full"
           >
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
-                  data={expiryAnalysisData}
+                  data={generalStats}
                   cx="50%"
                   cy="50%"
                   innerRadius={50}
@@ -118,7 +134,7 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
                   paddingAngle={2}
                   dataKey="value"
                 >
-                  {expiryAnalysisData.map((entry, index) => (
+                  {generalStats.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.fill} />
                   ))}
                 </Pie>
@@ -129,21 +145,23 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
         </CardContent>
       </Card>
 
-      {/* Critical Validations by Type */}
-      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-orange-50">
-        <CardHeader className="text-center bg-gradient-to-r from-orange-600 to-red-600 text-white rounded-t-lg">
-          <CardTitle className="text-lg font-bold">⚠️ Validaciones Críticas por Tipo</CardTitle>
+      {/* Validaciones por Tipo */}
+      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-green-50">
+        <CardHeader className="text-center bg-gradient-to-r from-green-600 to-teal-600 text-white rounded-t-lg">
+          <CardTitle className="text-lg font-bold">🔬 Validaciones por Tipo</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center p-6">
           <ChartContainer
             config={{
-              expired: { label: 'Vencidas', color: '#ef4444' },
-              expiring: { label: 'Por Vencer', color: '#f59e0b' },
+              procesos: { label: 'Procesos', color: '#3b82f6' },
+              metodos: { label: 'Métodos Analíticos', color: '#10b981' },
+              limpieza: { label: 'Limpieza', color: '#f59e0b' },
+              sistemas: { label: 'Sistemas', color: '#8b5cf6' },
             }}
             className="h-[250px] w-full"
           >
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={criticalValidationTypes}>
+              <BarChart data={validationsByType}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="name" 
@@ -151,8 +169,7 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
                   textAnchor="middle"
                 />
                 <YAxis />
-                <Bar dataKey="expired" fill="#ef4444" name="Vencidas" />
-                <Bar dataKey="expiring" fill="#f59e0b" name="Por Vencer" />
+                <Bar dataKey="value" fill="#3b82f6" />
                 <ChartTooltip content={<ChartTooltipContent />} />
               </BarChart>
             </ResponsiveContainer>
@@ -160,32 +177,31 @@ const AnalyticsCharts = ({ validations = [] }: AnalyticsChartsProps) => {
         </CardContent>
       </Card>
 
-      {/* Monthly Expiry Trend */}
-      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-yellow-50">
-        <CardHeader className="text-center bg-gradient-to-r from-yellow-600 to-orange-600 text-white rounded-t-lg">
-          <CardTitle className="text-lg font-bold">📈 Tendencia de Vencimientos</CardTitle>
+      {/* Validaciones por Subcategoría */}
+      <Card className="shadow-lg border-0 bg-gradient-to-br from-white to-purple-50">
+        <CardHeader className="text-center bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-t-lg">
+          <CardTitle className="text-lg font-bold">📋 Validaciones por Subcategoría</CardTitle>
         </CardHeader>
         <CardContent className="flex justify-center p-6">
           <ChartContainer
             config={{
-              expiring: { label: 'Vencimientos', color: '#f59e0b' },
+              subcategory: { label: 'Subcategoría', color: '#8b5cf6' },
             }}
             className="h-[250px] w-full"
           >
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={monthlyExpiryData}>
+              <BarChart data={validationsBySubcategory}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Line 
-                  type="monotone" 
-                  dataKey="expiring" 
-                  stroke="#f59e0b" 
-                  strokeWidth={3}
-                  dot={{ fill: '#f59e0b', strokeWidth: 2, r: 4 }}
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 10 }} 
+                  textAnchor="middle"
+                  angle={-45}
                 />
+                <YAxis />
+                <Bar dataKey="value" fill="#8b5cf6" />
                 <ChartTooltip content={<ChartTooltipContent />} />
-              </LineChart>
+              </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
