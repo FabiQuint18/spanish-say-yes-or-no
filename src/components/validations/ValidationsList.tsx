@@ -4,11 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSub, DropdownMenuSubContent, DropdownMenuSubTrigger } from '@/components/ui/dropdown-menu';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Validation, UserRole, ValidationFilters as ValidationFiltersType } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
-import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer, Download, FileSpreadsheet } from 'lucide-react';
+import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer, Download, FileSpreadsheet, ArrowUpDown, SortAsc, SortDesc, Calendar, AlphabeticalVariant } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 import { useToast } from '@/hooks/use-toast';
@@ -24,6 +24,8 @@ interface ValidationsListProps {
   onImportExcel: (data: any[]) => void;
   userRole?: UserRole;
 }
+
+type SortOption = 'alphabetical-az' | 'alphabetical-za' | 'date-oldest' | 'date-newest';
 
 const ValidationsList = ({ 
   validations, 
@@ -42,9 +44,10 @@ const ValidationsList = ({
   const [showPreview, setShowPreview] = useState(false);
   const [previewContent, setPreviewContent] = useState('');
   const [previewTitle, setPreviewTitle] = useState('');
+  const [sortOption, setSortOption] = useState<SortOption>('alphabetical-az');
 
-  // Aplicar filtros
-  const applyFilters = (validationsList: Validation[]): Validation[] => {
+  // Aplicar filtros y ordenamiento
+  const applyFiltersAndSort = (validationsList: Validation[]): Validation[] => {
     let filtered = validationsList;
 
     // Aplicar búsqueda
@@ -85,10 +88,26 @@ const ValidationsList = ({
       filtered = filtered.filter(v => v.status === filters.status);
     }
 
+    // Aplicar ordenamiento
+    switch (sortOption) {
+      case 'alphabetical-az':
+        filtered.sort((a, b) => (a.product?.name || '').localeCompare(b.product?.name || ''));
+        break;
+      case 'alphabetical-za':
+        filtered.sort((a, b) => (b.product?.name || '').localeCompare(a.product?.name || ''));
+        break;
+      case 'date-oldest':
+        filtered.sort((a, b) => new Date(a.issue_date).getTime() - new Date(b.issue_date).getTime());
+        break;
+      case 'date-newest':
+        filtered.sort((a, b) => new Date(b.issue_date).getTime() - new Date(a.issue_date).getTime());
+        break;
+    }
+
     return filtered;
   };
 
-  const filteredValidations = applyFilters(validations);
+  const filteredValidations = applyFiltersAndSort(validations);
 
   const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -213,14 +232,13 @@ const ValidationsList = ({
             body { 
               font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
               margin: 20px; 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: white;
               color: #333;
             }
             .container {
               background: white;
               padding: 30px;
               border-radius: 15px;
-              box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             }
             .header { 
               text-align: center; 
@@ -233,7 +251,6 @@ const ValidationsList = ({
               height: auto; 
               margin-bottom: 15px;
               border-radius: 10px;
-              box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             }
             h1 { 
               color: #2d3748; 
@@ -241,12 +258,11 @@ const ValidationsList = ({
               margin: 20px 0; 
               font-size: 28px;
               font-weight: 700;
-              text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             }
             .info { 
               margin-bottom: 30px; 
               text-align: center;
-              background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+              background: #f7fafc;
               padding: 20px;
               border-radius: 10px;
               border-left: 5px solid #667eea;
@@ -259,7 +275,6 @@ const ValidationsList = ({
               background: white;
               border-radius: 10px;
               overflow: hidden;
-              box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             }
             th, td { 
               border: 1px solid #e2e8f0; 
@@ -267,7 +282,7 @@ const ValidationsList = ({
               text-align: center; 
             }
             th { 
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: #667eea;
               color: white;
               font-weight: 600;
               text-transform: uppercase;
@@ -276,27 +291,16 @@ const ValidationsList = ({
             tr:nth-child(even) {
               background-color: #f8fafc;
             }
-            tr:hover {
-              background-color: #edf2f7;
-              transition: background-color 0.2s ease;
-            }
-            .status-badge { 
+            .status-text { 
               padding: 4px 8px; 
               border-radius: 20px; 
               font-size: 10px;
               font-weight: 600;
               text-transform: uppercase;
               letter-spacing: 0.5px;
-              color: white;
+              background: transparent !important;
+              color: #333 !important;
             }
-            .validado { background: #48bb78; }
-            .proximo_vencer { background: #ed8936; }
-            .vencido { background: #f56565; }
-            .en_validacion { background: #4299e1; }
-            .en_revalidacion { background: #9f7aea; }
-            .por_revalidar { background: #f6ad55; }
-            .primera_revision { background: #4fd1c7; }
-            .segunda_revision { background: #667eea; }
             .footer {
               margin-top: 30px;
               text-align: center;
@@ -361,7 +365,7 @@ const ValidationsList = ({
                     <td>${getValidationTypeLabel(validation.validation_type)}</td>
                     <td>${getSubcategoryLabel(validation.validation_type, validation.subcategory)}</td>
                     <td><strong>${validation.equipment_type}</strong></td>
-                    <td><span class="status-badge ${validation.status}">${validation.status.replace(/_/g, ' ')}</span></td>
+                    <td><span class="status-text">${validation.status.replace(/_/g, ' ')}</span></td>
                     <td>${formatDate(validation.issue_date)}</td>
                     <td>${formatDate(validation.expiry_date)}</td>
                   </tr>
@@ -455,6 +459,21 @@ const ValidationsList = ({
         return t('material_types.bulk');
       default:
         return type;
+    }
+  };
+
+  const getSortLabel = (option: SortOption) => {
+    switch (option) {
+      case 'alphabetical-az':
+        return 'Alfabéticamente (A-Z)';
+      case 'alphabetical-za':
+        return 'Alfabéticamente (Z-A)';
+      case 'date-oldest':
+        return 'Fecha: Más antiguo a más reciente';
+      case 'date-newest':
+        return 'Fecha: Más reciente a más antiguo';
+      default:
+        return 'Ordenar';
     }
   };
 
@@ -592,7 +611,7 @@ const ValidationsList = ({
                 id="excel-import"
               />
               <label htmlFor="excel-import">
-                <Button variant="secondary" className="gap-2 bg-green-600 hover:bg-green-700 text-white" asChild>
+                <Button variant="secondary" className="gap-2 bg-green-600 hover:bg-green-700 text-white border-0 shadow-lg" asChild>
                   <span>
                     <FileSpreadsheet className="h-4 w-4" />
                     Importar Excel
@@ -602,7 +621,7 @@ const ValidationsList = ({
 
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="secondary" className="gap-2 bg-white text-blue-600 hover:bg-blue-50">
+                  <Button variant="secondary" className="gap-2 bg-white text-blue-600 hover:bg-blue-50 border-2 border-blue-200">
                     <Printer className="h-4 w-4" />
                     Imprimir
                     <ChevronDown className="h-4 w-4" />
@@ -643,6 +662,52 @@ const ValidationsList = ({
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="max-w-sm border-2 border-blue-200 focus:border-blue-500 rounded-lg"
               />
+              
+              {/* Botón de Ordenar */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="gap-2 border-2 border-purple-200 hover:bg-purple-50">
+                    <ArrowUpDown className="h-4 w-4" />
+                    Ordenar
+                    <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 bg-white shadow-xl border border-gray-200">
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center">
+                      <AlphabeticalVariant className="h-4 w-4 mr-2" />
+                      Alfabéticamente
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem onClick={() => setSortOption('alphabetical-az')}>
+                        <SortAsc className="h-4 w-4 mr-2" />
+                        A-Z
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSortOption('alphabetical-za')}>
+                        <SortDesc className="h-4 w-4 mr-2" />
+                        Z-A
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                  
+                  <DropdownMenuSub>
+                    <DropdownMenuSubTrigger className="flex items-center">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Por Fecha Vigencia
+                    </DropdownMenuSubTrigger>
+                    <DropdownMenuSubContent>
+                      <DropdownMenuItem onClick={() => setSortOption('date-oldest')}>
+                        <SortAsc className="h-4 w-4 mr-2" />
+                        De lo más antiguo a lo más reciente
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => setSortOption('date-newest')}>
+                        <SortDesc className="h-4 w-4 mr-2" />
+                        De lo más reciente a lo más antiguo
+                      </DropdownMenuItem>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuSub>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <div className="overflow-x-auto rounded-lg border border-gray-200">

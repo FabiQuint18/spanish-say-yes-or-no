@@ -46,6 +46,7 @@ export interface ValidationFilters {
   subcategory?: string;
   validationCode?: string;
   productCode?: string;
+  materialType?: ProductType;
   equipmentType?: EquipmentType;
   status?: ValidationStatus;
   expiryDateFrom?: string;

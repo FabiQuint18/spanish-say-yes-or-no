@@ -138,6 +138,24 @@ const ValidationFiltersComponent = ({ filters, onFiltersChange, onClearFilters }
           </div>
 
           <div>
+            <Label htmlFor="material-type">Tipo de Material</Label>
+            <Select
+              value={filters.materialType || 'all'}
+              onValueChange={(value) => updateFilter('materialType', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Seleccionar tipo de material" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{t('common.all')}</SelectItem>
+                <SelectItem value="materia_prima">Materia Prima</SelectItem>
+                <SelectItem value="producto_terminado">Producto</SelectItem>
+                <SelectItem value="material_empaque">Empaque/Envase</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
             <Label htmlFor="equipment-type">{t('validations.equipment_type')}</Label>
             <Select
               value={filters.equipmentType || 'all'}
