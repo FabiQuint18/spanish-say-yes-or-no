@@ -8,7 +8,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Validation, UserRole, ValidationFilters as ValidationFiltersType } from '@/types/validation';
 import { formatDate, getDaysUntilExpiry } from '@/utils/dateUtils';
-import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer, Download, FileSpreadsheet, ArrowUpDown, SortAsc, SortDesc, Calendar, AlphabeticalVariant } from 'lucide-react';
+import { Search, Edit, Trash2, Plus, FileText, ChevronDown, Eye, Upload, Printer, Download, FileSpreadsheet, ArrowUpDown, SortAsc, SortDesc, Calendar, Variable as AlphabeticalVariant } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import ValidationFilters from '@/components/filters/ValidationFilters';
 import { useToast } from '@/hooks/use-toast';
