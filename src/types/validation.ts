@@ -58,6 +58,10 @@ export interface Product {
   code: string;
   name: string;
   type: ProductType;
+  observations?: string;
+  validation_type?: string;
+  subcategory?: string;
+  expiry_date?: string;
   created_at: string;
   updated_at: string;
 }

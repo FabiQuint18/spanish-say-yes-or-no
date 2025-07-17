@@ -99,9 +99,10 @@ const translations = {
       code: 'Código de Validación',
       validation_code: 'Código de Validación',
       product: 'Producto',
-      product_raw_material: 'Producto/Materia Prima',
+      material_name: 'Nombre del Material',
       product_raw_material_code: 'Código Producto/MP',
       product_code: 'Código de Producto',
+      material_type: 'Tipo de Material',
       type: 'Tipo',
       validation_type: 'Tipo de Validación',
       subcategory: 'Subcategoría',
@@ -192,8 +193,12 @@ const translations = {
       product_name: 'Nombre del Producto',
       product_type: 'Tipo de Producto',
       select_type: 'Seleccionar tipo',
-      description: 'Descripción',
-      product_description: 'Descripción del producto',
+      observations: 'Observaciones',
+      product_observations: 'Observaciones del producto',
+      validation_type: 'Tipo de Validación',
+      subcategory: 'Subcategoría',
+      expiry_date: 'Fecha de Vencimiento',
+      creation_date: 'Fecha de Creación',
     },
     
     // Material Types
@@ -362,9 +367,10 @@ const translations = {
       code: 'Validation Code',
       validation_code: 'Validation Code',
       product: 'Product',
-      product_raw_material: 'Product/Raw Material',
+      material_name: 'Material Name',
       product_raw_material_code: 'Product/RM Code',
       product_code: 'Product Code',
+      material_type: 'Material Type',
       type: 'Type',
       validation_type: 'Validation Type',
       subcategory: 'Subcategory',
@@ -454,8 +460,281 @@ const translations = {
       product_name: 'Product Name',
       product_type: 'Product Type',
       select_type: 'Select type',
-      description: 'Description',
-      product_description: 'Product description',
+      observations: 'Observations',
+      product_observations: 'Product observations',
+      validation_type: 'Validation Type',
+      subcategory: 'Subcategory',
+      expiry_date: 'Expiry Date',
+      creation_date: 'Creation Date',
+    },
+  },
+  pt: {
+    // Menu items
+    menu: {
+      dashboard: 'Painel',
+      products: 'Produtos',
+      validations: 'Validações',
+      equipments: 'Equipamentos',
+      users: 'Usuários',
+      security: 'Segurança',
+      settings: 'Configurações',
+    },
+
+    // Common
+    common: {
+      cancel: 'Cancelar',
+      save: 'Salvar',
+      edit: 'Editar',
+      delete: 'Excluir',
+      add: 'Adicionar',
+      search: 'Pesquisar',
+      filter: 'Filtrar',
+      export: 'Exportar',
+      import: 'Importar',
+      close: 'Fechar',
+      confirm: 'Confirmar',
+      loading: 'Carregando...',
+      all: 'Todos',
+      error: 'Erro',
+    },
+    
+    // System
+    system: {
+      title: 'Sistema de Gestão de Validações',
+      subtitle: 'Gestão integral de validações farmacêuticas',
+    },
+    
+    // Login
+    login: {
+      title: 'Entrar',
+      email: 'E-mail',
+      password: 'Senha',
+      button: 'Entrar',
+      loading: 'Entrando...',
+      success: 'Login realizado com sucesso',
+      welcome: 'Bem-vindo ao sistema',
+      error: 'Erro de autenticação',
+      logout: 'Sair',
+      logoutSuccess: 'Logout realizado com sucesso',
+    },
+    
+    // Dashboard
+    dashboard: {
+      title: 'Painel de Controle',
+      subtitle: 'Visão geral do sistema',
+      access_restricted: 'Acesso Restrito',
+      contact_administrator: 'Entre em contato com o administrador para obter permissões',
+    },
+    
+    // Stats
+    stats: {
+      validations: 'Validações',
+      products: 'Produtos',
+      expiring: 'Vencendo',
+      expired: 'Vencidas',
+      efficiency: 'Eficiência',
+      total_validations: 'Total de validações',
+      registered_products: 'Produtos registrados',
+      next_30_days: 'Próximos 30 dias',
+      validation_efficiency: 'Eficiência de validação',
+      validated: 'Validadas',
+      in_validation: 'Em Validação',
+    },
+    
+    // Analytics
+    analytics: {
+      title: 'Análises',
+      subtitle: 'Análise detalhada do sistema',
+    },
+    
+    // Validations
+    validations: {
+      title: 'Validações',
+      subtitle: 'Gestão de validações de métodos e processos',
+      new: 'Nova Validação',
+      list: 'Lista de Validações',
+      manage: 'Gerenciar validações do sistema',
+      code: 'Código de Validação',
+      validation_code: 'Código de Validação',
+      product: 'Produto',
+      material_name: 'Nome do Material',
+      product_raw_material_code: 'Código Produto/MP',
+      product_code: 'Código do Produto',
+      material_type: 'Tipo de Material',
+      type: 'Tipo',
+      validation_type: 'Tipo de Validação',
+      subcategory: 'Subcategoria',
+      equipment: 'Equipamento',
+      equipment_type: 'Tipo de Equipamento',
+      status: 'Status',
+      issue_date: 'Data de Emissão',
+      expiry_date: 'Data de Vencimento',
+      validity_date: 'Data de Vigência',
+      expiry_from: 'Data de Vigência',
+      expiry_to: 'Data de Vencimento',
+      search: 'Pesquisar validações...',
+      search_by_code: 'Pesquisar por código',
+      search_by_product: 'Pesquisar por produto',
+      search_filters: 'Filtros de Pesquisa',
+      clear_filters: 'Limpar Filtros',
+      select_type: 'Selecionar tipo',
+      select_subcategory: 'Selecionar subcategoria',
+      select_equipment: 'Selecionar equipamento',
+      select_status: 'Selecionar status',
+      filter_by_type: 'Filtrar por tipo',
+      filter_by_status: 'Filtrar por status',
+      completed: 'Validações completadas',
+      next30days: 'Próximas a vencer (30 dias)',
+      immediate: 'Ação imediata necessária',
+      protocols: 'Protocolos',
+      withDocumentation: 'Com documentação',
+      print: {
+        options: 'Opções de Impressão',
+        all: 'Imprimir Todas',
+        downloadAll: 'Baixar PDF - Todas',
+        byType: 'Imprimir',
+        downloadByType: 'Baixar PDF',
+      },
+      files: 'Arquivos',
+      actions: 'Ações',
+      no_results: 'Nenhum resultado encontrado',
+      no_validations: 'Nenhuma validação registrada',
+      
+      // Validation types
+      processes: 'Processos',
+      cleaning: 'Limpeza',
+      analytical_methods: 'Métodos Analíticos',
+      computerized_systems: 'Sistemas Computadorizados',
+      
+      // Subcategories
+      manufacturing: 'Fabricação',
+      packaging: 'Embalagem',
+      assay: 'Valoração',
+      dissolution: 'Dissolução',
+      impurities: 'Impurezas',
+      uniformity: 'Uniformidade de Unidades de Dosagem',
+      identification: 'Identificação',
+      traces: 'Traços',
+      not_applicable: 'Não Aplicável',
+      initial_validation: 'Validação Inicial',
+      periodic_revalidation: 'Revalidação Periódica',
+    },
+    
+    // Equipment
+    equipments: {
+      title: 'Equipamentos',
+      subtitle: 'Gestão de equipamentos analíticos',
+      add: 'Adicionar Equipamento',
+      list: 'Lista de Equipamentos',
+    },
+    
+    // Products
+    products: {
+      title: 'Produtos',
+      subtitle: 'Gestão de produtos e matérias-primas',
+      add: 'Adicionar Produto',
+      list: 'Lista de Produtos',
+      created: 'Produto Criado',
+      product: 'Produto',
+      added_successfully: 'adicionado com sucesso',
+      add_product: 'Adicionar Produto',
+      finished_products: 'Produtos Acabados',
+      raw_materials: 'Matérias-Primas',
+      packaging_materials: 'Materiais de Embalagem',
+      product_list: 'Lista de Produtos',
+      registered_products: 'Produtos registrados no sistema',
+      finished_product: 'Produto Acabado',
+      raw_material: 'Matéria-Prima',
+      packaging_material: 'Material de Embalagem',
+      add_new_product: 'Adicionar Novo Produto',
+      product_code: 'Código do Produto',
+      product_name: 'Nome do Produto',
+      product_type: 'Tipo de Produto',
+      select_type: 'Selecionar tipo',
+      observations: 'Observações',
+      product_observations: 'Observações do produto',
+      validation_type: 'Tipo de Validação',
+      subcategory: 'Subcategoria',
+      expiry_date: 'Data de Vencimento',
+      creation_date: 'Data de Criação',
+    },
+    
+    // Material Types
+    material_types: {
+      finished_product: 'Produto Acabado',
+      raw_material: 'Matéria-Prima',
+      packaging_material: 'Material de Embalagem',
+      bulk: 'Granel',
+    },
+    
+    // Users
+    users: {
+      title: 'Usuários',
+      subtitle: 'Gestão de usuários do sistema',
+      new: 'Novo Usuário',
+      list: 'Lista de Usuários',
+      manage: 'Gerenciar usuários do sistema',
+      name: 'Nome Completo',
+      email: 'E-mail',
+      role: 'Função',
+      password: 'Senha',
+      confirm_password: 'Confirmar Senha',
+      password_requirements: 'Mínimo 7 caracteres, 1 maiúscula, 1 símbolo especial (*,+,-,_,@,#,$,%,^,&,!,?), números e letras',
+      password_weak: 'A senha não atende aos requisitos de segurança',
+      password_mismatch: 'As senhas não coincidem',
+      created_successfully: 'Usuário criado com sucesso',
+    },
+    
+    // Security
+    security: {
+      title: 'Segurança',
+      subtitle: 'Configuração de segurança do sistema',
+    },
+    
+    // Settings
+    settings: {
+      title: 'Configurações',
+      subtitle: 'Configuração geral do sistema',
+    },
+    
+    // Roles
+    roles: {
+      super_administrador: 'Super Administrador',
+      administrador: 'Administrador',
+      coordinador: 'Coordenador',
+      analista: 'Analista',
+      visualizador: 'Visualizador',
+    },
+    
+    // Status
+    status: {
+      validado: 'Validado',
+      en_validacion: 'Em Validação',
+      por_revalidar: 'Para Revalidar',
+      vencido: 'Vencido',
+      proximo: 'Próximo ao Vencimento',
+      revalidacion: 'Em Revalidação',
+      primera_revision: 'Primeira Revisão',
+      segunda_revision: 'Segunda Revisão',
+      success: 'Sucesso',
+      failed: 'Falhou',
+      warning: 'Aviso',
+    },
+    
+    // Integrations
+    integrations: {
+      title: 'Integrações',
+      subtitle: 'Configuração de serviços externos',
+      email: 'E-mail',
+      teams: 'Microsoft Teams',
+      google: 'Google Workspace',
+      configure: 'Configurar Integrações',
+      test_connection: 'Testar Conexão',
+      activity_log: 'Registro de Atividades',
+      email_settings: 'Configurações de E-mail',
+      teams_settings: 'Configurações do Teams',
+      google_settings: 'Configurações do Google',
+    },
     },
     
     // Material Types

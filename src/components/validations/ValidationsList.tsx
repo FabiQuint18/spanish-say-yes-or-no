@@ -141,8 +141,8 @@ const ValidationsList = ({
         subcategory: row['Subcategoría'] || row['subcategory'] || 'valoracion',
         equipment_type: row['Equipo'] || row['equipment_type'] || 'HPLC',
         status: row['Estado'] || row['status'] || 'validado',
-        issue_date: row['Fecha de Vigencia'] || row['issue_date'] || new Date().toISOString().split('T')[0],
-        expiry_date: row['Fecha de Vencimiento'] || row['expiry_date'] || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        issue_date: formatExcelDate(row['Fecha de Vigencia'] || row['issue_date']) || new Date().toISOString().split('T')[0],
+        expiry_date: formatExcelDate(row['Fecha de Vencimiento'] || row['expiry_date']) || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       }));
 
       console.log('Mapped data:', mappedData);
@@ -163,6 +163,32 @@ const ValidationsList = ({
     
     // Reset input
     event.target.value = '';
+  };
+
+  const formatExcelDate = (dateValue: any): string => {
+    if (!dateValue) return '';
+    
+    // Si ya está en formato YYYY-MM-DD
+    if (typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)) {
+      return dateValue;
+    }
+    
+    // Si es un número de Excel (días desde 1900-01-01)
+    if (typeof dateValue === 'number') {
+      const excelEpoch = new Date(1900, 0, 1);
+      const date = new Date(excelEpoch.getTime() + (dateValue - 2) * 24 * 60 * 60 * 1000);
+      return date.toISOString().split('T')[0];
+    }
+    
+    // Si es una fecha en formato DD/MM/YYYY o similar
+    if (typeof dateValue === 'string') {
+      const date = new Date(dateValue);
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+      }
+    }
+    
+    return '';
   };
 
   const handlePrintPreview = () => {
@@ -611,7 +637,7 @@ const ValidationsList = ({
                 id="excel-import"
               />
               <label htmlFor="excel-import">
-                <Button variant="secondary" className="gap-2 bg-green-600 hover:bg-green-700 text-white border-0 shadow-lg" asChild>
+                <Button variant="secondary" className="gap-2 bg-[#1D6F42] hover:bg-[#0F5132] text-white border-0 shadow-lg" asChild>
                   <span>
                     <FileSpreadsheet className="h-4 w-4" />
                     Importar Excel
@@ -716,8 +742,9 @@ const ValidationsList = ({
                   <TableRow className="bg-gradient-to-r from-gray-50 to-blue-50">
                     <TableHead className="text-center font-semibold text-gray-700">Número</TableHead>
                     <TableHead className="text-center font-semibold text-gray-700">{t('validations.validation_code')}</TableHead>
-                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.product_raw_material')}</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.material_name')}</TableHead>
                     <TableHead className="text-center font-semibold text-gray-700">Código de Producto/MP</TableHead>
+                    <TableHead className="text-center font-semibold text-gray-700">{t('validations.material_type')}</TableHead>
                     <TableHead className="text-center font-semibold text-gray-700">{t('validations.validation_type')}</TableHead>
                     <TableHead className="text-center font-semibold text-gray-700">{t('validations.subcategory')}</TableHead>
                     <TableHead className="text-center font-semibold text-gray-700">{t('validations.equipment')}</TableHead>
@@ -740,13 +767,15 @@ const ValidationsList = ({
                       <TableCell className="text-center">
                         <div>
                           <div className="font-medium text-gray-900">{validation.product?.name}</div>
-                          <div className="text-sm text-gray-500">
-                            {getMaterialTypeLabel(validation.product?.type || '')}
-                          </div>
                         </div>
                       </TableCell>
                       <TableCell className="text-center font-medium text-purple-700">
                         {validation.product?.code}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge variant="outline" className="bg-orange-100 text-orange-800 border-orange-300">
+                          {getMaterialTypeLabel(validation.product?.type || '')}
+                        </Badge>
                       </TableCell>
                       <TableCell className="text-center">
                         <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">

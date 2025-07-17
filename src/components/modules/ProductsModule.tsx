@@ -26,11 +26,15 @@ const ProductsModule = () => {
   const { toast } = useToast();
   const [showForm, setShowForm] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState({
     code: '',
     name: '',
     type: '',
-    description: ''
+    observations: '',
+    validation_type: '',
+    subcategory: '',
+    expiry_date: ''
   });
 
   // Load products from localStorage on component mount
@@ -42,6 +46,22 @@ const ProductsModule = () => {
   }, []);
 
   const handleAddProduct = () => {
+    setEditingProduct(null);
+    setFormData({ code: '', name: '', type: '', observations: '', validation_type: '', subcategory: '', expiry_date: '' });
+    setShowForm(true);
+  };
+
+  const handleEditProduct = (product: Product) => {
+    setEditingProduct(product);
+    setFormData({
+      code: product.code,
+      name: product.name,
+      type: product.type,
+      observations: product.observations || '',
+      validation_type: product.validation_type || '',
+      subcategory: product.subcategory || '',
+      expiry_date: product.expiry_date || ''
+    });
     setShowForm(true);
   };
 
@@ -59,7 +79,7 @@ const ProductsModule = () => {
     }
 
     // Check if code already exists
-    if (products.some(product => product.code === formData.code)) {
+    if (products.some(product => product.code === formData.code && (!editingProduct || product.id !== editingProduct.id))) {
       toast({
         title: "Error",
         description: "Ya existe un producto con este código",
@@ -68,32 +88,59 @@ const ProductsModule = () => {
       return;
     }
 
-    // Create new product
-    const newProduct: Product = {
-      id: Date.now().toString(),
-      code: formData.code,
-      name: formData.name,
-      type: formData.type,
-      description: formData.description,
-      created_at: new Date().toISOString()
-    };
+    let updatedProducts;
+    
+    if (editingProduct) {
+      // Update existing product
+      updatedProducts = products.map(product =>
+        product.id === editingProduct.id
+          ? {
+              ...product,
+              code: formData.code,
+              name: formData.name,
+              type: formData.type,
+              observations: formData.observations,
+              validation_type: formData.validation_type,
+              subcategory: formData.subcategory,
+              expiry_date: formData.expiry_date,
+              updated_at: new Date().toISOString()
+            }
+          : product
+      );
+    } else {
+      // Create new product
+      const newProduct: Product = {
+        id: Date.now().toString(),
+        code: formData.code,
+        name: formData.name,
+        type: formData.type,
+        observations: formData.observations,
+        validation_type: formData.validation_type,
+        subcategory: formData.subcategory,
+        expiry_date: formData.expiry_date,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+      updatedProducts = [...products, newProduct];
+    }
 
-    const updatedProducts = [...products, newProduct];
     setProducts(updatedProducts);
     localStorage.setItem('systemProducts', JSON.stringify(updatedProducts));
 
     toast({
-      title: "Producto Creado",
-      description: `Producto ${formData.name} agregado exitosamente`,
+      title: editingProduct ? "Producto Actualizado" : "Producto Creado",
+      description: `Producto ${formData.name} ${editingProduct ? 'actualizado' : 'agregado'} exitosamente`,
     });
     
     setShowForm(false);
-    setFormData({ code: '', name: '', type: '', description: '' });
+    setEditingProduct(null);
+    setFormData({ code: '', name: '', type: '', observations: '', validation_type: '', subcategory: '', expiry_date: '' });
   };
 
   const handleClose = () => {
     setShowForm(false);
-    setFormData({ code: '', name: '', type: '', description: '' });
+    setEditingProduct(null);
+    setFormData({ code: '', name: '', type: '', observations: '', validation_type: '', subcategory: '', expiry_date: '' });
   };
 
   const handleDeleteProduct = (productId: string) => {
@@ -208,8 +255,10 @@ const ProductsModule = () => {
                     <TableHead>Código</TableHead>
                     <TableHead>Nombre</TableHead>
                     <TableHead>Tipo</TableHead>
-                    <TableHead>Descripción</TableHead>
-                    <TableHead>Fecha Creación</TableHead>
+                    <TableHead>{t('products.validation_type')}</TableHead>
+                    <TableHead>{t('products.subcategory')}</TableHead>
+                    <TableHead>{t('products.observations')}</TableHead>
+                    <TableHead>{t('products.expiry_date')}</TableHead>
                     <TableHead>Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -223,11 +272,13 @@ const ProductsModule = () => {
                           {getProductTypeLabel(product.type)}
                         </Badge>
                       </TableCell>
-                      <TableCell>{product.description}</TableCell>
-                      <TableCell>{new Date(product.created_at).toLocaleDateString()}</TableCell>
+                      <TableCell>{product.validation_type || 'N/A'}</TableCell>
+                      <TableCell>{product.subcategory || 'N/A'}</TableCell>
+                      <TableCell>{product.observations || 'N/A'}</TableCell>
+                      <TableCell>{product.expiry_date ? new Date(product.expiry_date).toLocaleDateString() : 'N/A'}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" onClick={() => handleEditProduct(product)}>
                             <Edit className="h-4 w-4" />
                           </Button>
                           <Button 
@@ -256,7 +307,9 @@ const ProductsModule = () => {
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="bg-popover border border-border max-w-md mx-auto">
           <DialogHeader>
-            <DialogTitle className="text-center">Agregar Nuevo Producto</DialogTitle>
+            <DialogTitle className="text-center">
+              {editingProduct ? 'Editar Producto' : 'Agregar Nuevo Producto'}
+            </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -293,12 +346,44 @@ const ProductsModule = () => {
               </Select>
             </div>
             <div>
-              <Label htmlFor="description">Descripción</Label>
+              <Label htmlFor="validation_type">{t('products.validation_type')}</Label>
+              <Select value={formData.validation_type} onValueChange={(value) => setFormData({ ...formData, validation_type: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo de validación" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="procesos">Procesos</SelectItem>
+                  <SelectItem value="metodos_analiticos">Métodos Analíticos</SelectItem>
+                  <SelectItem value="limpieza">Limpieza</SelectItem>
+                  <SelectItem value="sistemas_computarizados">Sistemas Computarizados</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="subcategory">{t('products.subcategory')}</Label>
               <Input
-                id="description"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Descripción del producto"
+                id="subcategory"
+                value={formData.subcategory}
+                onChange={(e) => setFormData({ ...formData, subcategory: e.target.value })}
+                placeholder="Subcategoría"
+              />
+            </div>
+            <div>
+              <Label htmlFor="observations">{t('products.observations')}</Label>
+              <Input
+                id="observations"
+                value={formData.observations}
+                onChange={(e) => setFormData({ ...formData, observations: e.target.value })}
+                placeholder={t('products.product_observations')}
+              />
+            </div>
+            <div>
+              <Label htmlFor="expiry_date">{t('products.expiry_date')}</Label>
+              <Input
+                id="expiry_date"
+                type="date"
+                value={formData.expiry_date}
+                onChange={(e) => setFormData({ ...formData, expiry_date: e.target.value })}
               />
             </div>
             <div className="flex flex-col sm:flex-row gap-2 justify-end">
@@ -306,7 +391,7 @@ const ProductsModule = () => {
                 {t('common.cancel')}
               </Button>
               <Button type="submit" className="w-full sm:w-auto">
-                Agregar Producto
+                {editingProduct ? 'Actualizar Producto' : 'Agregar Producto'}
               </Button>
             </div>
           </form>
