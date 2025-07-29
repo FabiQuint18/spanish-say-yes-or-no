@@ -1,6 +1,11 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-// Translation data
+import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
+import { Language } from '@/types/validation';
+
+/**
+ * Translation data structure with comprehensive multi-language support
+ * Organized by language and feature modules for better maintainability
+ */
 const translations = {
   es: {
     // System
@@ -53,6 +58,14 @@ const translations = {
     'common.observations': 'Observaciones',
     'common.all': 'Todos',
     'common.error': 'Error',
+    'common.loading': 'Cargando...',
+    'common.confirm': 'Confirmar',
+    'common.close': 'Cerrar',
+    'common.view': 'Ver',
+    'common.download': 'Descargar',
+    'common.upload': 'Subir',
+    'common.required': 'Requerido',
+    'common.optional': 'Opcional',
     
     // Validations
     'validations.title': 'Gestión de Validaciones',
@@ -66,6 +79,7 @@ const translations = {
     'validations.validation_type': 'Tipo de Validación',
     'validations.subcategory': 'Subcategoría',
     'validations.equipment': 'Equipo',
+    'validations.equipment_type': 'Tipo de Equipo',
     'validations.validity_date': 'Fecha de Vigencia',
     'validations.expiry_date': 'Fecha de Vencimiento',
     'validations.material_type': 'Tipo de Material',
@@ -88,31 +102,52 @@ const translations = {
     'validations.immediate': 'Atención inmediata',
     'validations.protocols': 'Protocolos',
     'validations.withDocumentation': 'Con documentación',
+    'validations.status': 'Estado de Validación',
+    
+    // Filters
+    'filters.title': 'Filtros de Búsqueda',
+    'filters.validation_type': 'Tipo de Validación',
+    'filters.subcategory': 'Subcategoría',
+    'filters.validation_code': 'Código de Validación',
+    'filters.material_type': 'Tipo de Material',
+    'filters.equipment_type': 'Tipo de Equipo',
+    'filters.status': 'Estado',
+    'filters.expiry_until': 'Vencimiento hasta',
+    'filters.clear_all': 'Limpiar todos los filtros',
+    'filters.apply': 'Aplicar filtros',
     
     // Validation Types
-    'validations.processes': 'Procesos',
-    'validations.cleaning': 'Limpieza',
-    'validations.analytical_methods': 'Métodos Analíticos',
-    'validations.computerized_systems': 'Sistemas Computarizados',
+    'validation_types.processes': 'Procesos',
+    'validation_types.cleaning': 'Limpieza',
+    'validation_types.analytical_methods': 'Métodos Analíticos',
+    'validation_types.computerized_systems': 'Sistemas Computarizados',
     
     // Subcategories
-    'validations.manufacturing': 'Fabricación',
-    'validations.packaging': 'Empaque',
-    'validations.assay': 'Valoración',
-    'validations.dissolution': 'Disolución',
-    'validations.impurities': 'Impurezas',
-    'validations.uniformity': 'Uniformidad de Unidades de Dosificación',
-    'validations.identification': 'Identificación',
-    'validations.traces': 'Trazas',
-    'validations.not_applicable': 'No Aplica',
-    'validations.initial_validation': 'Validación Inicial',
-    'validations.periodic_revalidation': 'Revalidación Periódica',
+    'subcategories.manufacturing': 'Fabricación',
+    'subcategories.packaging': 'Empaque',
+    'subcategories.assay': 'Valoración',
+    'subcategories.dissolution': 'Disolución',
+    'subcategories.impurities': 'Impurezas',
+    'subcategories.uniformity': 'Uniformidad de Unidades de Dosificación',
+    'subcategories.identification': 'Identificación',
+    'subcategories.traces': 'Trazas',
+    'subcategories.not_applicable': 'No Aplica',
+    'subcategories.initial_validation': 'Validación Inicial',
+    'subcategories.periodic_revalidation': 'Revalidación Periódica',
     
     // Material Types
     'material_types.raw_material': 'Materia Prima',
     'material_types.packaging_material': 'Material de Empaque',
     'material_types.finished_product': 'Producto Terminado',
     'material_types.bulk': 'Granel',
+    
+    // Equipment Types
+    'equipment_types.analytical': 'Analítico',
+    'equipment_types.production': 'Producción',
+    'equipment_types.packaging': 'Empaque',
+    'equipment_types.cleaning': 'Limpieza',
+    'equipment_types.hvac': 'HVAC',
+    'equipment_types.utility': 'Servicios',
     
     // Status
     'status.validado': 'Validado',
@@ -126,6 +161,11 @@ const translations = {
     'status.success': 'Exitoso',
     'status.failed': 'Fallido',
     'status.warning': 'Advertencia',
+    'status.active': 'Activo',
+    'status.inactive': 'Inactivo',
+    'status.pending': 'Pendiente',
+    'status.approved': 'Aprobado',
+    'status.rejected': 'Rechazado',
     
     // Products
     'products.title': 'Gestión de Productos',
@@ -187,7 +227,64 @@ const translations = {
     
     // Analytics
     'analytics.title': 'Analíticas del Sistema',
-    'analytics.subtitle': 'Análisis detallado de validaciones'
+    'analytics.subtitle': 'Análisis detallado de validaciones',
+    
+    // Excel Import
+    'excel.import': 'Importar Excel',
+    'excel.import.success': 'Importación Exitosa',
+    'excel.import.error': 'Error de Importación',
+    'excel.import.processing': 'Se procesaron {count} validaciones desde Excel',
+    'excel.import.format_error': 'Error al procesar el archivo Excel. Verifique el formato.',
+    'excel.import.file_type_error': 'Solo se permiten archivos Excel (.xlsx, .xls)',
+    
+    // Form Labels
+    'form.document_code': 'Código del Documento',
+    'form.product_code': 'Código de Producto o Materia Prima',
+    'form.product_name': 'Nombre del Producto',
+    'form.material_type': 'Tipo de Material',
+    'form.validation_type': 'Tipo de Validación',
+    'form.subcategory': 'Subcategoría',
+    'form.equipment_type': 'Tipo de Equipo',
+    'form.status': 'Estado',
+    'form.validity_date': 'Fecha de Vigencia',
+    'form.expiry_date': 'Fecha de Vencimiento',
+    'form.select_material_type': 'Seleccionar tipo de material',
+    'form.select_type': 'Seleccionar tipo',
+    'form.select_subcategory': 'Seleccionar subcategoría',
+    'form.select_equipment': 'Seleccionar equipo',
+    'form.select_status': 'Seleccionar estado',
+    'form.required_fields': 'Por favor completa los campos requeridos',
+    'form.validation_created': 'Validación Creada',
+    'form.validation_updated': 'Validación Actualizada',
+    'form.new_validation': 'Nueva validación {code} creada exitosamente',
+    'form.updated_validation': 'Actualización de validación {code} actualizada exitosamente',
+    'form.edit_validation': 'Editar Validación',
+    'form.new_validation_title': 'Nueva Validación',
+    'form.create_validation': 'Crear Validación',
+    'form.update_validation': 'Actualizar Validación',
+    
+    // Table and List
+    'table.number': 'Número',
+    'table.no_files': 'Sin archivos',
+    'table.sort': 'Ordenar',
+    'table.alphabetically': 'Alfabéticamente',
+    'table.by_date': 'Por Fecha Vigencia',
+    'table.oldest_to_newest': 'De lo más antiguo a lo más reciente',
+    'table.newest_to_oldest': 'De lo más reciente a lo más antiguo',
+    'table.a_to_z': 'A-Z',
+    'table.z_to_a': 'Z-A',
+    
+    // Print and Export
+    'print.preview': 'Vista Previa',
+    'print.print': 'Imprimir',
+    'print.download_pdf': 'Descargar PDF',
+    'print.cancel': 'Cancelar',
+    'print.report_title': 'Listado de Validaciones',
+    'print.generation_date': 'Fecha de generación',
+    'print.total_records': 'Total de registros',
+    'print.pharmaceutical_system': 'Sistema de Gestión de Validaciones Farmacéuticas',
+    'print.auto_generated': 'Documento generado automáticamente por el Sistema de Gestión de Validaciones',
+    'print.contact_admin': 'Para más información contacte al administrador del sistema'
   },
   
   en: {
@@ -241,6 +338,14 @@ const translations = {
     'common.observations': 'Observations',
     'common.all': 'All',
     'common.error': 'Error',
+    'common.loading': 'Loading...',
+    'common.confirm': 'Confirm',
+    'common.close': 'Close',
+    'common.view': 'View',
+    'common.download': 'Download',
+    'common.upload': 'Upload',
+    'common.required': 'Required',
+    'common.optional': 'Optional',
     
     // Validations
     'validations.title': 'Validation Management',
@@ -254,6 +359,7 @@ const translations = {
     'validations.validation_type': 'Validation Type',
     'validations.subcategory': 'Subcategory',
     'validations.equipment': 'Equipment',
+    'validations.equipment_type': 'Equipment Type',
     'validations.validity_date': 'Validity Date',
     'validations.expiry_date': 'Expiry Date',
     'validations.material_type': 'Material Type',
@@ -276,31 +382,52 @@ const translations = {
     'validations.immediate': 'Immediate attention',
     'validations.protocols': 'Protocols',
     'validations.withDocumentation': 'With documentation',
+    'validations.status': 'Validation Status',
+    
+    // Filters
+    'filters.title': 'Search Filters',
+    'filters.validation_type': 'Validation Type',
+    'filters.subcategory': 'Subcategory',
+    'filters.validation_code': 'Validation Code',
+    'filters.material_type': 'Material Type',
+    'filters.equipment_type': 'Equipment Type',
+    'filters.status': 'Status',
+    'filters.expiry_until': 'Expiry until',
+    'filters.clear_all': 'Clear all filters',
+    'filters.apply': 'Apply filters',
     
     // Validation Types
-    'validations.processes': 'Processes',
-    'validations.cleaning': 'Cleaning',
-    'validations.analytical_methods': 'Analytical Methods',
-    'validations.computerized_systems': 'Computerized Systems',
+    'validation_types.processes': 'Processes',
+    'validation_types.cleaning': 'Cleaning',
+    'validation_types.analytical_methods': 'Analytical Methods',
+    'validation_types.computerized_systems': 'Computerized Systems',
     
     // Subcategories
-    'validations.manufacturing': 'Manufacturing',
-    'validations.packaging': 'Packaging',
-    'validations.assay': 'Assay',
-    'validations.dissolution': 'Dissolution',
-    'validations.impurities': 'Impurities',
-    'validations.uniformity': 'Uniformity of Dosage Units',
-    'validations.identification': 'Identification',
-    'validations.traces': 'Traces',
-    'validations.not_applicable': 'Not Applicable',
-    'validations.initial_validation': 'Initial Validation',
-    'validations.periodic_revalidation': 'Periodic Revalidation',
+    'subcategories.manufacturing': 'Manufacturing',
+    'subcategories.packaging': 'Packaging',
+    'subcategories.assay': 'Assay',
+    'subcategories.dissolution': 'Dissolution',
+    'subcategories.impurities': 'Impurities',
+    'subcategories.uniformity': 'Uniformity of Dosage Units',
+    'subcategories.identification': 'Identification',
+    'subcategories.traces': 'Traces',
+    'subcategories.not_applicable': 'Not Applicable',
+    'subcategories.initial_validation': 'Initial Validation',
+    'subcategories.periodic_revalidation': 'Periodic Revalidation',
     
     // Material Types
     'material_types.raw_material': 'Raw Material',
     'material_types.packaging_material': 'Packaging Material',
     'material_types.finished_product': 'Finished Product',
     'material_types.bulk': 'Bulk',
+    
+    // Equipment Types
+    'equipment_types.analytical': 'Analytical',
+    'equipment_types.production': 'Production',
+    'equipment_types.packaging': 'Packaging',
+    'equipment_types.cleaning': 'Cleaning',
+    'equipment_types.hvac': 'HVAC',
+    'equipment_types.utility': 'Utilities',
     
     // Status
     'status.validado': 'Validated',
@@ -314,6 +441,11 @@ const translations = {
     'status.success': 'Success',
     'status.failed': 'Failed',
     'status.warning': 'Warning',
+    'status.active': 'Active',
+    'status.inactive': 'Inactive',
+    'status.pending': 'Pending',
+    'status.approved': 'Approved',
+    'status.rejected': 'Rejected',
     
     // Products
     'products.title': 'Product Management',
@@ -429,6 +561,14 @@ const translations = {
     'common.observations': 'Observações',
     'common.all': 'Todos',
     'common.error': 'Erro',
+    'common.loading': 'Carregando...',
+    'common.confirm': 'Confirmar',
+    'common.close': 'Fechar',
+    'common.view': 'Ver',
+    'common.download': 'Baixar',
+    'common.upload': 'Enviar',
+    'common.required': 'Obrigatório',
+    'common.optional': 'Opcional',
     
     // Validations
     'validations.title': 'Gestão de Validações',
@@ -442,6 +582,7 @@ const translations = {
     'validations.validation_type': 'Tipo de Validação',
     'validations.subcategory': 'Subcategoria',
     'validations.equipment': 'Equipamento',
+    'validations.equipment_type': 'Tipo de Equipamento',
     'validations.validity_date': 'Data de Validade',
     'validations.expiry_date': 'Data de Vencimento',
     'validations.material_type': 'Tipo de Material',
@@ -464,31 +605,52 @@ const translations = {
     'validations.immediate': 'Atenção imediata',
     'validations.protocols': 'Protocolos',
     'validations.withDocumentation': 'Com documentação',
+    'validations.status': 'Status da Validação',
+    
+    // Filters
+    'filters.title': 'Filtros de Pesquisa',
+    'filters.validation_type': 'Tipo de Validação',
+    'filters.subcategory': 'Subcategoria',
+    'filters.validation_code': 'Código de Validação',
+    'filters.material_type': 'Tipo de Material',
+    'filters.equipment_type': 'Tipo de Equipamento',
+    'filters.status': 'Status',
+    'filters.expiry_until': 'Vencimento até',
+    'filters.clear_all': 'Limpar todos os filtros',
+    'filters.apply': 'Aplicar filtros',
     
     // Validation Types
-    'validations.processes': 'Processos',
-    'validations.cleaning': 'Limpeza',
-    'validations.analytical_methods': 'Métodos Analíticos',
-    'validations.computerized_systems': 'Sistemas Computadorizados',
+    'validation_types.processes': 'Processos',
+    'validation_types.cleaning': 'Limpeza',
+    'validation_types.analytical_methods': 'Métodos Analíticos',
+    'validation_types.computerized_systems': 'Sistemas Computadorizados',
     
     // Subcategories
-    'validations.manufacturing': 'Fabricação',
-    'validations.packaging': 'Embalagem',
-    'validations.assay': 'Valoração',
-    'validations.dissolution': 'Dissolução',
-    'validations.impurities': 'Impurezas',
-    'validations.uniformity': 'Uniformidade de Unidades de Dosagem',
-    'validations.identification': 'Identificação',
-    'validations.traces': 'Traços',
-    'validations.not_applicable': 'Não Aplicável',
-    'validations.initial_validation': 'Validação Inicial',
-    'validations.periodic_revalidation': 'Revalidação Periódica',
+    'subcategories.manufacturing': 'Fabricação',
+    'subcategories.packaging': 'Embalagem',
+    'subcategories.assay': 'Valoração',
+    'subcategories.dissolution': 'Dissolução',
+    'subcategories.impurities': 'Impurezas',
+    'subcategories.uniformity': 'Uniformidade de Unidades de Dosagem',
+    'subcategories.identification': 'Identificação',
+    'subcategories.traces': 'Traços',
+    'subcategories.not_applicable': 'Não Aplicável',
+    'subcategories.initial_validation': 'Validação Inicial',
+    'subcategories.periodic_revalidation': 'Revalidação Periódica',
     
     // Material Types
     'material_types.raw_material': 'Matéria Prima',
     'material_types.packaging_material': 'Material de Embalagem',
     'material_types.finished_product': 'Produto Acabado',
     'material_types.bulk': 'Granel',
+    
+    // Equipment Types
+    'equipment_types.analytical': 'Analítico',
+    'equipment_types.production': 'Produção',
+    'equipment_types.packaging': 'Embalagem',
+    'equipment_types.cleaning': 'Limpeza',
+    'equipment_types.hvac': 'HVAC',
+    'equipment_types.utility': 'Utilidades',
     
     // Status
     'status.validado': 'Validado',
@@ -502,6 +664,11 @@ const translations = {
     'status.success': 'Sucesso',
     'status.failed': 'Falhou',
     'status.warning': 'Aviso',
+    'status.active': 'Ativo',
+    'status.inactive': 'Inativo',
+    'status.pending': 'Pendente',
+    'status.approved': 'Aprovado',
+    'status.rejected': 'Rejeitado',
     
     // Products
     'products.title': 'Gestão de Produtos',
@@ -563,42 +730,210 @@ const translations = {
     
     // Analytics
     'analytics.title': 'Análises do Sistema',
-    'analytics.subtitle': 'Análise detalhada de validações'
+    'analytics.subtitle': 'Análise detalhada de validações',
+    
+    // Excel Import
+    'excel.import': 'Importar Excel',
+    'excel.import.success': 'Importação Bem-sucedida',
+    'excel.import.error': 'Erro de Importação',
+    'excel.import.processing': 'Processadas {count} validações do Excel',
+    'excel.import.format_error': 'Erro ao processar arquivo Excel. Verifique o formato.',
+    'excel.import.file_type_error': 'Apenas arquivos Excel são permitidos (.xlsx, .xls)',
+    
+    // Form Labels
+    'form.document_code': 'Código do Documento',
+    'form.product_code': 'Código do Produto ou Matéria Prima',
+    'form.product_name': 'Nome do Produto',
+    'form.material_type': 'Tipo de Material',
+    'form.validation_type': 'Tipo de Validação',
+    'form.subcategory': 'Subcategoria',
+    'form.equipment_type': 'Tipo de Equipamento',
+    'form.status': 'Status',
+    'form.validity_date': 'Data de Validade',
+    'form.expiry_date': 'Data de Vencimento',
+    'form.select_material_type': 'Selecionar tipo de material',
+    'form.select_type': 'Selecionar tipo',
+    'form.select_subcategory': 'Selecionar subcategoria',
+    'form.select_equipment': 'Selecionar equipamento',
+    'form.select_status': 'Selecionar status',
+    'form.required_fields': 'Por favor complete os campos obrigatórios',
+    'form.validation_created': 'Validação Criada',
+    'form.validation_updated': 'Validação Atualizada',
+    'form.new_validation': 'Nova validação {code} criada com sucesso',
+    'form.updated_validation': 'Validação {code} atualizada com sucesso',
+    'form.edit_validation': 'Editar Validação',
+    'form.new_validation_title': 'Nova Validação',
+    'form.create_validation': 'Criar Validação',
+    'form.update_validation': 'Atualizar Validação',
+    
+    // Table and List
+    'table.number': 'Número',
+    'table.no_files': 'Sem arquivos',
+    'table.sort': 'Ordenar',
+    'table.alphabetically': 'Alfabeticamente',
+    'table.by_date': 'Por Data de Validade',
+    'table.oldest_to_newest': 'Do mais antigo ao mais recente',
+    'table.newest_to_oldest': 'Do mais recente ao mais antigo',
+    'table.a_to_z': 'A-Z',
+    'table.z_to_a': 'Z-A',
+    
+    // Print and Export
+    'print.preview': 'Visualizar',
+    'print.print': 'Imprimir',
+    'print.download_pdf': 'Baixar PDF',
+    'print.cancel': 'Cancelar',
+    'print.report_title': 'Lista de Validações',
+    'print.generation_date': 'Data de geração',
+    'print.total_records': 'Total de registros',
+    'print.pharmaceutical_system': 'Sistema de Gestão de Validações Farmacêuticas',
+    'print.auto_generated': 'Documento gerado automaticamente pelo Sistema de Gestão de Validações',
+    'print.contact_admin': 'Para mais informações entre em contato com o administrador do sistema'
   }
-};
+} as const;
 
-type Language = 'es' | 'en' | 'pt';
-
+/**
+ * Language context interface with enhanced functionality
+ */
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  isRTL: boolean;
+  availableLanguages: readonly Language[];
 }
 
+/**
+ * Language context with undefined as default to enforce provider usage
+ */
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
+/**
+ * Props for the LanguageProvider component
+ */
 interface LanguageProviderProps {
   children: ReactNode;
+  defaultLanguage?: Language;
 }
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('es');
+/**
+ * Enhanced Language Provider with performance optimizations and better error handling
+ */
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({
+  children,
+  defaultLanguage = 'es'
+}) => {
+  // Initialize language from localStorage or use default
+  const [language, setLanguageState] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const savedLanguage = localStorage.getItem('preferredLanguage') as Language;
+      if (savedLanguage && ['es', 'en', 'pt'].includes(savedLanguage)) {
+        return savedLanguage;
+      }
+    }
+    return defaultLanguage;
+  });
 
-  const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations[Language]] || key;
-  };
+  /**
+   * Enhanced setLanguage function with persistence
+   */
+  const setLanguage = useCallback((lang: Language) => {
+    setLanguageState(lang);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('preferredLanguage', lang);
+    }
+  }, []);
+
+  /**
+   * Enhanced translation function with parameter interpolation
+   */
+  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
+    try {
+      const translation = translations[language][key as keyof typeof translations[Language]];
+      
+      if (!translation) {
+        // Only warn in development
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(`Translation missing for key: ${key} in language: ${language}`);
+        }
+        return key;
+      }
+
+      // Handle parameter interpolation
+      if (params && typeof translation === 'string') {
+        return Object.entries(params).reduce((str, [paramKey, value]) => {
+          return str.replace(new RegExp(`{${paramKey}}`, 'g'), String(value));
+        }, translation);
+      }
+
+      return translation;
+    } catch (error) {
+      console.error(`Error translating key: ${key}`, error);
+      return key;
+    }
+  }, [language]);
+
+  /**
+   * Check if current language is right-to-left
+   */
+  const isRTL = useMemo(() => {
+    // Add RTL languages here if needed in the future
+    const rtlLanguages: Language[] = [];
+    return rtlLanguages.includes(language);
+  }, [language]);
+
+  /**
+   * Available languages for the application
+   */
+  const availableLanguages: readonly Language[] = ['es', 'en', 'pt'] as const;
+
+  /**
+   * Memoized context value to prevent unnecessary re-renders
+   */
+  const contextValue = useMemo(() => ({
+    language,
+    setLanguage,
+    t,
+    isRTL,
+    availableLanguages
+  }), [language, setLanguage, t, isRTL]);
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={contextValue}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
+/**
+ * Enhanced useLanguage hook with better error handling
+ */
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
+  
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    throw new Error(
+      'useLanguage must be used within a LanguageProvider. ' +
+      'Make sure to wrap your component tree with <LanguageProvider>.'
+    );
   }
+  
   return context;
 };
+
+/**
+ * Utility function to get translation without hook (for use outside components)
+ */
+export const getTranslation = (key: string, language: Language = 'es'): string => {
+  const translation = translations[language][key as keyof typeof translations[Language]];
+  return translation || key;
+};
+
+/**
+ * Type-safe translation keys (can be extended with specific modules)
+ */
+export type TranslationKey = keyof typeof translations.es;
+
+/**
+ * Utility type for translation parameters
+ */
+export type TranslationParams = Record<string, string | number>;
