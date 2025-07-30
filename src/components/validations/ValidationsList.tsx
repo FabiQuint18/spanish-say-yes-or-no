@@ -115,8 +115,8 @@ const ValidationsList = ({
 
     if (!file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
       toast({
-        title: "Error",
-        description: "Solo se permiten archivos Excel (.xlsx, .xls)",
+        title: t('common.error'),
+        description: t('excel.import.file_type_error'),
         variant: "destructive",
       });
       return;
@@ -149,14 +149,14 @@ const ValidationsList = ({
       onImportExcel(mappedData);
       
       toast({
-        title: "✅ Importación Exitosa",
-        description: `Se procesaron ${mappedData.length} validaciones desde Excel`,
+        title: `✅ ${t('excel.import.success')}`,
+        description: t('excel.import.processing').replace('{count}', mappedData.length.toString()),
       });
     } catch (error) {
       console.error('Error processing Excel:', error);
       toast({
-        title: "Error de Importación",
-        description: "Error al procesar el archivo Excel. Verifique el formato.",
+        title: t('excel.import.error'),
+        description: t('excel.import.format_error'),
         variant: "destructive",
       });
     }
@@ -509,7 +509,7 @@ const ValidationsList = ({
     const canDelete = userRole === 'administrador' || userRole === 'coordinador' || userRole === 'analista';
 
     if (files.length === 0 && !canUploadFiles) {
-      return <span className="text-sm text-muted-foreground">Sin archivos</span>;
+      return <span className="text-sm text-muted-foreground">{t('table.no_files')}</span>;
     }
 
     return (
@@ -640,7 +640,7 @@ const ValidationsList = ({
                 <Button variant="secondary" className="gap-2 bg-[#1D6F42] hover:bg-[#0F5132] text-white border-0 shadow-lg" asChild>
                   <span>
                     <FileSpreadsheet className="h-4 w-4" />
-                    Importar Excel
+                    {t('excel.import')}
                   </span>
                 </Button>
               </label>
@@ -649,7 +649,7 @@ const ValidationsList = ({
                 <DropdownMenuTrigger asChild>
                   <Button variant="secondary" className="gap-2 bg-white text-blue-600 hover:bg-blue-50 border-2 border-blue-200">
                     <Printer className="h-4 w-4" />
-                    Imprimir
+                    {t('print.print')}
                     <ChevronDown className="h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>
