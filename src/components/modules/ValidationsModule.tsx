@@ -116,7 +116,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
           id: Date.now().toString() + Math.random(),
           code: item.product_code,
           name: item.product_name,
-          type: 'producto_terminado',
+          type: item.material_type,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
         },
