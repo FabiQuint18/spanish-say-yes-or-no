@@ -1,11 +1,6 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-import React, { createContext, useContext, useState, ReactNode, useCallback, useMemo } from 'react';
-import { Language } from '@/types/validation';
-
-/**
- * Translation data structure with comprehensive multi-language support
- * Organized by language and feature modules for better maintainability
- */
+// Translation data
 const translations = {
   es: {
     // System
@@ -227,64 +222,7 @@ const translations = {
     
     // Analytics
     'analytics.title': 'Analíticas del Sistema',
-    'analytics.subtitle': 'Análisis detallado de validaciones',
-    
-    // Excel Import
-    'excel.import': 'Importar Excel',
-    'excel.import.success': 'Importación Exitosa',
-    'excel.import.error': 'Error de Importación',
-    'excel.import.processing': 'Se procesaron {count} validaciones desde Excel',
-    'excel.import.format_error': 'Error al procesar el archivo Excel. Verifique el formato.',
-    'excel.import.file_type_error': 'Solo se permiten archivos Excel (.xlsx, .xls)',
-    
-    // Form Labels
-    'form.document_code': 'Código del Documento',
-    'form.product_code': 'Código de Producto o Materia Prima',
-    'form.product_name': 'Nombre del Producto',
-    'form.material_type': 'Tipo de Material',
-    'form.validation_type': 'Tipo de Validación',
-    'form.subcategory': 'Subcategoría',
-    'form.equipment_type': 'Tipo de Equipo',
-    'form.status': 'Estado',
-    'form.validity_date': 'Fecha de Vigencia',
-    'form.expiry_date': 'Fecha de Vencimiento',
-    'form.select_material_type': 'Seleccionar tipo de material',
-    'form.select_type': 'Seleccionar tipo',
-    'form.select_subcategory': 'Seleccionar subcategoría',
-    'form.select_equipment': 'Seleccionar equipo',
-    'form.select_status': 'Seleccionar estado',
-    'form.required_fields': 'Por favor completa los campos requeridos',
-    'form.validation_created': 'Validación Creada',
-    'form.validation_updated': 'Validación Actualizada',
-    'form.new_validation': 'Nueva validación {code} creada exitosamente',
-    'form.updated_validation': 'Actualización de validación {code} actualizada exitosamente',
-    'form.edit_validation': 'Editar Validación',
-    'form.new_validation_title': 'Nueva Validación',
-    'form.create_validation': 'Crear Validación',
-    'form.update_validation': 'Actualizar Validación',
-    
-    // Table and List
-    'table.number': 'Número',
-    'table.no_files': 'Sin archivos',
-    'table.sort': 'Ordenar',
-    'table.alphabetically': 'Alfabéticamente',
-    'table.by_date': 'Por Fecha Vigencia',
-    'table.oldest_to_newest': 'De lo más antiguo a lo más reciente',
-    'table.newest_to_oldest': 'De lo más reciente a lo más antiguo',
-    'table.a_to_z': 'A-Z',
-    'table.z_to_a': 'Z-A',
-    
-    // Print and Export
-    'print.preview': 'Vista Previa',
-    'print.print': 'Imprimir',
-    'print.download_pdf': 'Descargar PDF',
-    'print.cancel': 'Cancelar',
-    'print.report_title': 'Listado de Validaciones',
-    'print.generation_date': 'Fecha de generación',
-    'print.total_records': 'Total de registros',
-    'print.pharmaceutical_system': 'Sistema de Gestión de Validaciones Farmacéuticas',
-    'print.auto_generated': 'Documento generado automáticamente por el Sistema de Gestión de Validaciones',
-    'print.contact_admin': 'Para más información contacte al administrador del sistema'
+    'analytics.subtitle': 'Análisis detallado de validaciones'
   },
   
   en: {
@@ -730,210 +668,47 @@ const translations = {
     
     // Analytics
     'analytics.title': 'Análises do Sistema',
-    'analytics.subtitle': 'Análise detalhada de validações',
-    
-    // Excel Import
-    'excel.import': 'Importar Excel',
-    'excel.import.success': 'Importação Bem-sucedida',
-    'excel.import.error': 'Erro de Importação',
-    'excel.import.processing': 'Processadas {count} validações do Excel',
-    'excel.import.format_error': 'Erro ao processar arquivo Excel. Verifique o formato.',
-    'excel.import.file_type_error': 'Apenas arquivos Excel são permitidos (.xlsx, .xls)',
-    
-    // Form Labels
-    'form.document_code': 'Código do Documento',
-    'form.product_code': 'Código do Produto ou Matéria Prima',
-    'form.product_name': 'Nome do Produto',
-    'form.material_type': 'Tipo de Material',
-    'form.validation_type': 'Tipo de Validação',
-    'form.subcategory': 'Subcategoria',
-    'form.equipment_type': 'Tipo de Equipamento',
-    'form.status': 'Status',
-    'form.validity_date': 'Data de Validade',
-    'form.expiry_date': 'Data de Vencimento',
-    'form.select_material_type': 'Selecionar tipo de material',
-    'form.select_type': 'Selecionar tipo',
-    'form.select_subcategory': 'Selecionar subcategoria',
-    'form.select_equipment': 'Selecionar equipamento',
-    'form.select_status': 'Selecionar status',
-    'form.required_fields': 'Por favor complete os campos obrigatórios',
-    'form.validation_created': 'Validação Criada',
-    'form.validation_updated': 'Validação Atualizada',
-    'form.new_validation': 'Nova validação {code} criada com sucesso',
-    'form.updated_validation': 'Validação {code} atualizada com sucesso',
-    'form.edit_validation': 'Editar Validação',
-    'form.new_validation_title': 'Nova Validação',
-    'form.create_validation': 'Criar Validação',
-    'form.update_validation': 'Atualizar Validação',
-    
-    // Table and List
-    'table.number': 'Número',
-    'table.no_files': 'Sem arquivos',
-    'table.sort': 'Ordenar',
-    'table.alphabetically': 'Alfabeticamente',
-    'table.by_date': 'Por Data de Validade',
-    'table.oldest_to_newest': 'Do mais antigo ao mais recente',
-    'table.newest_to_oldest': 'Do mais recente ao mais antigo',
-    'table.a_to_z': 'A-Z',
-    'table.z_to_a': 'Z-A',
-    
-    // Print and Export
-    'print.preview': 'Visualizar',
-    'print.print': 'Imprimir',
-    'print.download_pdf': 'Baixar PDF',
-    'print.cancel': 'Cancelar',
-    'print.report_title': 'Lista de Validações',
-    'print.generation_date': 'Data de geração',
-    'print.total_records': 'Total de registros',
-    'print.pharmaceutical_system': 'Sistema de Gestão de Validações Farmacêuticas',
-    'print.auto_generated': 'Documento gerado automaticamente pelo Sistema de Gestão de Validações',
-    'print.contact_admin': 'Para mais informações entre em contato com o administrador do sistema'
+    'analytics.subtitle': 'Análise detalhada de validações'
   }
-} as const;
+};
 
-/**
- * Language context interface with enhanced functionality
- */
+type Language = 'es' | 'en' | 'pt';
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string, params?: Record<string, string | number>) => string;
-  isRTL: boolean;
-  availableLanguages: readonly Language[];
+  t: (key: string) => string;
 }
 
-/**
- * Language context with undefined as default to enforce provider usage
- */
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
-/**
- * Props for the LanguageProvider component
- */
 interface LanguageProviderProps {
   children: ReactNode;
-  defaultLanguage?: Language;
 }
 
-/**
- * Enhanced Language Provider with performance optimizations and better error handling
- */
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({
-  children,
-  defaultLanguage = 'es'
-}) => {
-  // Initialize language from localStorage or use default
-  const [language, setLanguageState] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      const savedLanguage = localStorage.getItem('preferredLanguage') as Language;
-      if (savedLanguage && ['es', 'en', 'pt'].includes(savedLanguage)) {
-        return savedLanguage;
-      }
-    }
-    return defaultLanguage;
-  });
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+  const [language, setLanguage] = useState<Language>('es');
 
-  /**
-   * Enhanced setLanguage function with persistence
-   */
-  const setLanguage = useCallback((lang: Language) => {
-    setLanguageState(lang);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('preferredLanguage', lang);
-    }
-  }, []);
-
-  /**
-   * Enhanced translation function with parameter interpolation
-   */
-  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
-    try {
-      const translation = translations[language][key as keyof typeof translations[Language]];
-      
-      if (!translation) {
-        // Only warn in development
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(`Translation missing for key: ${key} in language: ${language}`);
-        }
-        return key;
-      }
-
-      // Handle parameter interpolation
-      if (params && typeof translation === 'string') {
-        return Object.entries(params).reduce((str, [paramKey, value]) => {
-          return str.replace(new RegExp(`{${paramKey}}`, 'g'), String(value));
-        }, translation);
-      }
-
-      return translation;
-    } catch (error) {
-      console.error(`Error translating key: ${key}`, error);
+  const t = (key: string): string => {
+    const translation = translations[language][key as keyof typeof translations[Language]];
+    if (!translation) {
+      console.warn(`Translation missing for key: ${key} in language: ${language}`);
       return key;
     }
-  }, [language]);
-
-  /**
-   * Check if current language is right-to-left
-   */
-  const isRTL = useMemo(() => {
-    // Add RTL languages here if needed in the future
-    const rtlLanguages: Language[] = [];
-    return rtlLanguages.includes(language);
-  }, [language]);
-
-  /**
-   * Available languages for the application
-   */
-  const availableLanguages: readonly Language[] = ['es', 'en', 'pt'] as const;
-
-  /**
-   * Memoized context value to prevent unnecessary re-renders
-   */
-  const contextValue = useMemo(() => ({
-    language,
-    setLanguage,
-    t,
-    isRTL,
-    availableLanguages
-  }), [language, setLanguage, t, isRTL]);
+    return translation;
+  };
 
   return (
-    <LanguageContext.Provider value={contextValue}>
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );
 };
 
-/**
- * Enhanced useLanguage hook with better error handling
- */
 export const useLanguage = (): LanguageContextType => {
   const context = useContext(LanguageContext);
-  
   if (context === undefined) {
-    throw new Error(
-      'useLanguage must be used within a LanguageProvider. ' +
-      'Make sure to wrap your component tree with <LanguageProvider>.'
-    );
+    throw new Error('useLanguage must be used within a LanguageProvider');
   }
-  
   return context;
 };
-
-/**
- * Utility function to get translation without hook (for use outside components)
- */
-export const getTranslation = (key: string, language: Language = 'es'): string => {
-  const translation = translations[language][key as keyof typeof translations[Language]];
-  return translation || key;
-};
-
-/**
- * Type-safe translation keys (can be extended with specific modules)
- */
-export type TranslationKey = keyof typeof translations.es;
-
-/**
- * Utility type for translation parameters
- */
-export type TranslationParams = Record<string, string | number>;
