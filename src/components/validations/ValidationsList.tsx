@@ -109,6 +109,99 @@ const ValidationsList = ({
 
   const filteredValidations = applyFiltersAndSort(validations);
 
+  // Funciones de mapeo para convertir texto de Excel a valores del sistema
+  const mapMaterialType = (materialType: string): string => {
+    const type = materialType.toLowerCase().trim();
+    if (type.includes('materia prima') || type.includes('raw material') || type === 'materia_prima') {
+      return 'materia_prima';
+    }
+    if (type.includes('empaque') || type.includes('packaging') || type === 'material_empaque') {
+      return 'material_empaque';
+    }
+    if (type.includes('granel') || type.includes('bulk') || type === 'granel') {
+      return 'granel';
+    }
+    if (type.includes('producto terminado') || type.includes('finished product') || type === 'producto_terminado') {
+      return 'producto_terminado';
+    }
+    return 'producto_terminado'; // Default
+  };
+
+  const mapValidationType = (validationType: string): string => {
+    const type = validationType.toLowerCase().trim();
+    if (type.includes('proceso') || type.includes('process') || type === 'procesos') {
+      return 'procesos';
+    }
+    if (type.includes('limpieza') || type.includes('cleaning') || type === 'limpieza') {
+      return 'limpieza';
+    }
+    if (type.includes('método') || type.includes('analítico') || type.includes('analytical') || type === 'metodos_analiticos') {
+      return 'metodos_analiticos';
+    }
+    if (type.includes('sistema') || type.includes('computarizado') || type.includes('computerized') || type === 'sistemas_computarizados') {
+      return 'sistemas_computarizados';
+    }
+    return 'metodos_analiticos'; // Default
+  };
+
+  const mapSubcategory = (subcategory: string): string => {
+    const sub = subcategory.toLowerCase().trim();
+    if (sub.includes('fabricación') || sub.includes('manufacturing') || sub === 'fabricacion') {
+      return 'fabricacion';
+    }
+    if (sub.includes('empaque') || sub.includes('packaging') || sub === 'empaque') {
+      return 'empaque';
+    }
+    if (sub.includes('valoración') || sub.includes('assay') || sub === 'valoracion') {
+      return 'valoracion';
+    }
+    if (sub.includes('disolución') || sub.includes('dissolution') || sub === 'disolucion') {
+      return 'disolucion';
+    }
+    if (sub.includes('impurezas') || sub.includes('impurities') || sub === 'impurezas') {
+      return 'impurezas';
+    }
+    if (sub.includes('uniformidad') || sub.includes('uniformity') || sub === 'uniformidad_unidades_dosificacion') {
+      return 'uniformidad_unidades_dosificacion';
+    }
+    if (sub.includes('identificación') || sub.includes('identification') || sub === 'identificacion') {
+      return 'identificacion';
+    }
+    if (sub.includes('trazas') || sub.includes('traces') || sub === 'trazas') {
+      return 'trazas';
+    }
+    return 'valoracion'; // Default
+  };
+
+  const mapStatus = (status: string): string => {
+    const stat = status.toLowerCase().trim();
+    if (stat.includes('validado') || stat.includes('validated') || stat === 'validado') {
+      return 'validado';
+    }
+    if (stat.includes('en validación') || stat.includes('in validation') || stat === 'en_validacion') {
+      return 'en_validacion';
+    }
+    if (stat.includes('próximo') || stat.includes('vencer') || stat.includes('expiring') || stat === 'proximo_vencer') {
+      return 'proximo_vencer';
+    }
+    if (stat.includes('vencido') || stat.includes('expired') || stat === 'vencido') {
+      return 'vencido';
+    }
+    if (stat.includes('revalidación') || stat.includes('revalidation') || stat === 'en_revalidacion') {
+      return 'en_revalidacion';
+    }
+    if (stat.includes('por revalidar') || stat.includes('to revalidate') || stat === 'por_revalidar') {
+      return 'por_revalidar';
+    }
+    if (stat.includes('primera revisión') || stat.includes('first review') || stat === 'primera_revision') {
+      return 'primera_revision';
+    }
+    if (stat.includes('segunda revisión') || stat.includes('second review') || stat === 'segunda_revision') {
+      return 'segunda_revision';
+    }
+    return 'validado'; // Default
+  };
+
   const handleExcelImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -136,11 +229,11 @@ const ValidationsList = ({
         validation_code: row['Código de Validación'] || row['validation_code'] || `VAL-EXCEL-${index + 1}`,
         product_code: row['Código de Producto/MP'] || row['product_code'] || `PT-EXCEL-${index + 1}`,
         product_name: row['Producto/Materia Prima'] || row['product_name'] || `Producto Excel ${index + 1}`,
-        material_type: row['Tipo de Material'] || row['material_type'] || 'producto_terminado',
-        validation_type: row['Tipo de Validación'] || row['validation_type'] || 'metodos_analiticos',
-        subcategory: row['Subcategoría'] || row['subcategory'] || 'valoracion',
+        material_type: mapMaterialType(row['Tipo de Material'] || row['material_type'] || 'producto_terminado'),
+        validation_type: mapValidationType(row['Tipo de Validación'] || row['validation_type'] || 'metodos_analiticos'),
+        subcategory: mapSubcategory(row['Subcategoría'] || row['subcategory'] || 'valoracion'),
         equipment_type: row['Equipo'] || row['equipment_type'] || 'HPLC',
-        status: row['Estado'] || row['status'] || 'validado',
+        status: mapStatus(row['Estado'] || row['status'] || 'validado'),
         issue_date: formatExcelDate(row['Fecha de Vigencia'] || row['issue_date']) || new Date().toISOString().split('T')[0],
         expiry_date: formatExcelDate(row['Fecha de Vencimiento'] || row['expiry_date']) || new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       }));
@@ -391,7 +484,7 @@ const ValidationsList = ({
                     <td>${getValidationTypeLabel(validation.validation_type)}</td>
                     <td>${getSubcategoryLabel(validation.validation_type, validation.subcategory)}</td>
                     <td><strong>${validation.equipment_type}</strong></td>
-                    <td><span class="status-text">${validation.status.replace(/_/g, ' ')}</span></td>
+                    <td><span class="status-text">${getStatusLabel(validation.status)}</span></td>
                     <td>${formatDate(validation.issue_date)}</td>
                     <td>${formatDate(validation.expiry_date)}</td>
                   </tr>
@@ -437,13 +530,13 @@ const ValidationsList = ({
   const getValidationTypeLabel = (type: string) => {
     switch (type) {
       case 'procesos':
-        return 'Procesos';
+        return t('validations.processes');
       case 'limpieza':
-        return 'Limpieza';
+        return t('validations.cleaning');
       case 'metodos_analiticos':
-        return 'Métodos Analíticos';
+        return t('validations.analytical_methods');
       case 'sistemas_computarizados':
-        return 'Sistemas Computarizados';
+        return t('validations.computerized_systems');
       default:
         return type;
     }
@@ -500,6 +593,29 @@ const ValidationsList = ({
         return 'Fecha: Más reciente a más antiguo';
       default:
         return 'Ordenar';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'validado':
+        return t('status.validado');
+      case 'en_validacion':
+        return t('status.en_validacion');
+      case 'proximo_vencer':
+        return t('status.proximo');
+      case 'vencido':
+        return t('status.vencido');
+      case 'en_revalidacion':
+        return t('status.revalidacion');
+      case 'por_revalidar':
+        return t('status.por_revalidar');
+      case 'primera_revision':
+        return t('status.primera_revision');
+      case 'segunda_revision':
+        return t('status.segunda_revision');
+      default:
+        return status.replace(/_/g, ' ');
     }
   };
 

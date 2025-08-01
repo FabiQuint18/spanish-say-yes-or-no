@@ -25,6 +25,7 @@ import SettingsModule from '@/components/modules/SettingsModule';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { UserRole, Language } from '@/types/validation';
 import { useToast } from '@/hooks/use-toast';
+import { secureStorage } from '@/utils/secureStorage';
 
 interface User {
   id: string;
@@ -97,15 +98,25 @@ const Index = () => {
   };
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('currentUser');
-    const savedLogo = localStorage.getItem('companyLogo');
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-      setIsLoggedIn(true);
-    }
-    if (savedLogo) {
-      setCompanyLogo(savedLogo);
-    }
+    const loadUserData = async () => {
+      try {
+        const savedUser = await secureStorage.getItem('currentUser');
+        const savedLogo = localStorage.getItem('companyLogo'); // Logo can remain unencrypted
+        if (savedUser) {
+          setCurrentUser(savedUser);
+          setIsLoggedIn(true);
+        }
+        if (savedLogo) {
+          setCompanyLogo(savedLogo);
+        }
+      } catch (error) {
+        console.error('Failed to load user data:', error);
+        // Clear potentially corrupted data
+        secureStorage.removeItem('currentUser');
+      }
+    };
+    
+    loadUserData();
   }, []);
 
   const handleGoogleLogin = async () => {
@@ -126,7 +137,7 @@ const Index = () => {
         };
         setCurrentUser(updatedUser);
         setIsLoggedIn(true);
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        await secureStorage.setItem('currentUser', updatedUser);
         toast({
           title: "✅ Login con Google exitoso",
           description: "¡Bienvenido al sistema!",
@@ -154,7 +165,7 @@ const Index = () => {
         };
         setCurrentUser(updatedUser);
         setIsLoggedIn(true);
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        await secureStorage.setItem('currentUser', updatedUser);
         toast({
           title: "✅ Login con Microsoft exitoso",
           description: "¡Bienvenido al sistema!",
@@ -182,7 +193,7 @@ const Index = () => {
         
         setCurrentUser(updatedUser);
         setIsLoggedIn(true);
-        localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+        await secureStorage.setItem('currentUser', updatedUser);
         
         toast({
           title: "✅ " + t('login.success'),
@@ -210,7 +221,7 @@ const Index = () => {
     setCurrentUser(null);
     setIsLoggedIn(false);
     setActiveModule('dashboard');
-    localStorage.removeItem('currentUser');
+    secureStorage.removeItem('currentUser');
     setLoginData({ email: '', password: '' });
     
     toast({
