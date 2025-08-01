@@ -9,9 +9,14 @@ export const calculateExpiryDate = (issueDate: string): string => {
 };
 
 export const getValidationStatus = (expiryDate: string): ValidationStatus => {
+  // Use UTC dates to avoid timezone issues
   const today = new Date();
+  const todayUTC = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  
   const expiry = new Date(expiryDate);
-  const diffTime = expiry.getTime() - today.getTime();
+  const expiryUTC = new Date(expiry.getFullYear(), expiry.getMonth(), expiry.getDate());
+  
+  const diffTime = expiryUTC.getTime() - todayUTC.getTime();
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays < 0) {
@@ -24,12 +29,27 @@ export const getValidationStatus = (expiryDate: string): ValidationStatus => {
 };
 
 export const formatDate = (dateString: string): string => {
-  return new Date(dateString).toLocaleDateString('es-ES');
+  try {
+    const date = new Date(dateString);
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return 'Fecha inválida';
+    }
+    return date.toLocaleDateString('es-ES');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Fecha inválida';
+  }
 };
 
 export const getDaysUntilExpiry = (expiryDate: string): number => {
+  // Use UTC dates to avoid timezone issues
   const today = new Date();
+  const todayUTC = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  
   const expiry = new Date(expiryDate);
-  const diffTime = expiry.getTime() - today.getTime();
+  const expiryUTC = new Date(expiry.getFullYear(), expiry.getMonth(), expiry.getDate());
+  
+  const diffTime = expiryUTC.getTime() - todayUTC.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 };

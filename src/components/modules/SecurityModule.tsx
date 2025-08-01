@@ -12,6 +12,7 @@ import { Shield, Key, AlertTriangle, Download, FileText, Lock } from 'lucide-rea
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useToast } from '@/hooks/use-toast';
 import { UserRole } from '@/types/validation';
+import { validatePassword, getPasswordStrengthText, getPasswordStrengthColor } from '@/utils/passwordValidator';
 
 interface SecurityModuleProps {
   userRole?: UserRole;
@@ -145,16 +146,23 @@ const SecurityModule = ({ userRole = 'administrador' }: SecurityModuleProps) => 
       return;
     }
 
-    // Validate password requirements
-    const minLength = passwordData.newPassword.length >= 7;
-    const hasUppercase = /[A-Z]/.test(passwordData.newPassword);
-    const hasSpecialChar = /[*+\-_@#$%^&!?]/.test(passwordData.newPassword);
-    const hasAlphaNumeric = /[a-zA-Z]/.test(passwordData.newPassword) && /[0-9]/.test(passwordData.newPassword);
+    // Use comprehensive password validation
+    const validation = validatePassword(passwordData.newPassword);
     
-    if (!minLength || !hasUppercase || !hasSpecialChar || !hasAlphaNumeric) {
+    if (!validation.isValid) {
       toast({
         title: "Error de Contraseña",
-        description: t('users.password.requirements'),
+        description: validation.errors.join('. '),
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Warn if password is not strong enough
+    if (validation.strength === 'weak' || validation.strength === 'medium') {
+      toast({
+        title: "Contraseña Débil",
+        description: `La contraseña es ${getPasswordStrengthText(validation.strength).toLowerCase()}. Se recomienda usar una contraseña más fuerte.`,
         variant: "destructive",
       });
       return;

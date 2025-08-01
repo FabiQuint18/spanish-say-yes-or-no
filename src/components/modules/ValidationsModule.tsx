@@ -8,6 +8,7 @@ import { Validation, UserRole, Product, Equipment } from '@/types/validation';
 import ValidationsList from '@/components/validations/ValidationsList';
 import ValidationForm from '@/components/validations/ValidationForm';
 import { useToast } from '@/hooks/use-toast';
+import { generateUniqueId, generateValidationCode } from '@/utils/idGenerator';
 
 interface ValidationsModuleProps {
   userRole?: UserRole;
@@ -99,9 +100,9 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
     if (Array.isArray(formData)) {
       console.log('Importing Excel data:', formData);
       const newValidations = formData.map(item => ({
-        id: Date.now().toString() + Math.random(),
-        product_id: Date.now().toString() + Math.random(),
-        validation_code: item.validation_code,
+        id: generateUniqueId(),
+        product_id: generateUniqueId(),
+        validation_code: item.validation_code || generateValidationCode(),
         equipment_type: item.equipment_type,
         validation_type: item.validation_type,
         subcategory: item.subcategory,
@@ -113,7 +114,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         product: {
-          id: Date.now().toString() + Math.random(),
+          id: generateUniqueId(),
           code: item.product_code,
           name: item.product_name,
           type: 'producto_terminado',
@@ -145,7 +146,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
       const newEquipments = newValidations
         .filter(v => v.equipment_type && !existingEquipments.some(e => e.type === v.equipment_type))
         .map(v => ({
-          id: Date.now().toString() + Math.random(),
+          id: generateUniqueId(),
           name: `${v.equipment_type}-${Math.floor(Math.random() * 1000)}`,
           type: v.equipment_type,
           model: 'Modelo Importado',
@@ -199,9 +200,9 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
     } else {
       // Crear nueva validación
       const newValidation: Validation = {
-        id: Date.now().toString(),
-        product_id: Date.now().toString(),
-        validation_code: formData.validation_code,
+        id: generateUniqueId(),
+        product_id: generateUniqueId(),
+        validation_code: formData.validation_code || generateValidationCode(),
         equipment_type: formData.equipment_type,
         validation_type: formData.validation_type,
         subcategory: formData.subcategory,
@@ -213,7 +214,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
         product: {
-          id: Date.now().toString(),
+          id: generateUniqueId(),
           code: formData.product_code,
           name: formData.product_name,
           type: formData.material_type,
@@ -244,7 +245,7 @@ const ValidationsModule = ({ userRole = 'analista' }: ValidationsModuleProps) =>
 
   const handleFileUpload = (validationId: string, file: File) => {
     const mockFile = {
-      id: `file-${Date.now()}`,
+      id: `file-${generateUniqueId()}`,
       validation_id: validationId,
       file_name: file.name,
       file_url: URL.createObjectURL(file),
