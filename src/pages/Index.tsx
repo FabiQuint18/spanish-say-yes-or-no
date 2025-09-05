@@ -126,7 +126,7 @@ const Index = () => {
       description: "Redirigiendo a Google para autenticación...",
     });
     
-    setTimeout(() => {
+    setTimeout(async () => {
       const user = mockUsers.find(u => u.email === 'analista@company.com');
       if (user) {
         const updatedUser = { 
@@ -154,7 +154,7 @@ const Index = () => {
       description: "Redirigiendo a Microsoft para autenticación...",
     });
     
-    setTimeout(() => {
+    setTimeout(async () => {
       const user = mockUsers.find(u => u.email === 'coordinador@company.com');
       if (user) {
         const updatedUser = { 
